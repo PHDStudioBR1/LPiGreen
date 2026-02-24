@@ -1,9 +1,15 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Instagram, Facebook, Linkedin, Youtube } from 'lucide-react';
 
 export function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="bg-gray-950 text-gray-400 py-16">
       <div className="container mx-auto px-6">
@@ -61,7 +67,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/5 text-center text-xs">
-          <p>© {new Date().getFullYear()} iGreen Energy Brasil. Todos os direitos reservados. CNPJ: 00.000.000/0000-00</p>
+          <p>© {year || '...'} iGreen Energy Brasil. Todos os direitos reservados. CNPJ: 00.000.000/0000-00</p>
         </div>
       </div>
     </footer>
