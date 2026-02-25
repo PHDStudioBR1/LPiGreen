@@ -1,68 +1,84 @@
 "use client"
 
 import React from 'react';
-import { Smartphone, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function HowItWorksSection() {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center mb-16 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">Como funciona a Energia por Assinatura?</h2>
-          <p className="text-lg text-muted-foreground">
-            É como a portabilidade do seu celular. Você continua usando a mesma rede, mas escolhe pagar para quem oferece o melhor preço.
-          </p>
+        <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
+          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
+            Veja o exemplo abaixo para entender:
+          </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <Card className="rounded-3xl border-none shadow-xl hover:shadow-2xl transition-shadow bg-white overflow-hidden group">
-            <CardContent className="p-8 space-y-4">
-              <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Zap size={28} />
-              </div>
-              <h3 className="text-xl font-bold">Modelo Tradicional</h3>
-              <p className="text-muted-foreground">
-                Você é obrigado a comprar energia da concessionária local, aceitando as bandeiras tarifárias abusivas e taxas de distribuição caras.
-              </p>
-            </CardContent>
-          </Card>
-
-          <div className="flex items-center justify-center">
-            <ArrowRight size={48} className="text-primary hidden md:block animate-pulse" />
-            <ArrowRight size={48} className="text-primary md:hidden rotate-90 my-4 animate-pulse" />
-          </div>
-
-          <Card className="rounded-3xl border-2 border-primary shadow-2xl bg-primary/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black py-1 px-4 rounded-bl-xl uppercase tracking-widest">
-              Recomendado
-            </div>
-            <CardContent className="p-8 space-y-4">
-              <div className="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform shadow-lg">
-                <ShieldCheck size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-primary">Modelo iGreen Energy</h3>
-              <p className="text-foreground font-medium">
-                Nós injetamos energia limpa gerada em nossas usinas direto na rede. A distribuidora abate esse valor da sua conta e você paga apenas o que consumiu com desconto garantido.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="glass rounded-[3rem] p-8 md:p-12 flex flex-col md:flex-row items-center gap-12 max-w-5xl mx-auto shadow-2xl">
-          <div className="md:w-1/3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-              <Smartphone size={160} className="text-primary relative z-10 mx-auto" strokeWidth={1} />
-            </div>
-          </div>
-          <div className="md:w-2/3 space-y-6 text-center md:text-left">
-            <h4 className="text-2xl font-bold">A Analogia da Operadora</h4>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Imagine que sua rede de energia é como o sinal de celular. A antena (distribuidora) é a mesma para todos, mas você pode assinar um plano mais barato com a iGreen. <span className="text-primary font-bold">A luz nunca cai</span>, o que muda é apenas o código de barras que você paga!
+        <Card className="max-w-4xl mx-auto mb-12 rounded-[2.5rem] border-none shadow-2xl bg-white">
+          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
+            <p>
+              Você conhece operadora de celular, certo? Claro, Vivo, TIM, Oi...
             </p>
-          </div>
-        </div>
+            <p>
+              Todas elas <span className="font-bold">não produzem a internet</span>. A internet não é "fabricada" por elas. Elas usam a infraestrutura de antenas e cabos (que muitas vezes nem são delas) para entregar o sinal até você.
+            </p>
+            <p>
+              Mas cada operadora tem parcerias, acordos e formas diferentes de te cobrar pelo mesmo serviço.
+            </p>
+            <p>
+              É por isso que:
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>A Claro pode te oferecer 50GB por R$ 100</li>
+              <li>A Vivo pode te oferecer 50GB por R$ 120</li>
+            </ul>
+            <p>
+              É a mesma internet. A mesma rede. O mesmo sinal.{' '}
+              <span className="font-bold">A diferença está em quem está intermediando e qual é o modelo de negócio.</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="max-w-4xl mx-auto rounded-[2.5rem] border border-primary/20 shadow-xl bg-primary/5">
+          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
+            <h3 className="text-2xl font-bold text-primary">
+              Agora transfere isso para a energia elétrica
+            </h3>
+            <p>
+              A energia que chega na sua casa <span className="font-bold">não é "produzida" pela distribuidora</span>. A distribuidora (Enel, CPFL, Light, Cemig...) é só o "entregador" da energia.
+            </p>
+            <p>
+              Essas empresas pegam energia de fontes (hidrelétricas), ou seja, onde o consumo é muito maior, e consequentemente o lucro deles também será muito maior ao repassar para a sua casa.
+            </p>
+            <h3 className="text-2xl font-bold text-primary mt-6">
+              Entra a iGreen Energy
+            </h3>
+            <p>
+              E aí que nós entramos.
+            </p>
+            <p>
+              A iGreen tem <span className="font-bold">usinas próprias de energia limpa</span> que produzem energia limpa e barata.
+            </p>
+            <p>
+              Essa energia é <span className="font-bold">injetada na rede da distribuidora</span> (a mesma rede que já existe).
+            </p>
+            <p>
+              E a gente faz um <span className="font-bold">acordo com a distribuidora</span> para vincular créditos de energia à sua conta.
+            </p>
+            <p className="font-medium">
+              Resultado?
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Você continua recebendo energia da mesma distribuidora</li>
+              <li>Pela mesma fiação</li>
+              <li>Com a mesma qualidade</li>
+              <li>Mas paga menos, porque agora está usando energia limpa</li>
+            </ul>
+            <p>
+              Nada vai mudar na qualidade da sua energia, pelo contrário, será uma energia{' '}
+              <span className="font-bold">mais limpa, sustentável e barata</span>!
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

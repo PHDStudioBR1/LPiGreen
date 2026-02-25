@@ -1,0 +1,31 @@
+# Dependencies
+node_modules
+npm-debug.log*
+.pnpm-debug.log*
+.next
+out
+
+# Git e IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+.env*.local
+.env
+
+# Testes e cobertura
+coverage
+.nyc_output
+*.test.*
+*.spec.*
+
+# Infra (não necessário dentro da imagem)
+infra
+.github
+Dockerfile
+.dockerignore
+
+# Outros
+*.md
+LICENSE

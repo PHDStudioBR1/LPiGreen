@@ -1,29 +1,70 @@
 "use client"
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
 
-const LOGOS = [
-  { name: 'CNN', text: 'CNN' },
-  { name: 'G1', text: 'G1' },
-  { name: 'Folha', text: 'Folha de S.Paulo' },
-  { name: 'Globo', text: 'Globo' },
-  { name: 'Forbes', text: 'Forbes' },
+const NEWS_ITEMS = [
+  {
+    outlet: 'CNN Brasil',
+    title: 'Contas de luz vão subir até o triplo do IPCA em 2026',
+  },
+  {
+    outlet: 'Canal Solar',
+    title: 'Conta de luz acumula alta de 16% e deve subir 8% em 2026',
+  },
+  {
+    outlet: 'Gazeta do Povo',
+    title: 'Conta de luz deve subir em 2026 para bancar R$ 47,8 bilhões em subsídios',
+  },
+  {
+    outlet: 'Portal Solar',
+    title: 'Tarifa residencial de energia deve subir 5,4% em média em 2026',
+  },
 ];
 
 export function AuthoritySection() {
   return (
-    <section className="py-12 bg-white/50 border-y border-border">
+    <section className="py-20 bg-white border-y border-border">
       <div className="container mx-auto px-6">
-        <p className="text-center text-sm font-bold text-muted-foreground mb-8 uppercase tracking-widest">
-          A imprensa já alertou sobre os aumentos na tarifa:
-        </p>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-          {LOGOS.map((logo) => (
-            <div key={logo.name} className="text-2xl md:text-3xl font-black text-gray-500 tracking-tighter hover:text-primary transition-colors cursor-default">
-              {logo.text}
-            </div>
+        <div className="max-w-4xl mx-auto text-center space-y-4 mb-10">
+          <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-red-700">
+            <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+            Atenção
+          </div>
+          <h2 className="text-2xl md:text-3xl font-headline font-black text-gray-900">
+            A imprensa já alertou: a conta de luz em 2026 já aumentou e pode chegar em até 13% de aumento na tarifa!
+          </h2>
+          <p className="text-sm md:text-base text-gray-600">
+            Dá só uma olhada nessas matérias abaixo:
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
+          {NEWS_ITEMS.map((item) => (
+            <Card
+              key={item.outlet}
+              className="group overflow-hidden rounded-2xl border border-border shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <CardContent className="flex h-full flex-col justify-between p-6 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">
+                  {item.outlet}
+                </div>
+                <p className="text-base md:text-lg font-semibold text-gray-900 leading-snug">
+                  {item.title}
+                </p>
+                <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2">
+                  <span>Ver matéria completa</span>
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
+
+        <p className="mt-10 text-center text-sm text-gray-600 max-w-3xl mx-auto">
+          Continue descendo para descobrir como se proteger desses aumentos e economizar na sua conta de luz.
+        </p>
       </div>
     </section>
   );

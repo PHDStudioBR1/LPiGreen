@@ -1,0 +1,34 @@
+"use client"
+
+import React from 'react';
+import { Button } from '@/components/ui/button';
+
+interface EligibilitySectionProps {
+  onCTAClick: () => void;
+}
+
+export function EligibilitySection({ onCTAClick }: EligibilitySectionProps) {
+  return (
+    <section className="py-24 bg-primary/5">
+      <div className="container mx-auto px-6">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
+            Descubra se você está apto para receber o desconto
+          </h2>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Nem todas as regiões têm vagas disponíveis no momento. Preencha o formulário rápido abaixo e descubra em
+            até 24h se você pode economizar até 50% na sua conta de luz.
+          </p>
+          <Button
+            size="lg"
+            onClick={onCTAClick}
+            className="h-16 px-10 text-xl font-black rounded-2xl shadow-xl hover:scale-[1.02] transition-transform"
+          >
+            Verificar se Estou Apto para o Desconto
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+

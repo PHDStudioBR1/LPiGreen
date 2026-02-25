@@ -30,16 +30,26 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
         <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full text-primary-foreground font-semibold text-sm">
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Vagas abertas para sua região
+            Representante iGreen Energy
           </div>
 
           <h1 className="text-4xl md:text-6xl font-headline font-black text-white leading-tight">
             Desconto de até <span className="text-primary italic">50%</span> na sua conta de energia elétrica!
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed">
-            Sem obras, sem investimento, sem complicação — Garantido pela <span className="text-white font-bold underline decoration-primary">Lei nº 14.300/2022</span>. Economize usando energia limpa por assinatura.
-          </p>
+          <div className="space-y-4 text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed">
+            <p>
+              Sem obras, sem investimento, sem complicação e sem pagar nada por isso — tudo por conta da{' '}
+              <span className="text-white font-bold underline decoration-primary">Lei nº 14.300/2022</span>.
+            </p>
+            <p>
+              Você continua recebendo a mesma energia, da mesma distribuidora, mas paga menos. Muito menos. E isso é{' '}
+              <span className="font-bold">100% legal e regulamentado</span>.
+            </p>
+            <p className="text-base md:text-lg text-gray-100">
+              Logo abaixo você fará o teste para saber se está apto para o desconto.
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
@@ -47,7 +57,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
               onClick={onCTAClick}
               className="h-16 px-8 text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all"
             >
-              Fazer Teste de Elegibilidade
+              Verificar se Estou Apto
             </Button>
           </div>
 

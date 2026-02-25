@@ -10,24 +10,40 @@ import {
 
 const FAQS = [
   {
-    q: "Isso é golpe ou pirâmide?",
-    a: "Absolutamente não. A geração distribuída é um modelo de negócio regulamentado pela ANEEL (Agência Nacional de Energia Elétrica) e agora pela Lei Federal 14.300/2022. Somos uma empresa real com usinas próprias."
+    q: "\"Isso parece golpe. Como pode ser de graça?\"",
+    a: "Entendemos sua desconfiança. Vivemos em um país onde todo mundo desconfia de tudo — e com razão. Mas olha só: Não é de graça. Você continua pagando sua conta de luz. A diferença é que você paga menos, porque está usando créditos de energia limpa. A iGreen ganha porque vende a energia produzida nas usinas para a distribuidora. E você ganha porque recebe desconto. É uma relação de ganha-ganha. Não tem mágica. É negócio."
   },
   {
-    q: "Minha luz vai cair se eu assinar?",
-    a: "Não. A infraestrutura de entrega (postes, fios e transformadores) continua sendo da sua distribuidora local. O sinal é o mesmo, a iGreen apenas injeta os créditos na rede para abater o seu valor."
+    q: "\"Se eu não pago a usina, como vocês ganham dinheiro?\"",
+    a: "A iGreen vende a energia gerada em suas usinas para a distribuidora e recebe por isso. Uma parte desse valor é usada para gerar o desconto na sua conta. Você paga menos, nós recebemos pela energia gerada e a distribuidora continua entregando a mesma energia de sempre."
   },
   {
-    q: "Tem alguma taxa de adesão ou fidelidade?",
-    a: "Não cobramos taxa de adesão nem multa por cancelamento. Você pode sair quando quiser, basta nos avisar com a antecedência prevista no contrato (geralmente 60 dias para trâmites burocráticos junto à distribuidora)."
+    q: "\"Minha energia vai ficar ruim? Vai cair luz?\"",
+    a: "Não. Nada muda na qualidade da energia que chega na sua casa. A distribuidora continua sendo a mesma, usando a mesma rede de postes e cabos. O que muda é apenas a forma como a energia é compensada na sua fatura, com os créditos de energia limpa."
   },
   {
-    q: "Preciso fazer alguma obra ou instalar painéis?",
-    a: "Nenhuma! Essa é a grande vantagem. Nós fazemos todo o investimento em grandes usinas e você apenas 'assina' uma parte dessa produção."
+    q: "\"Tem taxa escondida?\"",
+    a: "Não. Não existe taxa de adesão escondida, mensalidade extra ou qualquer cobrança surpresa. Você continua pagando a fatura normalmente para a distribuidora, só que com o valor reduzido pelos créditos de energia limpa."
   },
   {
-    q: "Como vou saber que o desconto foi aplicado?",
-    a: "Você continuará recebendo a conta da sua distribuidora, mas nela aparecerá um campo de 'Energia Injetada' ou 'Créditos de Energia', reduzindo o valor total a ser pago."
+    q: "\"E se eu quiser sair?\"",
+    a: "Você pode sair quando quiser. Basta solicitar o cancelamento e, após o prazo operacional para a distribuidora processar a alteração, sua conta volta ao valor normal, sem os créditos de energia limpa."
+  },
+  {
+    q: "\"Isso é legal? É regulamentado?\"",
+    a: "Sim. Todo o modelo é regulamentado pela ANEEL e pela Lei nº 14.300/2022, que trata justamente da geração distribuída e da possibilidade de compensar créditos de energia limpa na sua conta de luz."
+  },
+  {
+    q: "\"Por que minha distribuidora não me ofereceu isso?\"",
+    a: "Porque esse não é o modelo de negócio principal da distribuidora. Ela continua ganhando mais quando você paga o valor cheio da tarifa. A iGreen entrou justamente para oferecer uma alternativa mais vantajosa para você."
+  },
+  {
+    q: "\"Tem que ter telhado ou espaço?\"",
+    a: "Não. Você não precisa instalar painel nenhum na sua casa nem ter telhado disponível. As usinas são remotas e já estão em operação — você apenas passa a utilizar os créditos de energia gerada por elas."
+  },
+  {
+    q: "\"Quanto tempo demora para começar a economizar?\"",
+    a: "Depois de feita a adesão e da validação junto à distribuidora, os créditos começam a aparecer em sua fatura geralmente a partir do mês seguinte ao da ativação. A partir daí, você já vê o desconto direto na conta."
   }
 ];
 
