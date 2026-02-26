@@ -5,6 +5,20 @@ function stripOptional(s) {
   return s.replace(/\D/g, '');
 }
 
+function parseBrDate(str) {
+  if (typeof str !== 'string') return null;
+  const match = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const year = parseInt(match[3], 10);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+  return date;
+}
+
 const cpfCnpjRefine = (val) => {
   const digits = stripOptional(val || '');
   if (digits.length === 11) {
@@ -47,7 +61,10 @@ export const leadSchema = z.object({
   // 1.2 Cadastro
   document_number: z.string().min(1, 'CPF ou CNPJ é obrigatório').refine(cpfCnpjRefine, 'CPF ou CNPJ inválido'),
   name: z.string().min(2, 'Nome completo é obrigatório').max(255),
-  birth_date: z.string().min(1, 'Data de nascimento é obrigatória').refine((d) => !isNaN(Date.parse(d)) && new Date(d) < new Date(), 'Data inválida'),
+  birth_date: z.string().min(1, 'Data de nascimento é obrigatória').refine((d) => {
+    const parsed = parseBrDate(d);
+    return parsed && parsed < new Date();
+  }, 'Data inválida'),
   phone: z.string().min(10, 'WhatsApp inválido'),
   phone_confirm: z.string().min(10, 'Confirme seu celular'),
   email: z.string().email('E-mail inválido'),

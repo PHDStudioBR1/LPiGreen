@@ -30,7 +30,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { maskCep, maskPhone, maskCpfCnpj, maskCurrency } from "@/lib/masks";
+import { maskCep, maskPhone, maskCpfCnpj, maskCurrency, maskBirthDate } from "@/lib/masks";
 
 const UFS = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
@@ -72,7 +72,6 @@ export type LeadFormValues = {
   complement: string;
   power_company: string;
   installation_number: string;
-  discount_option: string;
   document_type: string;
   has_procurator: string;
   energy_bill_password: string;
@@ -98,7 +97,6 @@ const defaultValues: LeadFormValues = {
   complement: "",
   power_company: "",
   installation_number: "",
-  discount_option: "",
   document_type: "",
   has_procurator: "",
   energy_bill_password: "",
@@ -122,6 +120,40 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const { toast } = useToast();
 
   const form = useForm<LeadFormValues>({ defaultValues });
+
+  const fillAddressFromCep = useCallback(
+    async (cepValue: string) => {
+      const numeric = cepValue.replace(/\D/g, "");
+      if (numeric.length !== 8) return;
+
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${numeric}/json/`);
+        const data = await res.json();
+
+        if (data.erro) {
+          toast({
+            title: "CEP não encontrado",
+            description: "Verifique o CEP digitado.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        form.setValue("address", data.logradouro || "");
+        form.setValue("neighborhood", data.bairro || "");
+        form.setValue("city", data.localidade || "");
+        form.setValue("state", data.uf || "");
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+        toast({
+          title: "Erro ao buscar CEP",
+          description: "Tente novamente em alguns instantes.",
+          variant: "destructive",
+        });
+      }
+    },
+    [form, toast]
+  );
 
   const buildFormData = useCallback(() => {
     const fd = new FormData();
@@ -201,7 +233,16 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <Input placeholder="00000-000" {...field} onChange={(e) => field.onChange(maskCep(e.target.value))} />
+                          <Input
+                            placeholder="00000-000"
+                            {...field}
+                            onChange={(e) => {
+                              const masked = maskCep(e.target.value);
+                              field.onChange(masked);
+                              form.setValue("cep", masked);
+                              fillAddressFromCep(masked);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -261,7 +302,14 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Data de nascimento</FormLabel>
-                        <FormControl><Input type="date" {...field} /></FormControl>
+                        <FormControl>
+                          <Input
+                            placeholder="dd/mm/aaaa"
+                            inputMode="numeric"
+                            {...field}
+                            onChange={(e) => field.onChange(maskBirthDate(e.target.value))}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -333,7 +381,15 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <Input placeholder="00000-000" {...field} onChange={(e) => field.onChange(maskCep(e.target.value))} />
+                          <Input
+                            placeholder="00000-000"
+                            {...field}
+                            onChange={(e) => {
+                              const masked = maskCep(e.target.value);
+                              field.onChange(masked);
+                              fillAddressFromCep(masked);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -454,26 +510,6 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>Número da instalação</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="discount_option"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Escolha a opção de desconto</FormLabel>
-                        <FormControl>
-                          <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4 flex-wrap">
-                            {["8", "10", "12", "14"].map((pct) => (
-                              <div key={pct} className="flex items-center gap-2">
-                                <RadioGroupItem value={pct} id={`m-discount-${pct}`} />
-                                <Label htmlFor={`m-discount-${pct}`}>{pct}%</Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

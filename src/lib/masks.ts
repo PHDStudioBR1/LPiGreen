@@ -4,9 +4,26 @@ export function maskCep(value: string): string {
 }
 
 export function maskPhone(value: string): string {
-  const v = value.replace(/\D/g, '').slice(0, 11);
-  if (v.length <= 2) return v ? `(${v}` : '';
-  return `(${v.slice(0, 2)}) ${v.slice(2, 7)}${v.length > 6 ? '-' + v.slice(6, 11) : ''}`;
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  if (!digits) return '';
+
+  if (digits.length <= 2) {
+    return `(${digits}`;
+  }
+
+  if (digits.length <= 6) {
+    // Até aqui só DDD + início do número, sem traço
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+
+  if (digits.length <= 10) {
+    // Formato fixo: (11) 2345-6789
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  // Celular com 9 dígitos: (11) 91234-5678
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
 export function maskCpfCnpj(value: string): string {
@@ -31,4 +48,11 @@ export function maskCurrency(value: string): string {
 
 export function unmaskCurrency(value: string): number {
   return parseFloat(value.replace(/\D/g, '').replace(/,/, '.') || '0') / 100 || 0;
+}
+
+export function maskBirthDate(value: string): string {
+  const v = value.replace(/\D/g, '').slice(0, 8);
+  if (v.length <= 2) return v;
+  if (v.length <= 4) return `${v.slice(0, 2)}/${v.slice(2)}`;
+  return `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
 }
