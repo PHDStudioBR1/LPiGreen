@@ -78,10 +78,10 @@ export const leadSchema = z.object({
   state: z.string().length(2, 'Estado inválido'),
   complement: z.string().max(255).optional().nullable().transform((v) => (v === '' ? null : v)),
   // 1.4 Energia e documento
-  power_company: z.string().max(120).optional().nullable().transform((v) => (v === '' ? null : v)),
+  power_company: z.string().min(1, 'Distribuidora de energia é obrigatória').max(120),
   installation_number: z.string().min(1, 'Número da instalação é obrigatório').max(60),
   discount_option: z.union([z.enum(['8', '10', '12', '14']), z.literal('')]).optional().transform((v) => (v === '' ? null : v)),
-  document_type: z.string().max(60).optional().nullable().transform((v) => (v === '' ? null : v)),
+  document_type: z.string().min(1, 'Tipo de documento é obrigatório').max(60),
   // paths set by server after upload
   document_front_path: z.string().optional().nullable(),
   document_back_path: z.string().optional().nullable(),
@@ -89,7 +89,9 @@ export const leadSchema = z.object({
   has_procurator: z.union([z.string(), z.number()]).optional().transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
   energy_bill_password: z.string().max(255).optional().nullable().transform((v) => (v === '' ? null : v)),
   energy_bill_path: z.string().optional().nullable(),
-  has_pending_debts: z.union([z.string(), z.number()]).optional().transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
+  has_pending_debts: z.union([z.string(), z.number()])
+    .refine((v) => v !== '' && v != null, { message: 'Informe se possui débitos', path: ['has_pending_debts'] })
+    .transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
   payment_proof_path: z.string().optional().nullable(),
   status: z.string().optional(),
   source: z.string().optional(),
@@ -98,7 +100,11 @@ export const leadSchema = z.object({
   .refine((data) => String(data.phone).replace(/\D/g, '') === String(data.phone_confirm).replace(/\D/g, ''), { message: 'Celular e confirmação devem ser iguais', path: ['phone_confirm'] })
   .refine((data) => (data.email || '').toLowerCase() === (data.email_confirm || '').toLowerCase(), { message: 'E-mail e confirmação devem ser iguais', path: ['email_confirm'] })
   .refine((data) => data.document_front_path, { message: 'Documento pessoal – Frente é obrigatório', path: ['document_front_path'] })
-  .refine((data) => data.document_back_path, { message: 'Documento pessoal – Verso é obrigatório', path: ['document_back_path'] });
+  .refine((data) => data.document_back_path, { message: 'Documento pessoal – Verso é obrigatório', path: ['document_back_path'] })
+  .refine((data) => data.has_pending_debts !== 1 || data.payment_proof_path, {
+    message: 'Comprovante de pagamento é obrigatório quando há débitos em aberto',
+    path: ['payment_proof_path'],
+  });
 
 export function validateLead(body, files = {}) {
   const withPaths = {

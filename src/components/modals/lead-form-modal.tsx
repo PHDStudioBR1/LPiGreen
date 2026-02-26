@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, UploadCloud } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -73,7 +73,6 @@ export type LeadFormValues = {
   power_company: string;
   installation_number: string;
   document_type: string;
-  has_procurator: string;
   energy_bill_password: string;
   has_pending_debts: string;
 };
@@ -98,14 +97,70 @@ const defaultValues: LeadFormValues = {
   power_company: "",
   installation_number: "",
   document_type: "",
-  has_procurator: "",
   energy_bill_password: "",
-  has_pending_debts: "",
+  has_pending_debts: "nao",
 };
 
 export interface LeadFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+function FileUploadField(props: {
+  label: string;
+  description?: string;
+  accept?: string;
+  file?: File;
+  onChange: (file?: File) => void;
+}) {
+  const { label, description, accept, file, onChange } = props;
+  const id = React.useId();
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+  return (
+    <FormItem>
+      <FormLabel>{label}</FormLabel>
+      <FormControl>
+        <label
+          htmlFor={id}
+          className="flex items-center justify-between rounded-md border border-dashed border-muted-foreground/30 px-3 py-2 text-sm cursor-pointer hover:bg-muted/60 transition-colors"
+        >
+          <div className="flex flex-col">
+            <span className="font-medium truncate max-w-[220px]">
+              {file ? file.name : "Clique para selecionar ou arraste o arquivo"}
+            </span>
+            {description && (
+              <span className="text-xs text-muted-foreground">
+                {description}
+              </span>
+            )}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="ml-3 flex items-center gap-1"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              inputRef.current?.click();
+            }}
+          >
+            <UploadCloud className="h-4 w-4" />
+            <span>Escolher</span>
+          </Button>
+          <input
+            id={id}
+            type="file"
+            accept={accept}
+            className="sr-only"
+            ref={inputRef}
+            onChange={(e) => onChange(e.target.files?.[0])}
+          />
+        </label>
+      </FormControl>
+    </FormItem>
+  );
 }
 
 export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
@@ -120,6 +175,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const { toast } = useToast();
 
   const form = useForm<LeadFormValues>({ defaultValues });
+  const watchHasPendingDebts = form.watch("has_pending_debts");
 
   const fillAddressFromCep = useCallback(
     async (cepValue: string) => {
@@ -485,6 +541,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   <FormField
                     control={form.control}
                     name="power_company"
+                    rules={{ required: "Distribuidora de energia é obrigatória" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Distribuidora de energia</FormLabel>
@@ -517,6 +574,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   <FormField
                     control={form.control}
                     name="document_type"
+                    rules={{ required: "Tipo de documento é obrigatório" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo documento</FormLabel>
@@ -534,14 +592,20 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       </FormItem>
                     )}
                   />
-                  <FormItem>
-                    <FormLabel>Documento pessoal – Frente (obrigatório)</FormLabel>
-                    <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFiles((f) => ({ ...f, document_front: e.target.files?.[0] }))} />
-                  </FormItem>
-                  <FormItem>
-                    <FormLabel>Documento pessoal – Verso (obrigatório)</FormLabel>
-                    <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFiles((f) => ({ ...f, document_back: e.target.files?.[0] }))} />
-                  </FormItem>
+                  <FileUploadField
+                    label="Documento pessoal – Frente (obrigatório)"
+                    description="Envie uma foto ou PDF nítido do documento."
+                    accept="image/*,application/pdf"
+                    file={files.document_front}
+                    onChange={(file) => setFiles((f) => ({ ...f, document_front: file }))}
+                  />
+                  <FileUploadField
+                    label="Documento pessoal – Verso (obrigatório)"
+                    description="Envie uma foto ou PDF nítido do verso."
+                    accept="image/*,application/pdf"
+                    file={files.document_back}
+                    onChange={(file) => setFiles((f) => ({ ...f, document_back: file }))}
+                  />
                 </>
               )}
 
@@ -549,29 +613,6 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
               {step === 4 && (
                 <>
                   <p className="text-muted-foreground text-sm">Procurador e conta de energia</p>
-                  <FormField
-                    control={form.control}
-                    name="has_procurator"
-                    rules={{ required: "Informe se possui procurador" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Seu cliente possui procurador?</FormLabel>
-                        <FormControl>
-                          <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
-                            <div className="flex items-center gap-2">
-                              <RadioGroupItem value="sim" id="m-proc-sim" />
-                              <Label htmlFor="m-proc-sim">Sim</Label>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <RadioGroupItem value="nao" id="m-proc-nao" />
-                              <Label htmlFor="m-proc-nao">Não</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="energy_bill_password"
@@ -583,10 +624,13 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       </FormItem>
                     )}
                   />
-                  <FormItem>
-                    <FormLabel>Faça o anexo da sua conta de energia</FormLabel>
-                    <Input type="file" accept="application/pdf,image/*" onChange={(e) => setFiles((f) => ({ ...f, energy_bill: e.target.files?.[0] }))} />
-                  </FormItem>
+                  <FileUploadField
+                    label="Faça o anexo da sua conta de energia"
+                    description="Envie a conta recente em PDF ou imagem."
+                    accept="application/pdf,image/*"
+                    file={files.energy_bill}
+                    onChange={(file) => setFiles((f) => ({ ...f, energy_bill: file }))}
+                  />
                   <FormField
                     control={form.control}
                     name="has_pending_debts"
@@ -595,7 +639,16 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>Possui débitos em aberto?</FormLabel>
                         <FormControl>
-                          <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                          <RadioGroup
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              if (value !== "sim") {
+                                setFiles((f) => ({ ...f, payment_proof: undefined }));
+                              }
+                            }}
+                            value={field.value}
+                            className="flex gap-4"
+                          >
                             <div className="flex items-center gap-2">
                               <RadioGroupItem value="sim" id="m-deb-sim" />
                               <Label htmlFor="m-deb-sim">Sim</Label>
@@ -610,10 +663,15 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       </FormItem>
                     )}
                   />
-                  <FormItem>
-                    <FormLabel>Anexe o comprovante de pagamento (se débitos em aberto)</FormLabel>
-                    <Input type="file" accept="application/pdf,image/png,image/jpeg,image/jpg" onChange={(e) => setFiles((f) => ({ ...f, payment_proof: e.target.files?.[0] }))} />
-                  </FormItem>
+                  {watchHasPendingDebts === "sim" && (
+                    <FileUploadField
+                      label="Anexe o comprovante de pagamento (se débitos em aberto)"
+                      description="Envie o comprovante em PDF ou imagem."
+                      accept="application/pdf,image/png,image/jpeg,image/jpg"
+                      file={files.payment_proof}
+                      onChange={(file) => setFiles((f) => ({ ...f, payment_proof: file }))}
+                    />
+                  )}
                 </>
               )}
 
