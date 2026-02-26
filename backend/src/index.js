@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
 import { apiKeyAuth } from './middleware/auth.js';
 import leadsRouter from './routes/leads.js';
+import representantesRouter from './routes/representantes.js';
 
 const app = express();
 
@@ -18,8 +19,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+app.get(['/health', '/api/health'], (req, res) => res.status(200).json({ status: 'ok' }));
 app.use('/api/leads', apiKeyAuth, leadsRouter);
+app.use('/api/representantes', apiKeyAuth, representantesRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

@@ -93,6 +93,7 @@ export const leadSchema = z.object({
     .refine((v) => v !== '' && v != null, { message: 'Informe se possui débitos', path: ['has_pending_debts'] })
     .transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
   payment_proof_path: z.string().optional().nullable(),
+  eligibility_status: z.enum(['elegivel', 'nao_elegivel', 'cadastrado', 'nao_verificado']).optional().default('nao_verificado'),
   status: z.string().optional(),
   source: z.string().optional(),
   id_campaign: z.string().optional().nullable().transform((v) => (v === '' ? null : v)),

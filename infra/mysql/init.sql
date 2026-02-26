@@ -9,6 +9,31 @@ CREATE DATABASE IF NOT EXISTS igreen_captacao
 
 USE igreen_captacao;
 
+-- ------------------------------------------------------------
+-- Tabela de representantes comerciais
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS representantes (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(255) NOT NULL,
+  link_cadastro VARCHAR(512) NOT NULL,
+  tipo_produto VARCHAR(64) NOT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_representantes_link (link_cadastro)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Registros iniciais de representantes
+INSERT INTO representantes (nome, link_cadastro, tipo_produto)
+VALUES
+  ('Marcelo Narita', 'https://digital.igreenenergy.com.br/?id=121530', 'conexao'),
+  ('Donavan Alencar', 'https://digital.igreenenergy.com.br/?id=121534', 'conexao')
+ON DUPLICATE KEY UPDATE
+  nome = VALUES(nome),
+  tipo_produto = VALUES(tipo_produto),
+  ativo = 1;
+
 -- Usuário da aplicação (senha definida via Secret no K8s; aqui é exemplo)
 -- Em produção, criar usuário com: CREATE USER 'igreen_app'@'%' IDENTIFIED BY '<senha-do-secret>';
 -- GRANT abaixo assume que o usuário já foi criado (ex.: via job que lê o Secret)
@@ -55,6 +80,8 @@ CREATE TABLE IF NOT EXISTS leads (
   has_pending_debts TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0=Não, 1=Sim',
   payment_proof_path VARCHAR(512) DEFAULT NULL,
   -- metadados
+  representante_id BIGINT UNSIGNED NOT NULL,
+  eligibility_status VARCHAR(32) NOT NULL DEFAULT 'nao_verificado',
   status VARCHAR(32) DEFAULT 'new',
   source VARCHAR(64) DEFAULT 'web',
   id_campaign VARCHAR(64) DEFAULT NULL,
@@ -64,7 +91,9 @@ CREATE TABLE IF NOT EXISTS leads (
   KEY idx_created_at (created_at),
   KEY idx_status (status),
   KEY idx_email (email(64)),
-  KEY idx_document (document_number(14))
+  KEY idx_document (document_number(14)),
+  KEY idx_representante (representante_id),
+  CONSTRAINT fk_leads_representante FOREIGN KEY (representante_id) REFERENCES representantes(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

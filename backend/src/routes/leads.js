@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { insertLead } from '../leads-repository.js';
+import { insertLead, listLeadsByEligibilityStatus } from '../leads-repository.js';
 import { validateLead } from '../validation.js';
 import { uploadFields } from '../middleware/upload.js';
 
@@ -20,6 +20,16 @@ router.post('/', uploadFields, async (req, res) => {
   } catch (err) {
     console.error('Lead insert error:', err.message);
     return res.status(500).json({ error: 'Erro interno ao processar solicitação' });
+  }
+});
+
+router.get('/nao-verificado', async (req, res) => {
+  try {
+    const leads = await listLeadsByEligibilityStatus('nao_verificado');
+    return res.status(200).json(leads);
+  } catch (err) {
+    console.error('List leads nao_verificado error:', err.message);
+    return res.status(500).json({ error: 'Erro interno ao listar leads nao_verificado' });
   }
 });
 
