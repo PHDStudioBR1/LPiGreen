@@ -15,39 +15,35 @@ export function ScarcitySection() {
           </div>
           
           <h2 className="text-3xl md:text-4xl font-headline font-black text-gray-900 mb-8">
-            Número de vagas é limitado
+            O oceano azul da energia no Brasil
           </h2>
 
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-end">
-              <span className="font-bold text-gray-600">Neste momento, na sua região:</span>
-              <span className="text-2xl font-black text-red-600">77% das vagas preenchidas</span>
+              <span className="font-bold text-gray-600">Mercado no Brasil:</span>
+              <span className="text-2xl font-black text-red-600">+101 milhões de unidades consumidoras</span>
             </div>
             <Progress value={77} className="h-4 bg-red-100" />
+            <p className="text-sm text-gray-600 font-semibold">A iGreen já atende mais de 500.000 clientes — e atingiu apenas 0,49% do mercado. Oportunidade gigante.</p>
           </div>
 
           <div className="space-y-4 text-gray-700 text-sm md:text-base leading-relaxed text-left">
             <p>
-              A capacidade de geração das nossas usinas de energia limpa não é infinita. Cada usina produz uma
-              quantidade específica de energia, o que significa que só podemos atender um{' '}
-              <span className="font-bold">número limitado de pessoas</span> em cada região.
+              O mercado brasileiro tem mais de <span className="font-bold">101 milhões de unidades consumidoras</span>. A iGreen já ultrapassou a marca de 500.000 clientes e atingiu apenas <span className="font-bold">0,49%</span> desse mercado — um verdadeiro oceano azul.
             </p>
             <p>
-              Isso significa que milhares de pessoas já garantiram o desconto... e as vagas restantes estão diminuindo
-              todos os dias.
+              Milhares de pessoas já garantiram economia na conta de luz sem investimento e sem fidelidade. A capacidade de atendimento por região pode ser limitada.
             </p>
             <p className="font-semibold">
-              Por que isso acontece?
+              Por que agir agora?
             </p>
             <p>
-              Simples: a demanda está explodindo. Todo dia, mais pessoas descobrem que podem economizar até 50% na
-              conta de luz sem fazer nada — e obviamente, querem entrar. Mas a produção de energia das usinas tem
-              limite técnico. <span className="font-bold">Quando as vagas da sua região acabarem, não há mais o que fazer.</span>
+              A demanda por energia limpa e economia na conta de luz só cresce. A iGreen conta com o selo Great Place to Work (GPTW 2025-2026) e parceria com Vibra e Comerc Energia. <span className="font-bold">Verifique se sua região tem vagas disponíveis e faça parte da maior transição energética do Brasil.</span>
             </p>
           </div>
 
           <p className="mt-6 text-red-700 font-bold">
-            Com 77% das vagas já preenchidas, o tempo está acabando.
+            Mais de 500.000 brasileiros já estão economizando. Sua vez pode ser agora.
           </p>
         </div>
       </div>

@@ -29,10 +29,10 @@ export function SocialProofSection() {
       <div className="container mx-auto px-6">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-            Mais de 500.000 brasileiros já estão economizando com a iGreen Energy
+            Mais de 500.000 clientes no Brasil — e selo Great Place to Work (GPTW 2025-2026)
           </h2>
           <p className="text-lg text-muted-foreground">
-            Veja abaixo os depoimentos de quem já está economizando.
+            Parceria Vibra e Comerc Energia. Veja depoimentos de quem já está economizando.
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export function SocialProofSection() {
             className="h-14 px-10 rounded-2xl font-black"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            Quero começar a economizar
+            Faça parte da maior transição energética do Brasil agora
           </Button>
         </div>
       </div>

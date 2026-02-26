@@ -84,16 +84,15 @@ export function PressProofSection() {
             A iGreen trouxe esse modelo internacional para o Brasil.
           </p>
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            <span className="font-bold">Com usinas próprias</span> •{' '}
-            <span className="font-bold">Com regulamentação total</span> •{' '}
-            <span className="font-bold">+500.000 clientes atendidos</span>
+            <span className="font-bold">Parceria Vibra e Comerc Energia</span> •{' '}
+            <span className="font-bold">Selo Great Place to Work (GPTW 2025-2026)</span> •{' '}
+            <span className="font-bold">Mais de 500.000 clientes no Brasil</span>
           </p>
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            Você não está sendo cobaia. Você está entrando em algo que já provou funcionar no mundo inteiro.
+            A iGreen foi fundada em 2021; em 2023, 50% da empresa foi adquirida por gigantes do setor. Você está entrando em algo que já provou funcionar no mundo inteiro.
           </p>
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            E agora, com a lei brasileira do seu lado, você pode economizar até 50% na conta de luz sem fazer
-            absolutamente nada na sua casa.
+            Com a lei brasileira do seu lado, você pode economizar na conta de luz sem investimento, sem burocracia e sem fidelidade — energia limpa injetada na rede da sua distribuidora.
           </p>
         </div>
       </div>

@@ -40,7 +40,7 @@ export function StepsSection() {
             Como você entra
           </h2>
           <p className="text-lg text-muted-foreground">
-            Sem taxa de adesão. Sem custo de instalação.
+            Sem investimento. Sem burocracia. Sem fidelidade.
           </p>
         </div>
 

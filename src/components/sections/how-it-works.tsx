@@ -44,7 +44,7 @@ export function HowItWorksSection() {
               Agora transfere isso para a energia elétrica
             </h3>
             <p>
-              A energia que chega na sua casa <span className="font-bold">não é "produzida" pela distribuidora</span>. A distribuidora (Enel, CPFL, Light, Cemig...) é só o "entregador" da energia.
+              A energia que chega na sua casa <span className="font-bold">não é "produzida" pela distribuidora</span>. A distribuidora (Cemig, CPFL, Equatorial, Enel, Light...) é só o "entregador" da energia.
             </p>
             <p>
               Essas empresas pegam energia de fontes (hidrelétricas), ou seja, onde o consumo é muito maior, e consequentemente o lucro deles também será muito maior ao repassar para a sua casa.
@@ -56,10 +56,7 @@ export function HowItWorksSection() {
               E aí que nós entramos.
             </p>
             <p>
-              A iGreen tem <span className="font-bold">usinas próprias de energia limpa</span> que produzem energia limpa e barata.
-            </p>
-            <p>
-              Essa energia é <span className="font-bold">injetada na rede da distribuidora</span> (a mesma rede que já existe).
+              A iGreen tem <span className="font-bold">usinas de energia limpa</span>; a energia é produzida e <span className="font-bold">injetada na rede da distribuidora</span> (Cemig, CPFL, Equatorial e outras) — a mesma rede que já existe.
             </p>
             <p>
               E a gente faz um <span className="font-bold">acordo com a distribuidora</span> para vincular créditos de energia à sua conta.

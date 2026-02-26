@@ -10,6 +10,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Garante que public exista (Next.js não cria se o projeto não tiver a pasta)
+RUN mkdir -p /app/public
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

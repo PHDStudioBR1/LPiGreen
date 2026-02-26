@@ -35,11 +35,11 @@ const FAQS = [
   },
   {
     q: "\"Por que minha distribuidora não me ofereceu isso?\"",
-    a: "Porque esse não é o modelo de negócio principal da distribuidora. Ela continua ganhando mais quando você paga o valor cheio da tarifa. A iGreen entrou justamente para oferecer uma alternativa mais vantajosa para você."
+    a: "O modelo de negócio da distribuidora é diferente. A iGreen injeta energia limpa na rede (Cemig, CPFL, Equatorial e outras) e você recebe os créditos na sua conta — sem investimento, sem burocracia e sem fidelidade. É a Conexão Green para baixa tensão/residencial."
   },
   {
     q: "\"Tem que ter telhado ou espaço?\"",
-    a: "Não. Você não precisa instalar painel nenhum na sua casa nem ter telhado disponível. As usinas são remotas e já estão em operação — você apenas passa a utilizar os créditos de energia gerada por elas."
+    a: "Não. Na Conexão Green você não instala nada. A energia limpa é gerada em usinas e injetada na rede da distribuidora. Você só usa os créditos na sua fatura e ainda pode participar do Cashback Indicou, Ganhou."
   },
   {
     q: "\"Quanto tempo demora para começar a economizar?\"",

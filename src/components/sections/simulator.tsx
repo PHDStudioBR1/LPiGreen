@@ -9,8 +9,8 @@ import { Zap } from 'lucide-react';
 export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
   const [billValue, setBillValue] = useState(400);
 
-  // Simulação baseada em desconto de até 50%, como na página original
-  const monthlySavings = billValue * 0.5;
+  // Simulação baseada em desconto de 14%
+  const monthlySavings = billValue * 0.14;
   const yearlySavings = monthlySavings * 12;
 
   return (
@@ -19,10 +19,10 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-              Vamos fazer as contas?
+              Quanto você pode economizar?
             </h2>
             <p className="text-lg text-muted-foreground">
-              Simule com o valor da sua conta e veja quanto você pode economizar.
+              Simule com o valor da sua conta (Conexão Green) e veja o potencial de economia sem investimento e sem fidelidade.
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
                     onClick={onCTAClick}
                     className="h-16 px-12 text-xl font-black rounded-2xl w-full md:w-auto shadow-xl hover:scale-[1.02] transition-all"
                   >
-                    Quero esse desconto <Zap className="ml-2 fill-current" />
+                    Faça parte da maior transição energética do Brasil agora <Zap className="ml-2 fill-current" />
                   </Button>
                   <div className="mt-8 space-y-3 text-sm text-muted-foreground text-left md:text-center">
                     <p>Agora pensa no que você poderia fazer com esse dinheiro:</p>
@@ -88,7 +88,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
                       <li>Ou simplesmente ter mais tranquilidade no fim do mês</li>
                     </ul>
                     <p className="text-xs italic">
-                      * Simulação baseada em desconto de até 50%. Valores podem variar conforme região e consumo.
+                      * Simulação ilustrativa. Conexão Green: economia na conta sem investimento. Valores podem variar conforme região e consumo.
                     </p>
                   </div>
                 </div>

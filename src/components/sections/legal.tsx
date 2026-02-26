@@ -9,14 +9,14 @@ export function LegalSection() {
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
           <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-            E como você aproveita a Lei 14.300/2022 para economizar até 50% na sua conta de luz?
+            Como você aproveita a Lei 14.300/2022 para economizar na conta de luz?
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Talvez você não saiba, mas existe uma regulamentação no Brasil, a{' '}
-            <span className="font-bold">Lei nº 14.300/2022</span>, que permite algo revolucionário:
+            Existe uma regulamentação no Brasil, a{' '}
+            <span className="font-bold">Lei nº 14.300/2022</span>, que permite:
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Qualquer pessoa pode usar energia limpa... sem precisar instalar painel nenhum na sua casa.
+            Usar energia limpa na sua casa ou empresa sem investimento, sem burocracia e sem fidelidade — a energia é injetada na rede da distribuidora (Cemig, CPFL, Equatorial e outras).
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export function LegalSection() {
           <p>Não precisa investir em equipamento.</p>
           <p>Não precisa mudar nada na sua casa.</p>
           <p>
-            E ainda assim, você pode economizar <span className="font-bold">até 50% na sua conta de luz</span>.
+            E ainda assim, você pode <span className="font-bold">economizar na sua conta de luz</span> e ter acesso ao Cashback Indicou, Ganhou.
           </p>
           <p>Como?</p>
           <p>

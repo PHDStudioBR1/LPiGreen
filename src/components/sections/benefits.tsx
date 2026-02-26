@@ -5,16 +5,16 @@ import { Card, CardContent } from '@/components/ui/card';
 
 const BENEFITS = [
   {
-    title: 'Sorteios Mensais',
-    text: 'Já entregamos prêmios em valores financeiros, carro, moto, casa e muito mais para nossos clientes.',
+    title: 'Conexão Club',
+    text: 'Clube de benefícios gratuito para clientes: mais de 600 mil ofertas com descontos de até 70% em farmácias (Drogasil, Pague Menos) e cinemas (Cinemark).',
   },
   {
-    title: 'Descontos em Parceiros',
-    text: 'Rede de benefícios exclusivos em produtos e serviços de empresas parceiras.',
+    title: 'Cashback Indicou, Ganhou',
+    text: 'Indique amigos e ganhe: você pode zerar a própria conta de luz com o programa de indicação da Conexão Green.',
   },
   {
-    title: 'Programa de Indicação',
-    text: 'Indique amigos e ganhe bônus toda vez que alguém aderir ao programa.',
+    title: 'Energia Limpa na Rede',
+    text: 'Energia limpa injetada na rede da sua distribuidora (Cemig, CPFL, Equatorial). Sem investimento, sem burocracia e sem fidelidade.',
   },
   {
     title: 'Contribuição Ambiental',
@@ -28,7 +28,7 @@ export function BenefitsSection() {
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
           <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-            Além de economizar todo mês na conta de luz, você ainda ganha:
+            Além de economizar na conta de luz, você ainda ganha:
           </h2>
         </div>
 
@@ -44,9 +44,9 @@ export function BenefitsSection() {
         </div>
 
         <div className="max-w-3xl mx-auto mt-12 text-center text-sm text-muted-foreground leading-relaxed">
-          <p>Veja como é simples e os benefícios que você tem:</p>
+          <p>Simples, sem fidelidade e com benefícios reais. Faça parte da maior transição energética do Brasil.</p>
           <p className="mt-2">
-            Dá só uma olhada nesse caso real de uma pessoa que ganhou um carro ZERO KM:
+            Confira depoimentos e cases reais de quem já está economizando:
           </p>
         </div>
       </div>

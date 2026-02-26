@@ -33,10 +33,10 @@ export function AuthoritySection() {
             Atenção
           </div>
           <h2 className="text-2xl md:text-3xl font-headline font-black text-gray-900">
-            A imprensa já alertou: a conta de luz em 2026 já aumentou e pode chegar em até 13% de aumento na tarifa!
+            A imprensa já alertou: a conta de luz em 2026 subiu e pode chegar a aumentos de até 8% a 13% na tarifa!
           </h2>
           <p className="text-sm md:text-base text-gray-600">
-            Dá só uma olhada nessas matérias abaixo:
+            Proteja-se dos aumentos: veja o que a mídia está dizendo:
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export function AuthoritySection() {
         </div>
 
         <p className="mt-10 text-center text-sm text-gray-600 max-w-3xl mx-auto">
-          Continue descendo para descobrir como se proteger desses aumentos e economizar na sua conta de luz.
+          Faça parte da maior transição energética do Brasil: descubra como se proteger desses aumentos e economizar na sua conta de luz.
         </p>
       </div>
     </section>

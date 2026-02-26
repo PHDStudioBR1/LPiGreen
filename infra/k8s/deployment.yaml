@@ -15,9 +15,13 @@ spec:
       labels:
         app: lpigreen-web
     spec:
+      # Use se o repositório Docker for privado: crie o secret com kubectl create secret docker-registry ...
+      imagePullSecrets:
+        - name: lpigreen-registry
       containers:
       - name: web
         image: donavanalencar/lpigreen-web:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
           name: http

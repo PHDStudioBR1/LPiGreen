@@ -67,9 +67,9 @@ export function EligibilityModal({ isOpen, onClose }: EligibilityModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] rounded-2xl overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline font-bold text-primary">Teste de Elegibilidade</DialogTitle>
+          <DialogTitle className="text-2xl font-headline font-bold text-primary">Verifique se você está apto</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Preencha os dados abaixo para ver se sua região já possui cobertura de energia limpa.
+            Preencha os dados abaixo. Em até 24h um especialista confirmará se sua região tem cobertura para economia na conta de luz (Conexão Green — sem investimento, sem fidelidade).
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -129,7 +129,7 @@ export function EligibilityModal({ isOpen, onClose }: EligibilityModalProps) {
               />
             </div>
             <Button type="submit" className="w-full py-6 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-[1.02]">
-              Verificar Agora
+              Quero fazer parte da maior transição energética do Brasil
             </Button>
           </form>
         </Form>

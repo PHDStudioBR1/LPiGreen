@@ -32,7 +32,7 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
         onClick={onCTAClick}
         className="rounded-full font-bold shadow-lg bg-primary hover:bg-primary/90 transition-all"
       >
-        Verificar Elegibilidade
+        Faça parte da transição energética
       </Button>
     </header>
   );

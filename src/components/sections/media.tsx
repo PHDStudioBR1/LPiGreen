@@ -8,10 +8,10 @@ export function MediaSection() {
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
           <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-            Notícias na mídia sobre a empresa
+            iGreen na mídia
           </h2>
           <p className="text-lg text-muted-foreground">
-            Veja alguma das inúmeras reportagens que temos na mídia falando sobre nós:
+            Parceria Vibra e Comerc Energia • Mais de 500.000 clientes • Selo GPTW 2025-2026. Veja reportagens sobre a iGreen:
           </p>
         </div>
 

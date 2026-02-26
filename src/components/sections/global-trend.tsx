@@ -41,7 +41,7 @@ export function GlobalTrendSection() {
             É um modelo consolidado, testado e comprovado. E agora, finalmente, chegou ao Brasil de forma regulamentada.
           </p>
           <p className="font-medium">
-            Logo abaixo você fará o teste para saber se está apto para o desconto.
+            Faça parte da maior transição energética do Brasil: verifique se você está apto para economizar.
           </p>
         </div>
       </div>

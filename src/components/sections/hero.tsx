@@ -34,20 +34,19 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-headline font-black text-white leading-tight">
-            Desconto de até <span className="text-primary italic">50%</span> na sua conta de energia elétrica!
+            Economia na conta de luz <span className="text-primary italic">sem investimento, sem burocracia e sem fidelidade</span>
           </h1>
 
           <div className="space-y-4 text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed">
             <p>
-              Sem obras, sem investimento, sem complicação e sem pagar nada por isso — tudo por conta da{' '}
+              Energia limpa injetada na rede da sua distribuidora (Cemig, CPFL, Equatorial e outras) — tudo amparado pela{' '}
               <span className="text-white font-bold underline decoration-primary">Lei nº 14.300/2022</span>.
             </p>
             <p>
-              Você continua recebendo a mesma energia, da mesma distribuidora, mas paga menos. Muito menos. E isso é{' '}
-              <span className="font-bold">100% legal e regulamentado</span>.
+              Você continua recebendo a mesma energia, da mesma distribuidora, mas paga menos. Acesso ao benefício do <span className="font-bold">Cashback Indicou, Ganhou</span> — podendo zerar a própria conta de luz.
             </p>
             <p className="text-base md:text-lg text-gray-100">
-              Logo abaixo você fará o teste para saber se está apto para o desconto.
+              Faça parte da maior transição energética do Brasil. Verifique agora se você está apto.
             </p>
           </div>
 
@@ -57,7 +56,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
               onClick={onCTAClick}
               className="h-16 px-8 text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all"
             >
-              Verificar se Estou Apto
+              Faça parte da maior transição energética do Brasil agora
             </Button>
           </div>
 
@@ -96,7 +95,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
                    </div>
                 </div>
                 <p className="text-xs text-muted-foreground italic text-center">
-                  *Valores estimados com base na média de consumo residencial.
+                  *Conexão Green: economia na conta sem investimento. Valores estimados com base na média de consumo residencial.
                 </p>
              </div>
           </div>
