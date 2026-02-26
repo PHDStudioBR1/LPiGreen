@@ -1,26 +1,12 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { config } from '../config.js';
-
-const dir = config.uploadDir;
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, dir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || '.bin';
-    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
-    cb(null, name);
-  },
-});
 
 const allowedMimes = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp',
   'application/pdf',
 ];
+
+// Armazenamento em memória: arquivos vêm como Buffer para conversão em base64 e gravação no banco
+const storage = multer.memoryStorage();
 
 export const upload = multer({
   storage,

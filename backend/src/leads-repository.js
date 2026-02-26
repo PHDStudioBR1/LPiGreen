@@ -33,8 +33,8 @@ export async function insertLead(lead) {
         cep_landing, valor_conta, document_number, name, birth_date, phone, phone_confirm,
         email, email_confirm, cep, address, number, neighborhood, city, state, complement,
         power_company, installation_number, discount_option, document_type,
-        document_front_path, document_back_path, has_procurator, energy_bill_password,
-        energy_bill_path, has_pending_debts, payment_proof_path,
+        document_front_base64, document_back_base64, has_procurator, energy_bill_password,
+        energy_bill_base64, has_pending_debts, payment_proof_base64,
         representante_id, eligibility_status, status, source, id_campaign
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -58,13 +58,13 @@ export async function insertLead(lead) {
         lead.installation_number,
         lead.discount_option ?? null,
         lead.document_type ?? null,
-        lead.document_front_path ?? null,
-        lead.document_back_path ?? null,
+        lead.document_front_base64 ?? null,
+        lead.document_back_base64 ?? null,
         lead.has_procurator ?? 0,
         lead.energy_bill_password ?? null,
-        lead.energy_bill_path ?? null,
+        lead.energy_bill_base64 ?? null,
         lead.has_pending_debts ?? 0,
-        lead.payment_proof_path ?? null,
+        lead.payment_proof_base64 ?? null,
         representanteId,
         lead.eligibility_status ?? 'nao_verificado',
         lead.status ?? 'new',
@@ -83,20 +83,19 @@ export async function insertLead(lead) {
   }
 }
 
+const LEAD_SELECT_ALL = `
+  id, cep_landing, valor_conta, document_number, name, birth_date, phone, phone_confirm,
+  email, email_confirm, cep, address, number, neighborhood, city, state, complement,
+  power_company, installation_number, discount_option, document_type,
+  document_front_base64, document_back_base64, has_procurator, energy_bill_password,
+  energy_bill_base64, has_pending_debts, payment_proof_base64,
+  representante_id, eligibility_status, status, source, id_campaign, created_at, updated_at
+`;
+
 export async function listLeadsByEligibilityStatus(status = 'nao_verificado') {
   const pool = getPool();
   const [rows] = await pool.query(
-    `SELECT
-       id,
-       document_number,
-       name,
-       email,
-       phone,
-       eligibility_status,
-       status,
-       source,
-       representante_id,
-       created_at
+    `SELECT ${LEAD_SELECT_ALL}
      FROM leads
      WHERE eligibility_status = ?
      ORDER BY created_at DESC`,
@@ -162,17 +161,7 @@ export async function listLeads(filters = {}) {
 
   const [rows] = await pool.query(
     `
-      SELECT
-        id,
-        document_number,
-        name,
-        email,
-        phone,
-        eligibility_status,
-        status,
-        source,
-        representante_id,
-        created_at
+      SELECT ${LEAD_SELECT_ALL}
       FROM leads
       ${whereSql}
       ORDER BY created_at DESC
@@ -188,45 +177,7 @@ export async function listLeads(filters = {}) {
 export async function getLeadById(id) {
   const pool = getPool();
   const [rows] = await pool.query(
-    `
-      SELECT
-        id,
-        cep_landing,
-        valor_conta,
-        document_number,
-        name,
-        birth_date,
-        phone,
-        phone_confirm,
-        email,
-        email_confirm,
-        cep,
-        address,
-        number,
-        neighborhood,
-        city,
-        state,
-        complement,
-        power_company,
-        installation_number,
-        discount_option,
-        document_type,
-        document_front_path,
-        document_back_path,
-        has_procurator,
-        energy_bill_password,
-        energy_bill_path,
-        has_pending_debts,
-        payment_proof_path,
-        representante_id,
-        eligibility_status,
-        status,
-        source,
-        id_campaign,
-        created_at
-      FROM leads
-      WHERE id = ?
-    `,
+    `SELECT ${LEAD_SELECT_ALL} FROM leads WHERE id = ?`,
     [id]
   );
 

@@ -82,17 +82,17 @@ export const leadSchema = z.object({
   installation_number: z.string().min(1, 'Número da instalação é obrigatório').max(60),
   discount_option: z.union([z.enum(['8', '10', '12', '14']), z.literal('')]).optional().transform((v) => (v === '' ? null : v)),
   document_type: z.string().min(1, 'Tipo de documento é obrigatório').max(60),
-  // paths set by server after upload
-  document_front_path: z.string().optional().nullable(),
-  document_back_path: z.string().optional().nullable(),
+  // Documentos em base64 (preenchidos pela rota a partir dos buffers de upload)
+  document_front_base64: z.string().optional().nullable(),
+  document_back_base64: z.string().optional().nullable(),
   // 1.5 Procurador e conta
   has_procurator: z.union([z.string(), z.number()]).optional().transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
   energy_bill_password: z.string().max(255).optional().nullable().transform((v) => (v === '' ? null : v)),
-  energy_bill_path: z.string().optional().nullable(),
+  energy_bill_base64: z.string().optional().nullable(),
   has_pending_debts: z.union([z.string(), z.number()])
     .refine((v) => v !== '' && v != null, { message: 'Informe se possui débitos', path: ['has_pending_debts'] })
     .transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
-  payment_proof_path: z.string().optional().nullable(),
+  payment_proof_base64: z.string().optional().nullable(),
   eligibility_status: z.enum(['elegivel', 'nao_elegivel', 'cadastrado', 'nao_verificado']).optional().default('nao_verificado'),
   status: z.string().optional(),
   source: z.string().optional(),
@@ -100,20 +100,20 @@ export const leadSchema = z.object({
 })
   .refine((data) => String(data.phone).replace(/\D/g, '') === String(data.phone_confirm).replace(/\D/g, ''), { message: 'Celular e confirmação devem ser iguais', path: ['phone_confirm'] })
   .refine((data) => (data.email || '').toLowerCase() === (data.email_confirm || '').toLowerCase(), { message: 'E-mail e confirmação devem ser iguais', path: ['email_confirm'] })
-  .refine((data) => data.document_front_path, { message: 'Documento pessoal – Frente é obrigatório', path: ['document_front_path'] })
-  .refine((data) => data.document_back_path, { message: 'Documento pessoal – Verso é obrigatório', path: ['document_back_path'] })
-  .refine((data) => data.has_pending_debts !== 1 || data.payment_proof_path, {
+  .refine((data) => data.document_front_base64, { message: 'Documento pessoal – Frente é obrigatório', path: ['document_front_base64'] })
+  .refine((data) => data.document_back_base64, { message: 'Documento pessoal – Verso é obrigatório', path: ['document_back_base64'] })
+  .refine((data) => data.has_pending_debts !== 1 || data.payment_proof_base64, {
     message: 'Comprovante de pagamento é obrigatório quando há débitos em aberto',
-    path: ['payment_proof_path'],
+    path: ['payment_proof_base64'],
   });
 
 export function validateLead(body, files = {}) {
-  const withPaths = {
+  const withBase64 = {
     ...body,
-    document_front_path: body.document_front_path || (files.document_front?.[0]?.path) || null,
-    document_back_path: body.document_back_path || (files.document_back?.[0]?.path) || null,
-    energy_bill_path: body.energy_bill_path || (files.energy_bill?.[0]?.path) || null,
-    payment_proof_path: body.payment_proof_path || (files.payment_proof?.[0]?.path) || null,
+    document_front_base64: body.document_front_base64 ?? (files.document_front?.[0]?.buffer != null ? files.document_front[0].buffer.toString('base64') : null),
+    document_back_base64: body.document_back_base64 ?? (files.document_back?.[0]?.buffer != null ? files.document_back[0].buffer.toString('base64') : null),
+    energy_bill_base64: body.energy_bill_base64 ?? (files.energy_bill?.[0]?.buffer != null ? files.energy_bill[0].buffer.toString('base64') : null),
+    payment_proof_base64: body.payment_proof_base64 ?? (files.payment_proof?.[0]?.buffer != null ? files.payment_proof[0].buffer.toString('base64') : null),
   };
-  return leadSchema.safeParse(withPaths);
+  return leadSchema.safeParse(withBase64);
 }

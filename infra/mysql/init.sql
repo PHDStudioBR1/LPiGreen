@@ -71,14 +71,14 @@ CREATE TABLE IF NOT EXISTS leads (
   installation_number VARCHAR(60) NOT NULL,
   discount_option VARCHAR(10) DEFAULT NULL COMMENT '8, 10, 12, 14',
   document_type VARCHAR(60) DEFAULT NULL COMMENT 'ex: RG (Novo)',
-  document_front_path VARCHAR(512) DEFAULT NULL,
-  document_back_path VARCHAR(512) DEFAULT NULL,
+  document_front_base64 LONGTEXT DEFAULT NULL COMMENT 'Documento frente (imagem/PDF) em base64',
+  document_back_base64 LONGTEXT DEFAULT NULL COMMENT 'Documento verso em base64',
   -- 1.5 Procurador e conta
   has_procurator TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0=Não, 1=Sim',
   energy_bill_password VARCHAR(255) DEFAULT NULL,
-  energy_bill_path VARCHAR(512) DEFAULT NULL,
+  energy_bill_base64 LONGTEXT DEFAULT NULL COMMENT 'Conta de energia em base64',
   has_pending_debts TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0=Não, 1=Sim',
-  payment_proof_path VARCHAR(512) DEFAULT NULL,
+  payment_proof_base64 LONGTEXT DEFAULT NULL COMMENT 'Comprovante de pagamento em base64',
   -- metadados
   representante_id BIGINT UNSIGNED NOT NULL,
   eligibility_status VARCHAR(32) NOT NULL DEFAULT 'nao_verificado',

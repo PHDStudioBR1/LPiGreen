@@ -125,6 +125,9 @@ curl -X GET \
 
 ## Leads
 
+**Documentos (arquivos)**  
+Os anexos (`document_front`, `document_back`, `energy_bill`, `payment_proof`) são enviados via `multipart/form-data`. O servidor converte cada arquivo para **base64** e grava no banco nas colunas `document_front_base64`, `document_back_base64`, `energy_bill_base64`, `payment_proof_base64`. Todas as respostas **GET** de leads (lista, por ID, nao-verificado) retornam **todos os campos** do lead, incluindo esses documentos em **base64** (string), quando existirem.
+
 ### `POST /api/leads`
 
 Cria um novo lead, aplica todas as validações de negócio e associa automaticamente um **representante** (distribuição alternada / balanceada entre os representantes ativos).
@@ -135,7 +138,8 @@ Cria um novo lead, aplica todas as validações de negócio e associa automatica
 - **Autenticação**: **obrigatória** (API Key).
 
 > O campo `representante_id` **não é enviado** pelo cliente.  
-> O backend escolhe automaticamente o representante com menos leads.
+> O backend escolhe automaticamente o representante com menos leads.  
+> Os arquivos enviados são convertidos em base64 e armazenados no banco (não são gravados em disco).
 
 ### Campos esperados (form-data)
 
@@ -332,19 +336,46 @@ curl -X GET \
 
 #### Exemplo de resposta (`200 OK`)
 
+Retorna **todos os campos** do lead, incluindo documentos em base64 (quando existirem). Exemplo resumido (os campos `*_base64` podem ser strings longas):
+
 ```json
 [
   {
     "id": 123,
+    "cep_landing": "12345-678",
+    "valor_conta": "250.00",
     "document_number": "123.456.789-09",
     "name": "Fulano de Tal",
-    "email": "fulano@example.com",
+    "birth_date": "1990-01-01",
     "phone": "(11) 99999-0000",
+    "phone_confirm": "(11) 99999-0000",
+    "email": "fulano@example.com",
+    "email_confirm": "fulano@example.com",
+    "cep": "12345-678",
+    "address": "Rua Exemplo",
+    "number": "123",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "complement": null,
+    "power_company": "Cemig",
+    "installation_number": "123456789",
+    "discount_option": "10",
+    "document_type": "RG (Novo)",
+    "document_front_base64": "iVBORw0KGgoAAAANSUhEUgAAA...",
+    "document_back_base64": "/9j/4AAQSkZJRgABAQAAAQAB...",
+    "has_procurator": 0,
+    "energy_bill_password": null,
+    "energy_bill_base64": "JVBERi0xLjQKJeLjz9MK...",
+    "has_pending_debts": 0,
+    "payment_proof_base64": null,
+    "representante_id": 1,
     "eligibility_status": "nao_verificado",
     "status": "new",
     "source": "web",
-    "representante_id": 1,
-    "created_at": "2026-02-26T12:34:56.000Z"
+    "id_campaign": null,
+    "created_at": "2026-02-26T12:34:56.000Z",
+    "updated_at": "2026-02-26T12:34:56.000Z"
   }
 ]
 ```
@@ -456,28 +487,13 @@ curl -X GET \
 
 #### Exemplo de resposta (`200 OK`)
 
-```json
-[
-  {
-    "id": 123,
-    "document_number": "123.456.789-09",
-    "name": "Fulano de Tal",
-    "email": "fulano@example.com",
-    "phone": "(11) 99999-0000",
-    "eligibility_status": "nao_verificado",
-    "status": "new",
-    "source": "web",
-    "representante_id": 1,
-    "created_at": "2026-02-26T12:34:56.000Z"
-  }
-]
-```
+Retorna **todos os campos** de cada lead, incluindo documentos em **base64** (`document_front_base64`, `document_back_base64`, `energy_bill_base64`, `payment_proof_base64`). Cada item do array tem a mesma estrutura do `GET /api/leads/:id` (todos os campos listados abaixo).
 
 ---
 
 ### `GET /api/leads/:id`
 
-Busca os **detalhes completos** de um lead específico (incluindo dados de endereço e caminhos de arquivos).
+Busca os **detalhes completos** de um lead específico: todos os campos, incluindo endereço e documentos em **base64**.
 
 - **URL**: `/api/leads/:id`
 - **Autenticação**: obrigatória (API Key)
@@ -492,11 +508,13 @@ curl -X GET \
 
 #### Resposta de sucesso (`200 OK`)
 
+Todos os campos do lead. Documentos vêm em **base64** (strings; podem ser longas).
+
 ```json
 {
   "id": 123,
   "cep_landing": "12345-678",
-  "valor_conta": "250,00",
+  "valor_conta": "250.00",
   "document_number": "123.456.789-09",
   "name": "Fulano de Tal",
   "birth_date": "1990-01-01",
@@ -515,19 +533,20 @@ curl -X GET \
   "installation_number": "123456789",
   "discount_option": "10",
   "document_type": "RG (Novo)",
-  "document_front_path": "/caminho/para/rg-frente.jpg",
-  "document_back_path": "/caminho/para/rg-verso.jpg",
+  "document_front_base64": "iVBORw0KGgoAAAANSUhEUgAAA...",
+  "document_back_base64": "/9j/4AAQSkZJRgABAQAAAQAB...",
   "has_procurator": 0,
   "energy_bill_password": null,
-  "energy_bill_path": "/caminho/para/conta-energia.pdf",
+  "energy_bill_base64": "JVBERi0xLjQKJeLjz9MK...",
   "has_pending_debts": 0,
-  "payment_proof_path": "/caminho/para/comprovante.pdf",
+  "payment_proof_base64": null,
   "representante_id": 1,
   "eligibility_status": "nao_verificado",
   "status": "new",
   "source": "web",
   "id_campaign": null,
-  "created_at": "2026-02-26T12:34:56.000Z"
+  "created_at": "2026-02-26T12:34:56.000Z",
+  "updated_at": "2026-02-26T12:34:56.000Z"
 }
 ```
 

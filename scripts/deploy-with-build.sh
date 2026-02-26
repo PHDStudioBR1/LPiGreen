@@ -102,6 +102,12 @@ kubectl apply -f "$K8S_DIR/mysql-lead-form-logs-migration-job.yaml" -n "$NAMESPA
 kubectl wait --for=condition=complete job/mysql-lead-form-logs-migration -n "$NAMESPACE" --timeout=120s 2>/dev/null || echo -e "${YELLOW}Job em andamento ou já concluído${NC}"
 echo ""
 
+echo -e "${BLUE}7b. Job migração colunas base64 (documentos) – apenas para bancos antigos...${NC}"
+kubectl delete job mysql-document-base64-migration -n "$NAMESPACE" --ignore-not-found=true
+kubectl apply -f "$K8S_DIR/mysql-document-base64-migration-job.yaml" -n "$NAMESPACE"
+kubectl wait --for=condition=complete job/mysql-document-base64-migration -n "$NAMESPACE" --timeout=120s 2>/dev/null || echo -e "${YELLOW}Job concluído ou ignorado (colunas base64 já existem no schema)${NC}"
+echo ""
+
 echo -e "${BLUE}8. Deploy Redis...${NC}"
 kubectl apply -f "$K8S_DIR/redis-secret.yaml" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/redis-pvc.yaml" -n "$NAMESPACE"

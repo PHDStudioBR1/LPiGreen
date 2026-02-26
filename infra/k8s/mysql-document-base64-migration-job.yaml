@@ -1,0 +1,36 @@
+# Job para adicionar colunas de documentos em base64 na tabela leads.
+# Executar uma vez em bancos que ainda usam apenas *_path.
+# Bancos criados com init.sql atualizado já possuem as colunas base64.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-document-base64-migration
+  namespace: lpigreen
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: mysql:8.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mysql -h mysql -u root -p"$MYSQL_ROOT_PASSWORD" -D igreen_captacao -e "
+              ALTER TABLE leads
+                ADD COLUMN document_front_base64 LONGTEXT NULL COMMENT 'Documento frente (imagem/PDF) em base64' AFTER document_type,
+                ADD COLUMN document_back_base64 LONGTEXT NULL COMMENT 'Documento verso em base64' AFTER document_front_base64,
+                ADD COLUMN energy_bill_base64 LONGTEXT NULL COMMENT 'Conta de energia em base64' AFTER energy_bill_password,
+                ADD COLUMN payment_proof_base64 LONGTEXT NULL COMMENT 'Comprovante de pagamento em base64' AFTER has_pending_debts;
+              "
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+---
+# Nota: se o banco foi criado com init.sql que já contém as colunas *_base64,
+# este job falhará com "Duplicate column". Nesse caso, não é necessário rodá-lo.
