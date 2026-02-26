@@ -6,10 +6,12 @@ const API_KEY = process.env.LEAD_API_KEY || process.env.API_KEY || "";
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get("content-type") || "";
-    const body =
-      contentType.includes("multipart/form-data")
-        ? await request.arrayBuffer()
-        : await request.text();
+    let body: ArrayBuffer | string;
+    if (contentType.includes("multipart/form-data")) {
+      body = await request.arrayBuffer();
+    } else {
+      body = await request.text();
+    }
 
     const headers: HeadersInit = {
       "Content-Type": contentType,

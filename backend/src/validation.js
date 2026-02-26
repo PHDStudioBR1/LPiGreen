@@ -59,24 +59,24 @@ export const leadSchema = z.object({
   neighborhood: z.string().min(1, 'Bairro é obrigatório').max(120),
   city: z.string().min(1, 'Cidade é obrigatória').max(120),
   state: z.string().length(2, 'Estado inválido'),
-  complement: z.string().max(255).optional().nullable(),
+  complement: z.string().max(255).optional().nullable().transform((v) => (v === '' ? null : v)),
   // 1.4 Energia e documento
-  power_company: z.string().max(120).optional().nullable(),
+  power_company: z.string().max(120).optional().nullable().transform((v) => (v === '' ? null : v)),
   installation_number: z.string().min(1, 'Número da instalação é obrigatório').max(60),
-  discount_option: z.enum(['8', '10', '12', '14']).optional().nullable(),
-  document_type: z.string().max(60).optional().nullable(),
+  discount_option: z.union([z.enum(['8', '10', '12', '14']), z.literal('')]).optional().transform((v) => (v === '' ? null : v)),
+  document_type: z.string().max(60).optional().nullable().transform((v) => (v === '' ? null : v)),
   // paths set by server after upload
   document_front_path: z.string().optional().nullable(),
   document_back_path: z.string().optional().nullable(),
   // 1.5 Procurador e conta
   has_procurator: z.union([z.string(), z.number()]).optional().transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
-  energy_bill_password: z.string().max(255).optional().nullable(),
+  energy_bill_password: z.string().max(255).optional().nullable().transform((v) => (v === '' ? null : v)),
   energy_bill_path: z.string().optional().nullable(),
   has_pending_debts: z.union([z.string(), z.number()]).optional().transform((v) => (v === 'sim' || v === 'Sim' || v === 1 || v === '1') ? 1 : 0),
   payment_proof_path: z.string().optional().nullable(),
   status: z.string().optional(),
   source: z.string().optional(),
-  id_campaign: z.string().optional().nullable(),
+  id_campaign: z.string().optional().nullable().transform((v) => (v === '' ? null : v)),
 })
   .refine((data) => String(data.phone).replace(/\D/g, '') === String(data.phone_confirm).replace(/\D/g, ''), { message: 'Celular e confirmação devem ser iguais', path: ['phone_confirm'] })
   .refine((data) => (data.email || '').toLowerCase() === (data.email_confirm || '').toLowerCase(), { message: 'E-mail e confirmação devem ser iguais', path: ['email_confirm'] })

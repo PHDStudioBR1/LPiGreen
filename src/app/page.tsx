@@ -1,7 +1,6 @@
 "use client"
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { HeroSection } from '@/components/sections/hero';
 import { AuthoritySection } from '@/components/sections/authority';
 import { HowItWorksSection } from '@/components/sections/how-it-works';
@@ -19,9 +18,11 @@ import { BenefitsSection } from '@/components/sections/benefits';
 import { MediaSection } from '@/components/sections/media';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { StickyHeader } from '@/components/ui/sticky-header';
+import { LeadFormModal } from '@/components/modals/lead-form-modal';
+
 export default function Home() {
-  const router = useRouter();
-  const handleCTAClick = () => router.push('/formulario');
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const handleCTAClick = () => setIsFormModalOpen(true);
 
   return (
     <div className="min-h-screen font-body flex flex-col">
@@ -45,6 +46,8 @@ export default function Home() {
       </main>
 
       <Footer onCTAClick={handleCTAClick} />
+
+      <LeadFormModal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)} />
       
       <WhatsAppButton />
     </div>
