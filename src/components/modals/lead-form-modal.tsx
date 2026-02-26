@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ChevronLeft, ChevronRight, UploadCloud } from "lucide-react";
 import {
@@ -37,10 +37,13 @@ const UFS = [
   "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ];
 
-const DISTRIBUIDORAS = [
-  "CPFL", "CPFL Piratininga", "CPFL Santa Cruz", "Cemig", "Equatorial",
-  "Enel", "Neoenergia", "Outra",
-];
+const ANEEL_DISTRIBUIDORAS_URL = "/api/aneel/distribuidoras";
+
+type AneelDistribuidora = {
+  SigAgente: string;
+  NumCNPJDistribuidora: string;
+  DscBaseTarifaria: string;
+};
 
 const TIPO_DOC = ["RG (Novo)", "RG (Antigo)", "CNH"];
 
@@ -52,6 +55,8 @@ const STEPS = [
   { id: "procurador", title: "Procurador e conta" },
   { id: "final", title: "Finalizar" },
 ];
+const PROGRESS_START_STEP = 1;
+const FORM_SESSION_STORAGE_KEY = "lead_form_session_id";
 
 export type LeadFormValues = {
   cep_landing: string;
@@ -165,17 +170,150 @@ function FileUploadField(props: {
 
 export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const [step, setStep] = useState(0);
+  const [sessionId, setSessionId] = useState<string>("");
   const [files, setFiles] = useState<{
     document_front?: File;
     document_back?: File;
     energy_bill?: File;
     payment_proof?: File;
   }>({});
+  const [distribuidoras, setDistribuidoras] = useState<AneelDistribuidora[]>([]);
+  const [loadingDistribuidoras, setLoadingDistribuidoras] = useState(false);
+  const [distribuidorasError, setDistribuidorasError] = useState<string | null>(null);
+  const [showDistribuidoraSuggestions, setShowDistribuidoraSuggestions] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<LeadFormValues>({ defaultValues });
   const watchHasPendingDebts = form.watch("has_pending_debts");
+
+  const getOrCreateSessionId = useCallback(() => {
+    const fromStorage = window.localStorage.getItem(FORM_SESSION_STORAGE_KEY);
+    if (fromStorage) return fromStorage;
+    const generated =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `lead-${Date.now()}`;
+    window.localStorage.setItem(FORM_SESSION_STORAGE_KEY, generated);
+    return generated;
+  }, []);
+
+  const clearRemoteProgress = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      await fetch(`/api/leads/progress/${encodeURIComponent(sessionId)}`, {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Erro ao limpar cache de progresso:", error);
+    }
+  }, [sessionId]);
+
+  const persistProgress = useCallback(
+    async (stepIndex: number) => {
+      if (!sessionId || stepIndex < PROGRESS_START_STEP) return;
+      try {
+        await fetch("/api/leads/progress", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            step_index: stepIndex,
+            step_id: STEPS[stepIndex]?.id,
+            values: form.getValues(),
+          }),
+        });
+      } catch (error) {
+        console.error("Erro ao salvar progresso no Redis:", error);
+      }
+    },
+    [form, sessionId]
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const sid = getOrCreateSessionId();
+    setSessionId(sid);
+
+    const loadProgress = async () => {
+      try {
+        const res = await fetch(`/api/leads/progress/${encodeURIComponent(sid)}`, {
+          method: "GET",
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.values && typeof data.values === "object") {
+          form.reset({
+            ...defaultValues,
+            ...data.values,
+          });
+        }
+        if (Number.isInteger(data?.step_index) && data.step_index >= PROGRESS_START_STEP) {
+          setStep(Math.min(data.step_index, STEPS.length - 1));
+        }
+      } catch (error) {
+        console.error("Erro ao recuperar progresso salvo:", error);
+      }
+    };
+
+    loadProgress();
+  }, [form, getOrCreateSessionId, isOpen]);
+
+  useEffect(() => {
+    const fetchDistribuidoras = async () => {
+      try {
+        setLoadingDistribuidoras(true);
+        setDistribuidorasError(null);
+
+        const res = await fetch(ANEEL_DISTRIBUIDORAS_URL, {
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        const json = await res.json();
+        const records: AneelDistribuidora[] = json?.result?.records ?? [];
+
+        // Deduplica por nome e remove registros "Não Informado"
+        const porNome = new Map<string, AneelDistribuidora>();
+        for (const r of records) {
+          const nome = typeof r.SigAgente === "string" ? r.SigAgente.trim() : "";
+          if (!nome || nome.toLowerCase() === "não informado") continue;
+          if (!porNome.has(nome)) {
+            porNome.set(nome, r);
+          }
+        }
+
+        const listaOrdenada = Array.from(porNome.values()).sort((a, b) =>
+          a.SigAgente.localeCompare(b.SigAgente, "pt-BR")
+        );
+
+        setDistribuidoras(listaOrdenada);
+      } catch (error) {
+        console.error("Erro ao buscar distribuidoras da ANEEL:", error);
+        setDistribuidorasError(
+          "Não foi possível carregar automaticamente as distribuidoras. Você pode digitar o nome manualmente."
+        );
+      } finally {
+        setLoadingDistribuidoras(false);
+      }
+    };
+
+    fetchDistribuidoras();
+  }, []);
+
+  const formatCnpj = (cnpj: string) => {
+    const onlyNumbers = cnpj.replace(/\D/g, "");
+    if (onlyNumbers.length !== 14) return cnpj;
+
+    return onlyNumbers.replace(
+      /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+      "$1.$2.$3/$4-$5"
+    );
+  };
 
   const fillAddressFromCep = useCallback(
     async (cepValue: string) => {
@@ -232,6 +370,9 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
     setSubmitting(true);
     try {
       const fd = buildFormData();
+      if (sessionId) {
+        fd.append("session_id", sessionId);
+      }
       const res = await fetch("/api/leads", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -243,6 +384,13 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
         return;
       }
       toast({ title: "Enviado!", description: "Seus dados foram registrados. Em breve entraremos em contato." });
+      await clearRemoteProgress();
+      const newSessionId =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `lead-${Date.now()}`;
+      window.localStorage.setItem(FORM_SESSION_STORAGE_KEY, newSessionId);
+      setSessionId(newSessionId);
       form.reset(defaultValues);
       setFiles({});
       setStep(0);
@@ -253,7 +401,10 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   };
 
   const next = () => {
-    if (step < STEPS.length - 1) setStep((s) => s + 1);
+    if (step < STEPS.length - 1) {
+      void persistProgress(step);
+      setStep((s) => s + 1);
+    }
     else form.handleSubmit(onSubmit)();
   };
 
@@ -545,16 +696,57 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Distribuidora de energia</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {DISTRIBUIDORAS.map((d) => (
-                              <SelectItem key={d} value={d}>{d}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              {...field}
+                              placeholder={
+                                loadingDistribuidoras
+                                  ? "Carregando distribuidoras..."
+                                  : "Digite o nome da distribuidora"
+                              }
+                              autoComplete="off"
+                              onFocus={() => setShowDistribuidoraSuggestions(true)}
+                              onChange={(e) => {
+                                field.onChange(e.target.value);
+                                setShowDistribuidoraSuggestions(true);
+                              }}
+                            />
+                            {showDistribuidoraSuggestions && !loadingDistribuidoras && distribuidoras.length > 0 && (
+                              <div className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md">
+                                {distribuidoras
+                                  .filter((d) =>
+                                    !field.value
+                                      ? true
+                                      : d.SigAgente.toLowerCase().includes(field.value.toLowerCase())
+                                  )
+                                  .slice(0, 30)
+                                  .map((d) => (
+                                    <button
+                                      type="button"
+                                      key={`${d.SigAgente}-${d.NumCNPJDistribuidora}`}
+                                      className="flex w-full items-center justify-between px-3 py-1.5 text-sm hover:bg-muted text-left"
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        form.setValue("power_company", d.SigAgente);
+                                        setShowDistribuidoraSuggestions(false);
+                                      }}
+                                    >
+                                      <span className="truncate">{d.SigAgente}</span>
+                                      <span className="ml-2 text-xs text-muted-foreground">
+                                        {formatCnpj(d.NumCNPJDistribuidora)}
+                                      </span>
+                                    </button>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
+                        </FormControl>
+                        {distribuidorasError && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {distribuidorasError}
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}

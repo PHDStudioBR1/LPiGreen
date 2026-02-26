@@ -96,7 +96,20 @@ kubectl apply -f "$K8S_DIR/mysql-create-user-job.yaml" -n "$NAMESPACE"
 kubectl wait --for=condition=complete job/mysql-create-app-user -n "$NAMESPACE" --timeout=120s 2>/dev/null || echo -e "${YELLOW}Job em andamento ou já concluído${NC}"
 echo ""
 
-echo -e "${BLUE}7. Deploy API (backend)...${NC}"
+echo -e "${BLUE}7. Job migração de logs de formulário (idempotente)...${NC}"
+kubectl delete job mysql-lead-form-logs-migration -n "$NAMESPACE" --ignore-not-found=true
+kubectl apply -f "$K8S_DIR/mysql-lead-form-logs-migration-job.yaml" -n "$NAMESPACE"
+kubectl wait --for=condition=complete job/mysql-lead-form-logs-migration -n "$NAMESPACE" --timeout=120s 2>/dev/null || echo -e "${YELLOW}Job em andamento ou já concluído${NC}"
+echo ""
+
+echo -e "${BLUE}8. Deploy Redis...${NC}"
+kubectl apply -f "$K8S_DIR/redis-secret.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/redis-pvc.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/redis-deployment.yaml" -n "$NAMESPACE"
+kubectl rollout status deployment/redis -n "$NAMESPACE" --timeout=180s 2>/dev/null || echo -e "${YELLOW}Redis ainda iniciando${NC}"
+echo ""
+
+echo -e "${BLUE}9. Deploy API (backend)...${NC}"
 kubectl apply -f "$K8S_DIR/api-secret.yaml" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/backend-deployment.yaml" -n "$NAMESPACE"
 kubectl set image deployment/lpigreen-api api="${DOCKER_REGISTRY}/lpigreen-api:${VERSION}" -n "$NAMESPACE"
@@ -104,7 +117,7 @@ kubectl rollout status deployment/lpigreen-api -n "$NAMESPACE" --timeout=300s
 echo -e "${GREEN}✓ API implantada${NC}"
 echo ""
 
-echo -e "${BLUE}8. Deploy frontend e Ingress...${NC}"
+echo -e "${BLUE}10. Deploy frontend e Ingress...${NC}"
 kubectl apply -f "$K8S_DIR/deployment.yaml" -n "$NAMESPACE"
 kubectl set image deployment/lpigreen-web web="${DOCKER_REGISTRY}/lpigreen-web:${VERSION}" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/middlewares/" -n "$NAMESPACE"

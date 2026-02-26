@@ -25,10 +25,10 @@ export default function Home() {
   const handleCTAClick = () => setIsFormModalOpen(true);
 
   return (
-    <div className="min-h-screen font-body flex flex-col">
+    <div className="min-h-screen w-full min-w-0 font-body flex flex-col overflow-x-hidden">
       <StickyHeader onCTAClick={handleCTAClick} />
       
-      <main className="flex-grow">
+      <main className="flex-grow w-full min-w-0">
         <HeroSection onCTAClick={handleCTAClick} />
         <AuthoritySection onCTAClick={handleCTAClick} />
         <LegalSection />

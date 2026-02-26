@@ -9,6 +9,13 @@ export const config = {
     password: process.env.MYSQL_PASSWORD || '',
     database: process.env.MYSQL_DATABASE || 'igreen_captacao',
   },
+  redis: {
+    host: process.env.REDIS_HOST || 'redis',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || '',
+    db: parseInt(process.env.REDIS_DB || '0', 10),
+    ttlSeconds: parseInt(process.env.REDIS_TTL_SECONDS || '259200', 10),
+  },
   apiKey: process.env.API_KEY || '',
   uploadDir: process.env.UPLOAD_DIR || './uploads',
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),

@@ -10,7 +10,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bg');
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-6">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-12 sm:py-20 px-4 sm:px-6 w-full">
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         {heroImage && (
@@ -26,18 +26,18 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
       </div>
 
-      <div className="container relative z-10 mx-auto grid lg:grid-cols-2 gap-12 items-center">
-        <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000">
+      <div className="container relative z-10 mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12 items-center w-full max-w-full">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-left duration-1000 min-w-0">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full text-primary-foreground font-semibold text-sm">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Representante iGreen Energy
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" />
+            <span className="truncate">Representante iGreen Energy</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-headline font-black text-white leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-headline font-black text-white leading-tight break-words">
             Economia na conta de luz <span className="text-primary italic">sem investimento, sem burocracia e sem fidelidade</span>
           </h1>
 
-          <div className="space-y-4 text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed">
+          <div className="space-y-4 text-base sm:text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed min-w-0">
             <p>
               Energia limpa injetada na rede da sua distribuidora (Cemig, CPFL, Equatorial e outras) — tudo amparado pela{' '}
               <span className="text-white font-bold underline decoration-primary">Lei nº 14.300/2022</span>.
@@ -50,17 +50,18 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
             <Button
               size="lg"
               onClick={onCTAClick}
-              className="h-16 px-8 text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all"
+              className="h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all w-full sm:w-auto text-center"
             >
-              Faça parte da maior transição energética do Brasil agora
+              <span className="sm:hidden">Quero economizar na conta de luz</span>
+              <span className="hidden sm:inline">Faça parte da maior transição energética do Brasil agora</span>
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 pt-4 text-gray-300">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4 text-gray-300">
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5" />
               <span>Zero Investimento</span>

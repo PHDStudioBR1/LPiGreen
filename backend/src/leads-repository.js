@@ -105,3 +105,179 @@ export async function listLeadsByEligibilityStatus(status = 'nao_verificado') {
   return rows;
 }
 
+export async function updateLeadEligibilityByDocument(documentNumber, eligibilityStatus) {
+  const pool = getPool();
+  const [result] = await pool.execute(
+    `UPDATE leads
+     SET eligibility_status = ?
+     WHERE document_number = ?`,
+    [eligibilityStatus, documentNumber]
+  );
+  return result.affectedRows;
+}
+
+export async function listLeads(filters = {}) {
+  const pool = getPool();
+
+  const {
+    status,
+    eligibility_status: eligibilityStatus,
+    representante_id: representanteId,
+    document_number: documentNumber,
+    created_from: createdFrom,
+    created_to: createdTo,
+    limit = 50,
+    offset = 0,
+  } = filters;
+
+  const where = [];
+  const params = [];
+
+  if (status) {
+    where.push('status = ?');
+    params.push(status);
+  }
+  if (eligibilityStatus) {
+    where.push('eligibility_status = ?');
+    params.push(eligibilityStatus);
+  }
+  if (representanteId) {
+    where.push('representante_id = ?');
+    params.push(representanteId);
+  }
+  if (documentNumber) {
+    where.push('document_number LIKE ?');
+    params.push(`%${documentNumber}%`);
+  }
+  if (createdFrom) {
+    where.push('created_at >= ?');
+    params.push(createdFrom);
+  }
+  if (createdTo) {
+    where.push('created_at <= ?');
+    params.push(createdTo);
+  }
+
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+  const [rows] = await pool.query(
+    `
+      SELECT
+        id,
+        document_number,
+        name,
+        email,
+        phone,
+        eligibility_status,
+        status,
+        source,
+        representante_id,
+        created_at
+      FROM leads
+      ${whereSql}
+      ORDER BY created_at DESC
+      LIMIT ?
+      OFFSET ?
+    `,
+    [...params, Number(limit), Number(offset)]
+  );
+
+  return rows;
+}
+
+export async function getLeadById(id) {
+  const pool = getPool();
+  const [rows] = await pool.query(
+    `
+      SELECT
+        id,
+        cep_landing,
+        valor_conta,
+        document_number,
+        name,
+        birth_date,
+        phone,
+        phone_confirm,
+        email,
+        email_confirm,
+        cep,
+        address,
+        number,
+        neighborhood,
+        city,
+        state,
+        complement,
+        power_company,
+        installation_number,
+        discount_option,
+        document_type,
+        document_front_path,
+        document_back_path,
+        has_procurator,
+        energy_bill_password,
+        energy_bill_path,
+        has_pending_debts,
+        payment_proof_path,
+        representante_id,
+        eligibility_status,
+        status,
+        source,
+        id_campaign,
+        created_at
+      FROM leads
+      WHERE id = ?
+    `,
+    [id]
+  );
+
+  if (!rows || rows.length === 0) {
+    return null;
+  }
+
+  return rows[0];
+}
+
+export async function updateLeadById(id, fields) {
+  const pool = getPool();
+
+  const allowedFields = ['status', 'eligibility_status', 'representante_id', 'id_campaign'];
+  const setParts = [];
+  const params = [];
+
+  for (const key of allowedFields) {
+    if (Object.prototype.hasOwnProperty.call(fields, key)) {
+      setParts.push(`${key} = ?`);
+      params.push(fields[key]);
+    }
+  }
+
+  if (setParts.length === 0) {
+    return 0;
+  }
+
+  const [result] = await pool.execute(
+    `
+      UPDATE leads
+      SET ${setParts.join(', ')}
+      WHERE id = ?
+    `,
+    [...params, id]
+  );
+
+  return result.affectedRows;
+}
+
+export async function softDeleteLeadById(id) {
+  const pool = getPool();
+  const [result] = await pool.execute(
+    `
+      UPDATE leads
+      SET status = 'deleted'
+      WHERE id = ?
+    `,
+    [id]
+  );
+
+  return result.affectedRows;
+}
+

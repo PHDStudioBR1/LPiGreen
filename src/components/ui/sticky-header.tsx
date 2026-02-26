@@ -18,21 +18,22 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-6 py-3 flex items-center justify-between",
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center justify-between gap-2 w-full min-w-0",
         isScrolled ? "bg-white/80 backdrop-blur-md shadow-md translate-y-0" : "-translate-y-full"
       )}
     >
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+      <div className="flex items-center gap-2 min-w-0 shrink">
+        <div className="w-8 h-8 shrink-0 bg-primary rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-xs">iG</span>
         </div>
-        <span className="font-headline font-bold text-xl text-primary">iGreen Energy</span>
+        <span className="font-headline font-bold text-lg sm:text-xl text-primary truncate">iGreen Energy</span>
       </div>
-      <Button 
+      <Button
         onClick={onCTAClick}
-        className="rounded-full font-bold shadow-lg bg-primary hover:bg-primary/90 transition-all"
+        className="rounded-full font-bold shadow-lg bg-primary hover:bg-primary/90 transition-all shrink-0 text-sm sm:text-base px-4 sm:px-6 py-2"
       >
-        Faça parte da transição energética
+        <span className="sm:hidden">Quero economizar</span>
+        <span className="hidden sm:inline">Faça parte da transição energética</span>
       </Button>
     </header>
   );

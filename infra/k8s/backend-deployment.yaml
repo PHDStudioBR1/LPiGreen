@@ -50,6 +50,19 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: api-key
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: redis-password
+            - name: REDIS_DB
+              value: "0"
+            - name: REDIS_TTL_SECONDS
+              value: "259200"
             - name: UPLOAD_DIR
               value: "/app/uploads"
           volumeMounts:
