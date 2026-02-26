@@ -34,6 +34,25 @@ spec:
   entryPoints:
     - websecure
   routes:
+    # POST /api/leads vai para o frontend (Next.js), que faz proxy para o backend com API Key
+    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/leads`)
+      kind: Rule
+      services:
+        - name: web-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
+    # Demais rotas /api (ex.: health) -> backend
+    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: api-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
+    # Frontend (web)
     - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/`)
       kind: Rule
       services:

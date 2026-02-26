@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 
@@ -23,7 +24,7 @@ const NEWS_ITEMS = [
   },
 ];
 
-export function AuthoritySection() {
+export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
   return (
     <section className="py-20 bg-white border-y border-border">
       <div className="container mx-auto px-6">
@@ -42,29 +43,38 @@ export function AuthoritySection() {
 
         <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
           {NEWS_ITEMS.map((item) => (
-            <Card
-              key={item.outlet}
-              className="group overflow-hidden rounded-2xl border border-border shadow-lg hover:shadow-xl transition-shadow"
-            >
-              <CardContent className="flex h-full flex-col justify-between p-6 space-y-4">
-                <div className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">
-                  {item.outlet}
-                </div>
-                <p className="text-base md:text-lg font-semibold text-gray-900 leading-snug">
-                  {item.title}
-                </p>
-                <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2">
-                  <span>Ver matéria completa</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-              </CardContent>
-            </Card>
+            <Link key={item.outlet} href="/formulario">
+              <Card className="group overflow-hidden rounded-2xl border border-border shadow-lg hover:shadow-xl transition-shadow h-full">
+                <CardContent className="flex h-full flex-col justify-between p-6 space-y-4">
+                  <div className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">
+                    {item.outlet}
+                  </div>
+                  <p className="text-base md:text-lg font-semibold text-gray-900 leading-snug">
+                    {item.title}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2">
+                    <span>Ver matéria completa</span>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
         <p className="mt-10 text-center text-sm text-gray-600 max-w-3xl mx-auto">
           Faça parte da maior transição energética do Brasil: descubra como se proteger desses aumentos e economizar na sua conta de luz.
         </p>
+        {onCTAClick && (
+          <div className="mt-6 text-center">
+            <Link
+              href="/formulario"
+              className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all"
+            >
+              Quero economizar na conta de luz
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

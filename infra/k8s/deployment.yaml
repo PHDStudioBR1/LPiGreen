@@ -32,6 +32,13 @@ spec:
           value: "3000"
         - name: HOSTNAME
           value: "0.0.0.0"
+        - name: LEAD_API_URL
+          value: "http://api-service"
+        - name: LEAD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secret
+              key: api-key
         livenessProbe:
           httpGet:
             path: /

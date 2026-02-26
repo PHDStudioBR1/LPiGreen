@@ -1,8 +1,9 @@
 "use client"
 
 import React from 'react';
+import Link from 'next/link';
 
-export function Footer() {
+export function Footer({ onCTAClick }: { onCTAClick?: () => void }) {
   return (
     <footer className="bg-gray-950 text-gray-400 py-16">
       <div className="container mx-auto px-6">
@@ -16,6 +17,16 @@ export function Footer() {
           <p className="text-sm text-gray-400">
             WhatsApp • E-mail • @igreenenergy
           </p>
+          {onCTAClick && (
+            <div className="pt-4">
+              <Link
+                href="/formulario"
+                className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all"
+              >
+                Faça parte da transição energética
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="pt-8 border-t border-white/5 text-center text-xs space-y-3">

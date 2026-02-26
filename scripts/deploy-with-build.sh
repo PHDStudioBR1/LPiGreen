@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build da imagem LPiGreen (Next.js), push para o registry e deploy no Kubernetes.
+# Build das imagens LPiGreen (frontend + backend), push para o registry e deploy no Kubernetes.
 # Use este script quando alterar código e quiser implantar a nova versão.
 #
 # Requer: Docker em execução, login no registry (docker login), kubectl configurado.
@@ -18,10 +18,7 @@ K8S_DIR="$PROJECT_ROOT/infra/k8s"
 NAMESPACE="${K8S_NAMESPACE:-lpigreen}"
 
 DOCKER_REGISTRY="${DOCKER_REGISTRY:-donavanalencar}"
-PROJECT_NAME="lpigreen-web"
 VERSION="${VERSION:-latest}"
-IMAGE_NAME="${DOCKER_REGISTRY}/${PROJECT_NAME}:${VERSION}"
-IMAGE_LATEST="${DOCKER_REGISTRY}/${PROJECT_NAME}:latest"
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -33,54 +30,95 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}  BUILD + PUSH + DEPLOY - LPiGreen${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
-echo -e "Registry: ${DOCKER_REGISTRY}"
-echo -e "Image:   ${IMAGE_NAME}"
+echo -e "Registry:  ${DOCKER_REGISTRY}"
+echo -e "Version:   ${VERSION}"
 echo -e "Namespace: ${NAMESPACE}"
 echo ""
 
-# 1. Build
-echo -e "${BLUE}1. Building image...${NC}"
+# --- 1. Build frontend ---
+echo -e "${BLUE}1. Building frontend (lpigreen-web)...${NC}"
 if [[ ! -f "$PROJECT_ROOT/Dockerfile" ]]; then
     echo -e "${RED}Dockerfile não encontrado em $PROJECT_ROOT${NC}" >&2
     exit 1
 fi
 docker build -f "$PROJECT_ROOT/Dockerfile" \
-    -t "$IMAGE_NAME" -t "$IMAGE_LATEST" \
+    -t "${DOCKER_REGISTRY}/lpigreen-web:${VERSION}" -t "${DOCKER_REGISTRY}/lpigreen-web:latest" \
     "$PROJECT_ROOT"
-echo -e "${GREEN}✓ Build concluído${NC}"
+echo -e "${GREEN}✓ Frontend build concluído${NC}"
 echo ""
 
-# 2. Push
-echo -e "${BLUE}2. Pushing image...${NC}"
-docker push "$IMAGE_NAME"
-docker push "$IMAGE_LATEST"
+# --- 2. Build backend ---
+echo -e "${BLUE}2. Building backend (lpigreen-api)...${NC}"
+if [[ ! -f "$PROJECT_ROOT/backend/Dockerfile" ]]; then
+    echo -e "${RED}Dockerfile do backend não encontrado${NC}" >&2
+    exit 1
+fi
+docker build -f "$PROJECT_ROOT/backend/Dockerfile" \
+    -t "${DOCKER_REGISTRY}/lpigreen-api:${VERSION}" -t "${DOCKER_REGISTRY}/lpigreen-api:latest" \
+    "$PROJECT_ROOT/backend"
+echo -e "${GREEN}✓ Backend build concluído${NC}"
+echo ""
+
+# --- 3. Push imagens ---
+echo -e "${BLUE}3. Pushing imagens...${NC}"
+docker push "${DOCKER_REGISTRY}/lpigreen-web:${VERSION}"
+docker push "${DOCKER_REGISTRY}/lpigreen-web:latest"
+docker push "${DOCKER_REGISTRY}/lpigreen-api:${VERSION}"
+docker push "${DOCKER_REGISTRY}/lpigreen-api:latest"
 echo -e "${GREEN}✓ Push concluído${NC}"
 echo ""
 
-# 3. Deploy no Kubernetes (namespace já criado ou será criado)
-echo -e "${BLUE}3. Deploy no cluster...${NC}"
+# --- 4. Deploy no Kubernetes ---
 if ! command -v kubectl &> /dev/null; then
     echo -e "${RED}kubectl não encontrado${NC}" >&2
     exit 1
 fi
+
+echo -e "${BLUE}4. Aplicando namespace e ConfigMap mysql-init...${NC}"
 kubectl apply -f "$K8S_DIR/namespace.yaml"
+kubectl create configmap mysql-init -n "$NAMESPACE" \
+    --from-file=init.sql="$PROJECT_ROOT/infra/mysql/init.sql" \
+    --dry-run=client -o yaml | kubectl apply -f -
+echo -e "${GREEN}✓${NC}"
+echo ""
+
+echo -e "${BLUE}5. Deploy MySQL...${NC}"
+kubectl apply -f "$K8S_DIR/mysql-secret.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/mysql-configmap.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/mysql-pvc.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/mysql-deployment.yaml" -n "$NAMESPACE"
+kubectl rollout status deployment/mysql -n "$NAMESPACE" --timeout=300s 2>/dev/null || echo -e "${YELLOW}MySQL ainda iniciando (ok na primeira vez)${NC}"
+echo ""
+
+echo -e "${BLUE}6. Job criar usuário MySQL...${NC}"
+kubectl delete job mysql-create-app-user -n "$NAMESPACE" --ignore-not-found=true
+kubectl apply -f "$K8S_DIR/mysql-create-user-job.yaml" -n "$NAMESPACE"
+kubectl wait --for=condition=complete job/mysql-create-app-user -n "$NAMESPACE" --timeout=120s 2>/dev/null || echo -e "${YELLOW}Job em andamento ou já concluído${NC}"
+echo ""
+
+echo -e "${BLUE}7. Deploy API (backend)...${NC}"
+kubectl apply -f "$K8S_DIR/api-secret.yaml" -n "$NAMESPACE"
+kubectl apply -f "$K8S_DIR/backend-deployment.yaml" -n "$NAMESPACE"
+kubectl set image deployment/lpigreen-api api="${DOCKER_REGISTRY}/lpigreen-api:${VERSION}" -n "$NAMESPACE"
+kubectl rollout status deployment/lpigreen-api -n "$NAMESPACE" --timeout=300s
+echo -e "${GREEN}✓ API implantada${NC}"
+echo ""
+
+echo -e "${BLUE}8. Deploy frontend e Ingress...${NC}"
 kubectl apply -f "$K8S_DIR/deployment.yaml" -n "$NAMESPACE"
+kubectl set image deployment/lpigreen-web web="${DOCKER_REGISTRY}/lpigreen-web:${VERSION}" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/middlewares/" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/certificate.yaml" -n "$NAMESPACE"
 kubectl apply -f "$K8S_DIR/ingress-route.yaml" -n "$NAMESPACE"
-echo -e "${GREEN}✓ Manifestos aplicados${NC}"
-echo ""
-
-# 4. Aguardar rollout
-echo -e "${BLUE}4. Aguardando rollout do deployment...${NC}"
 kubectl rollout status deployment/lpigreen-web -n "$NAMESPACE" --timeout=300s
-echo -e "${GREEN}✓ LPiGreen implantado com sucesso${NC}"
+echo -e "${GREEN}✓ Frontend e Ingress aplicados${NC}"
 echo ""
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  Deploy concluído!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-echo "Logs: kubectl logs -n $NAMESPACE -l app=lpigreen-web --tail=50 -f"
-echo "Status: kubectl get pods -n $NAMESPACE -l app=lpigreen-web"
+echo "Pods:    kubectl get pods -n $NAMESPACE"
+echo "Web:     kubectl logs -n $NAMESPACE -l app=lpigreen-web --tail=50 -f"
+echo "API:     kubectl logs -n $NAMESPACE -l app=lpigreen-api --tail=50 -f"
 echo ""

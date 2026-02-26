@@ -1,0 +1,9 @@
+# Parâmetros opcionais do MySQL (podem ser usados no deployment como env ou args)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: lpigreen
+data:
+  MYSQL_DATABASE: "igreen_captacao"
+  # MYSQL_CHARSET: "utf8mb4"

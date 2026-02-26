@@ -65,15 +65,15 @@ export function EligibilityModal({ isOpen, onClose }: EligibilityModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-2xl overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] rounded-2xl flex flex-col p-6 gap-0 overflow-hidden">
+        <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="text-2xl font-headline font-bold text-primary">Verifique se você está apto</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogDescription className="text-muted-foreground text-sm">
             Preencha os dados abaixo. Em até 24h um especialista confirmará se sua região tem cobertura para economia na conta de luz (Conexão Green — sem investimento, sem fidelidade).
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-2 overflow-y-auto flex-1 min-h-0 pb-2 pr-1 -mr-1">
             <FormField
               control={form.control}
               name="name"

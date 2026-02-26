@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build e Push imagem
+      - name: Build e Push imagem (frontend)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -71,6 +71,18 @@ jobs:
             ${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest
             ${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}
           cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest
+          cache-to: type=inline
+
+      - name: Build e Push imagem (backend API)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest
+            ${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest
           cache-to: type=inline
 
   deploy:
@@ -102,7 +114,36 @@ jobs:
       - name: Aplicar Namespace
         run: kubectl apply -f infra/k8s/namespace.yaml
 
-      - name: Deploy aplicação
+      - name: ConfigMap mysql-init (script de criação do banco)
+        run: |
+          kubectl create configmap mysql-init -n ${{ env.K8S_NAMESPACE }} \
+            --from-file=init.sql=infra/mysql/init.sql \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy MySQL (secret, config, pvc, deployment)
+        run: |
+          kubectl apply -f infra/k8s/mysql-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/mysql-configmap.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/mysql-pvc.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/mysql-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/mysql -n ${{ env.K8S_NAMESPACE }} --timeout=300s || true
+
+      - name: Job criar usuário MySQL (idempotente)
+        run: |
+          kubectl delete job mysql-create-app-user -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
+          kubectl apply -f infra/k8s/mysql-create-user-job.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl wait --for=condition=complete job/mysql-create-app-user -n ${{ env.K8S_NAMESPACE }} --timeout=120s || true
+
+      - name: Deploy API (backend)
+        run: |
+          kubectl apply -f infra/k8s/api-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/backend-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl set image deployment/lpigreen-api \
+            api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }} \
+            -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+
+      - name: Deploy aplicação (frontend)
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl set image deployment/lpigreen-web \

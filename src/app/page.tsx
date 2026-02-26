@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import { HeroSection } from '@/components/sections/hero';
 import { AuthoritySection } from '@/components/sections/authority';
 import { HowItWorksSection } from '@/components/sections/how-it-works';
@@ -18,15 +19,9 @@ import { BenefitsSection } from '@/components/sections/benefits';
 import { MediaSection } from '@/components/sections/media';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { StickyHeader } from '@/components/ui/sticky-header';
-import { EligibilityModal } from '@/components/modals/eligibility-modal';
-import { Toaster } from '@/components/ui/toaster';
-
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleCTAClick = () => {
-    setIsModalOpen(true);
-  };
+  const router = useRouter();
+  const handleCTAClick = () => router.push('/formulario');
 
   return (
     <div className="min-h-screen font-body flex flex-col">
@@ -34,7 +29,7 @@ export default function Home() {
       
       <main className="flex-grow">
         <HeroSection onCTAClick={handleCTAClick} />
-        <AuthoritySection />
+        <AuthoritySection onCTAClick={handleCTAClick} />
         <LegalSection />
         <GlobalTrendSection />
         <PressProofSection />
@@ -49,16 +44,9 @@ export default function Home() {
         <FAQSection />
       </main>
 
-      <Footer />
+      <Footer onCTAClick={handleCTAClick} />
       
       <WhatsAppButton />
-      
-      <EligibilityModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
-
-      <Toaster />
     </div>
   );
 }
