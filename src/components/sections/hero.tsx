@@ -23,18 +23,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             data-ai-hint={heroImage.imageHint}
           />
         )}
-        <div className="absolute inset-0 overflow-hidden z-0">
-          <iframe
-            src="https://player.vimeo.com/video/1168986086?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0"
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            aria-hidden="true"
-            tabIndex={-1}
-          />
-          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        </div>
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
       </div>
 
       <div className="container relative z-10 mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12 items-center w-full max-w-full">
@@ -88,7 +77,19 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
           </div>
         </div>
 
-        <div className="hidden lg:block animate-in fade-in slide-in-from-right duration-1000">
+        <div className="hidden lg:flex lg:flex-col lg:gap-4 animate-in fade-in slide-in-from-right duration-1000 w-full">
+          {/* Vídeo acima do card "Simulação Real" — mesma estética da imagem */}
+          <div className="relative w-full overflow-hidden rounded-[2.5rem] shadow-2xl aspect-video bg-black/20">
+            <iframe
+              src="https://player.vimeo.com/video/1168986086?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0"
+              className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+          </div>
           <div className="glass p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
              <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
              <div className="relative z-10 space-y-6">
