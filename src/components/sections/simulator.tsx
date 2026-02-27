@@ -26,7 +26,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
             </p>
           </div>
 
-          <Card className="rounded-[2.5rem] border-none shadow-2xl bg-white overflow-hidden">
+          <Card className="rounded-[2.5rem] border-none shadow-2xl bg-white dark:bg-neutral-800 overflow-hidden">
             <CardContent className="p-8 md:p-12">
               <div className="space-y-12">
                 <div className="space-y-6">

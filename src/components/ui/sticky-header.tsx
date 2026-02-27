@@ -1,4 +1,4 @@
-\"use client\";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
       className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center justify-between gap-2 w-full min-w-0",
         isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-md translate-y-0"
+          ? "bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md shadow-md translate-y-0"
           : "-translate-y-full"
       )}
     >

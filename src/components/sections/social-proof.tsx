@@ -80,7 +80,10 @@ export function SocialProofSection() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {TESTIMONIALS.map((t, idx) => (
-            <Card key={idx} className="rounded-3xl border-none shadow-lg hover:shadow-xl transition-all bg-white overflow-hidden">
+            <Card
+              key={idx}
+              className="rounded-3xl border-none shadow-lg hover:shadow-xl transition-all bg-white dark:bg-neutral-800 overflow-hidden"
+            >
               <CardContent className="p-8 space-y-6">
                 <div className="flex gap-1 text-yellow-400">
                   {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}

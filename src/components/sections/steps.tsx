@@ -33,7 +33,7 @@ const STEPS = [
 
 export function StepsSection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white dark:bg-neutral-950">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
           <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">

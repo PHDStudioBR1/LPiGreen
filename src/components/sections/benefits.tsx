@@ -34,7 +34,10 @@ export function BenefitsSection() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {BENEFITS.map((benefit) => (
-            <Card key={benefit.title} className="rounded-3xl border border-border shadow-lg bg-white">
+            <Card
+              key={benefit.title}
+              className="rounded-3xl border border-border shadow-lg bg-white dark:bg-neutral-800 dark:border-neutral-700"
+            >
               <CardContent className="p-6 space-y-2">
                 <h3 className="text-base font-bold text-foreground">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{benefit.text}</p>

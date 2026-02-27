@@ -13,7 +13,7 @@ export function HowItWorksSection() {
           </h2>
         </div>
 
-        <Card className="max-w-4xl mx-auto mb-12 rounded-[2.5rem] border-none shadow-2xl bg-white">
+        <Card className="max-w-4xl mx-auto mb-12 rounded-[2.5rem] border-none shadow-2xl bg-white dark:bg-neutral-800">
           <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
             <p>
               Você conhece operadora de celular, certo? Claro, Vivo, TIM, Oi...
