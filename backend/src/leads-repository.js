@@ -19,9 +19,15 @@ async function getNextRepresentativeId(connection) {
   return rows[0].id;
 }
 
-export async function insertLead(lead) {
+function isConnectionClosedError(err) {
+  const msg = (err && err.message) ? String(err.message) : '';
+  return /closed state|Connection lost|ECONNRESET|ECONNREFUSED|broken pipe/i.test(msg);
+}
+
+export async function insertLead(lead, _retry = false) {
   const pool = getPool();
   const connection = await pool.getConnection();
+  let released = false;
 
   try {
     await connection.beginTransaction();
@@ -76,10 +82,15 @@ export async function insertLead(lead) {
     await connection.commit();
     return result.insertId;
   } catch (error) {
-    await connection.rollback();
+    await connection.rollback().catch(() => {});
+    if (isConnectionClosedError(error) && !_retry) {
+      connection.release();
+      released = true;
+      return insertLead(lead, true);
+    }
     throw error;
   } finally {
-    connection.release();
+    if (!released) connection.release();
   }
 }
 

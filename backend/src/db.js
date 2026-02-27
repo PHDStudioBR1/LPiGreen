@@ -14,6 +14,8 @@ export function getPool() {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10000,
     });
   }
   return pool;
