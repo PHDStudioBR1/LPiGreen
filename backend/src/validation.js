@@ -61,10 +61,16 @@ export const leadSchema = z.object({
   // 1.2 Cadastro
   document_number: z.string().min(1, 'CPF ou CNPJ é obrigatório').refine(cpfCnpjRefine, 'CPF ou CNPJ inválido'),
   name: z.string().min(2, 'Nome completo é obrigatório').max(255),
-  birth_date: z.string().min(1, 'Data de nascimento é obrigatória').refine((d) => {
-    const parsed = parseBrDate(d);
-    return parsed && parsed < new Date();
-  }, 'Data inválida'),
+  birth_date: z.string().min(1, 'Data de nascimento é obrigatória')
+    .transform((d) => {
+      const p = parseBrDate(d);
+      if (!p) return d;
+      const y = p.getFullYear();
+      const m = String(p.getMonth() + 1).padStart(2, '0');
+      const day = String(p.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    })
+    .refine((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && new Date(d) < new Date(), 'Data inválida'),
   phone: z.string().min(10, 'WhatsApp inválido'),
   phone_confirm: z.string().min(10, 'Confirme seu celular'),
   email: z.string().email('E-mail inválido'),

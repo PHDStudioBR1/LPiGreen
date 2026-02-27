@@ -39,7 +39,7 @@ ON DUPLICATE KEY UPDATE
 -- GRANT abaixo assume que o usuário já foi criado (ex.: via job que lê o Secret)
 -- Para init automático com senha fixa em dev, descomente e ajuste:
 -- CREATE USER IF NOT EXISTS 'igreen_app'@'%' IDENTIFIED BY 'change_me_in_secret';
--- GRANT SELECT, INSERT, UPDATE ON igreen_captacao.* TO 'igreen_app'@'%';
+-- GRANT SELECT, INSERT, UPDATE, DELETE ON igreen_captacao.* TO 'igreen_app'@'%';
 -- FLUSH PRIVILEGES;
 
 -- ------------------------------------------------------------
