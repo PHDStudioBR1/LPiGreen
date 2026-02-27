@@ -23,7 +23,18 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             data-ai-hint={heroImage.imageHint}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 overflow-hidden z-0">
+          <iframe
+            src="https://player.vimeo.com/video/1168986086?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        </div>
       </div>
 
       <div className="container relative z-10 mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12 items-center w-full max-w-full">
