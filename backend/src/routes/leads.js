@@ -18,6 +18,7 @@ import {
   getLeadFormLogById,
   deleteLeadFormLogById,
 } from '../lead-form-logs-repository.js';
+import { documentValidationService } from '../document-validation/index.js';
 
 const router = Router();
 const CACHE_START_STEP_INDEX = 1;
@@ -122,7 +123,53 @@ router.post('/', uploadFields, async (req, res) => {
         details: parsed.error.flatten().fieldErrors,
       });
     }
+
     const leadId = await insertLead(parsed.data);
+
+    const documentosParaValidacao = [
+      {
+        slot: 'document_front',
+        label: 'Documento pessoal – Frente',
+        tipo_esperado: 'rg_ou_cnh_frente',
+        mimetype: req.files?.document_front?.[0]?.mimetype || null,
+        size_bytes: req.files?.document_front?.[0]?.size ?? null,
+        ocr_text: null,
+        metadata: { field: 'document_front' },
+      },
+      {
+        slot: 'document_back',
+        label: 'Documento pessoal – Verso',
+        tipo_esperado: 'rg_verso',
+        mimetype: req.files?.document_back?.[0]?.mimetype || null,
+        size_bytes: req.files?.document_back?.[0]?.size ?? null,
+        ocr_text: null,
+        metadata: { field: 'document_back' },
+      },
+      {
+        slot: 'energy_bill',
+        label: 'Conta de luz',
+        tipo_esperado: 'conta_de_luz',
+        mimetype: req.files?.energy_bill?.[0]?.mimetype || null,
+        size_bytes: req.files?.energy_bill?.[0]?.size ?? null,
+        ocr_text: null,
+        metadata: { field: 'energy_bill' },
+      },
+    ];
+
+    let documentValidation = null;
+    try {
+      documentValidation = await documentValidationService.validateDocuments({
+        documentos: documentosParaValidacao,
+        formContext: {
+          document_type: parsed.data.document_type,
+          power_company: parsed.data.power_company,
+          installation_number: parsed.data.installation_number,
+          has_pending_debts: parsed.data.has_pending_debts,
+        },
+      });
+    } catch (error) {
+      console.error('Lead document validation error:', error.message);
+    }
 
     await registerLeadProgressLog(req, {
       sessionId: typeof body.session_id === 'string' ? body.session_id.slice(0, MAX_SESSION_ID_LENGTH) : null,
@@ -133,10 +180,15 @@ router.post('/', uploadFields, async (req, res) => {
         lead_id: leadId,
         document_number: parsed.data.document_number,
         email: parsed.data.email,
+        document_validation_status: documentValidation?.status_final || null,
       }),
     });
 
-    return res.status(201).json({ id: leadId, message: 'Lead registrado com sucesso' });
+    return res.status(201).json({
+      id: leadId,
+      message: 'Lead registrado com sucesso',
+      document_validation: documentValidation,
+    });
   } catch (err) {
     console.error('Lead insert error:', err.message);
     return res.status(500).json({ error: 'Erro interno ao processar solicitação' });

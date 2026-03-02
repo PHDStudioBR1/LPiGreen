@@ -20,4 +20,16 @@ export const config = {
   uploadDir: process.env.UPLOAD_DIR || './uploads',
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '60', 10),
+  docAi: {
+    provider: (process.env.DOC_AI_PROVIDER || '').toLowerCase(),
+    timeoutMs: parseInt(process.env.DOC_AI_TIMEOUT_MS || '8000', 10),
+    openai: {
+      apiKey: process.env.OPENAI_API_KEY || '',
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+    },
+    deepseek: {
+      apiKey: process.env.DEEPSEEK_API_KEY || '',
+      model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+    },
+  },
 };

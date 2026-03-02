@@ -238,7 +238,31 @@ curl -X POST \
 ```json
 {
   "id": 123,
-  "message": "Lead registrado com sucesso"
+  "message": "Lead registrado com sucesso",
+  "document_validation": {
+    "documentos": [
+      {
+        "slot": "document_front",
+        "tipo_detectado": "rg_frente",
+        "legivel": true,
+        "documento_esperado": true,
+        "confianca": 0.95,
+        "problemas_encontrados": []
+      },
+      {
+        "slot": "energy_bill",
+        "tipo_detectado": "conta_de_luz",
+        "legivel": true,
+        "documento_esperado": true,
+        "confianca": 0.9,
+        "problemas_encontrados": []
+      }
+    ],
+    "status_final": "aprovado",
+    "faltantes": [],
+    "conflitos_duplicados": [],
+    "recomendacao": "aprovar"
+  }
 }
 ```
 
