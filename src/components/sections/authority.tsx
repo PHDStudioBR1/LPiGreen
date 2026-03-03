@@ -52,10 +52,7 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
                   <p className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-snug">
                     {item.title}
                   </p>
-                  <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2">
-                    <span>Ver matéria completa</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2"></div>
                 </CardContent>
               </Card>
             </Link>
