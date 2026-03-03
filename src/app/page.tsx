@@ -27,7 +27,7 @@ export default function Home() {
     <div className="min-h-screen w-full min-w-0 font-body flex flex-col overflow-x-hidden">
       <StickyHeader onCTAClick={handleCTAClick} />
       
-      <main className="flex-grow w-full min-w-0">
+      <main className="flex-grow w-full min-w-0 pt-20">
         <HeroSection onCTAClick={handleCTAClick} />
         <AuthoritySection onCTAClick={handleCTAClick} />
         <LegalSection />
