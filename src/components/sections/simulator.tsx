@@ -110,7 +110,15 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
             </div>
 
             <div className="w-full aspect-video rounded-2xl shadow-2xl border border-border dark:border-neutral-800 overflow-hidden relative bg-black">
-              <iframe src="https://player.vimeo.com/video/1169991922?title=0&byline=0&portrait=0" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen></iframe>
+              <iframe
+                src="https://player.vimeo.com/video/1169991922?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                title="Igreen globo"
+                allowFullScreen
+              ></iframe>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6 mt-8">
