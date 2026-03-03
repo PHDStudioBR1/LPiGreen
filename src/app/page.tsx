@@ -15,7 +15,6 @@ import { PressProofSection } from '@/components/sections/press-proof';
 import { EligibilitySection } from '@/components/sections/eligibility-section';
 import { StepsSection } from '@/components/sections/steps';
 import { BenefitsSection } from '@/components/sections/benefits';
-import { MediaSection } from '@/components/sections/media';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { StickyHeader } from '@/components/ui/sticky-header';
 import { LeadFormModal } from '@/components/modals/lead-form-modal';
@@ -41,7 +40,6 @@ export default function Home() {
         <StepsSection />
         <SocialProofSection />
         <BenefitsSection />
-        <MediaSection />
         <FAQSection />
       </main>
 
