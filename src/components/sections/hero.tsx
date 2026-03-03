@@ -15,14 +15,23 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         {heroImage && (
-          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            className="object-cover"
-            priority
-            data-ai-hint={heroImage.imageHint}
-          />
+          <>
+            <Image
+              src={heroImage.imageUrl}
+              alt={heroImage.description}
+              fill
+              className="object-cover dark:hidden"
+              priority
+              data-ai-hint={heroImage.imageHint}
+            />
+            <Image
+              src="/hero-dark.png"
+              alt="Quarto com janelas à noite"
+              fill
+              className="object-cover hidden dark:block"
+              priority
+            />
+          </>
         )}
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
       </div>
