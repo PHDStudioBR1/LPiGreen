@@ -4,6 +4,7 @@ import React from 'react';
 import { Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { HeroVideo } from '@/components/sections/hero-video';
 
 const TESTIMONIALS = [
   {
@@ -43,18 +44,8 @@ export function SocialProofSection() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-20">
-          <div className="mb-12 overflow-hidden rounded-2xl border border-border shadow-lg">
-            <div className="relative aspect-video w-full overflow-hidden bg-foreground/10">
-              <iframe
-                src="https://player.vimeo.com/video/1170064148?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1"
-                className="absolute inset-0 h-full w-full"
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                title="Depoimento Marcio Garcia sobre iGreen Energy"
-                allowFullScreen
-              ></iframe>
-            </div>
+          <div className="mb-12 overflow-hidden rounded-2.5xl border border-border shadow-lg">
+            <HeroVideo videoId="1170064148" />
           </div>
         </div>
 

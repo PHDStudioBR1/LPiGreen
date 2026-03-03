@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 
-const VIMEO_VIDEO_ID = "1168986086"
-const IFRAME_SRC = `https://player.vimeo.com/video/${VIMEO_VIDEO_ID}?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0`
-
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00"
   const m = Math.floor(seconds / 60)
@@ -17,7 +14,11 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 
-export function HeroVideo() {
+type HeroVideoProps = {
+  videoId?: string
+}
+
+export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const playerRef = useRef<Player | null>(null)
   const isDraggingTimelineRef = useRef(false)
@@ -117,7 +118,7 @@ export function HeroVideo() {
     <div className="relative w-full overflow-hidden rounded-[2.5rem] shadow-2xl aspect-video bg-black/20 group">
       <iframe
         ref={iframeRef}
-        src={IFRAME_SRC}
+        src={`https://player.vimeo.com/video/${videoId}?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0`}
         className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
         frameBorder="0"
         allow="autoplay; fullscreen; picture-in-picture"

@@ -5,6 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Zap } from 'lucide-react';
+import { HeroVideo } from '@/components/sections/hero-video';
 
 export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
   const [billValue, setBillValue] = useState(400);
@@ -109,17 +110,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
               <p className="text-lg text-muted-foreground">A mídia testou e comprovou: entenda como a energia por assinatura reduz a sua conta sem que você precise instalar placas ou investir um centavo.</p>
             </div>
 
-            <div className="w-full aspect-video rounded-2xl shadow-2xl border border-border dark:border-neutral-800 overflow-hidden relative bg-black">
-              <iframe
-                src="https://player.vimeo.com/video/1169991922?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                title="Igreen globo"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <HeroVideo videoId="1169991922" />
             
             <div className="grid md:grid-cols-2 gap-6 mt-8">
               
