@@ -11,7 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'iGreen Energy | Economize até 50% na sua Conta de Luz',
-  description: 'Descubra como economizar até 50% na sua conta de luz usando energia limpa por assinatura. Sem obras e sem investimento. Garantido pela Lei 14.300/2022.',
+  description:
+    'Descubra como economizar até 50% na sua conta de luz usando energia limpa por assinatura. Sem obras e sem investimento. Garantido pela Lei 14.300/2022.',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export const viewport: Viewport = {
