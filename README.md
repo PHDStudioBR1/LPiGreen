@@ -29,6 +29,22 @@ No diretório `backend/` existe um arquivo `.env.example` com exemplos de config
 - `OPENAI_API_KEY` / `OPENAI_MODEL`
 - `DEEPSEEK_API_KEY` / `DEEPSEEK_MODEL`
 
+### Configuração no Kubernetes (GitHub Actions)
+
+No deploy pelo pipeline, o secret `doc-ai-secret` é criado/atualizado a partir dos **GitHub Secrets** do repositório. Configure em *Settings → Secrets and variables → Actions*:
+
+- `DOC_AI_PROVIDER` – `openai` ou `deepseek`
+- `OPENAI_API_KEY` – chave da API OpenAI (se provider = openai)
+- `OPENAI_MODEL` – opcional (default: `gpt-4.1-mini`)
+- `DEEPSEEK_API_KEY` – chave da API DeepSeek (se provider = deepseek)
+- `DEEPSEEK_MODEL` – opcional (default: `deepseek-chat`)
+- `DOC_AI_TIMEOUT_MS` – opcional (default: `8000`)
+
+Se `DOC_AI_PROVIDER` ou a API key correspondente estiverem vazios, a validação fica desativada e a resposta terá `status_final: "necessita_revisao_manual"`. Nos logs do pod da API você verá: `Document validation: desabilitado. Defina DOC_AI_PROVIDER...`
+
+Para deploy manual no cluster, crie o secret antes do backend:  
+`kubectl apply -f infra/k8s/doc-ai-secret.yaml -n lpigreen` (edite o YAML com os valores desejados).
+
 Quando configurado, o backend:
 
 - monta um payload enxuto com **metadados** dos arquivos (`slot`, `mimetype`, tamanho em bytes, etc.);

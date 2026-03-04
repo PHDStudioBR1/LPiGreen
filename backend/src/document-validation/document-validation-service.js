@@ -224,9 +224,19 @@ export class DocumentValidationService {
   async validateDocuments({ documentos, formContext }) {
     const knownSlots = documentos.map((d) => d.slot);
 
-    if (!this.isEnabled() || knownSlots.length === 0) {
+    if (!this.isEnabled()) {
+      console.warn(
+        'Document validation: desabilitado. Defina DOC_AI_PROVIDER (openai|deepseek) e a API key correspondente (OPENAI_API_KEY ou DEEPSEEK_API_KEY).'
+      );
       return this.buildManualReviewFallback(documentos);
     }
+
+    if (knownSlots.length === 0) {
+      console.warn('Document validation: nenhum documento para validar.');
+      return this.buildManualReviewFallback(documentos);
+    }
+
+    console.info(`Document validation: usando provider "${this.config.provider}" para ${knownSlots.length} documento(s).`);
 
     const basePrompt = this.buildPrompt({ documentos, formContext });
 
@@ -238,7 +248,9 @@ export class DocumentValidationService {
       }
 
       try {
-        return parseAndNormalizeModelResponse(firstRaw, knownSlots);
+        const result = parseAndNormalizeModelResponse(firstRaw, knownSlots);
+        console.info(`Document validation: sucesso. status_final=${result.status_final}`);
+        return result;
       } catch (err) {
         console.error('Document validation: erro ao parsear primeira resposta da LLM:', err.message);
       }
@@ -252,7 +264,9 @@ export class DocumentValidationService {
       }
 
       try {
-        return parseAndNormalizeModelResponse(secondRaw, knownSlots);
+        const result = parseAndNormalizeModelResponse(secondRaw, knownSlots);
+        console.info(`Document validation: sucesso no retry. status_final=${result.status_final}`);
+        return result;
       } catch (err) {
         console.error('Document validation: erro ao parsear resposta de retry da LLM:', err.message);
         return this.buildManualReviewFallback(documentos);

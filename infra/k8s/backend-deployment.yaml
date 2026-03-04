@@ -65,6 +65,43 @@ spec:
               value: "259200"
             - name: UPLOAD_DIR
               value: "/app/uploads"
+            # Validação de documentos via IA (provider e chaves vêm do secret doc-ai-secret)
+            - name: DOC_AI_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: DOC_AI_PROVIDER
+                  optional: true
+            - name: DOC_AI_TIMEOUT_MS
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: DOC_AI_TIMEOUT_MS
+                  optional: true
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: OPENAI_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: OPENAI_MODEL
+                  optional: true
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: DEEPSEEK_API_KEY
+                  optional: true
+            - name: DEEPSEEK_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: doc-ai-secret
+                  key: DEEPSEEK_MODEL
+                  optional: true
           volumeMounts:
             - name: uploads
               mountPath: /app/uploads
