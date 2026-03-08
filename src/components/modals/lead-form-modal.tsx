@@ -380,10 +380,23 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
         const message = details && typeof details === "object"
           ? Object.values(details).flat().filter(Boolean).join(". ") || data.error
           : (data.error || "Falha ao enviar.");
-        toast({ title: "Erro de validação", description: message, variant: "destructive" });
+        const isDocumentRejection = res.status === 422 && data.document_validation;
+        toast({
+          title: isDocumentRejection ? "Documentos não aprovados" : "Erro de validação",
+          description: message,
+          variant: "destructive",
+        });
         return;
       }
-      toast({ title: "Enviado!", description: "Seus dados foram registrados. Em breve entraremos em contato." });
+      const validation = data.document_validation;
+      const statusFinal = validation?.status_final;
+      const desc =
+        statusFinal === "aprovado"
+          ? "Seus dados e documentos foram aprovados. Em breve entraremos em contato."
+          : statusFinal === "necessita_revisao_manual"
+            ? "Seus dados foram registrados. Nossa equipe irá conferir os documentos e entrará em contato."
+            : "Seus dados foram registrados. Em breve entraremos em contato.";
+      toast({ title: "Enviado!", description: desc });
       await clearRemoteProgress();
       const newSessionId =
         typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
@@ -786,14 +799,14 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   />
                   <FileUploadField
                     label="Documento pessoal – Frente (obrigatório)"
-                    description="Envie uma foto ou PDF nítido do documento."
+                    description="Envie uma foto nítida da frente do documento (RG ou CNH). Será validado automaticamente."
                     accept="image/*,application/pdf"
                     file={files.document_front}
                     onChange={(file) => setFiles((f) => ({ ...f, document_front: file }))}
                   />
                   <FileUploadField
                     label="Documento pessoal – Verso (obrigatório)"
-                    description="Envie uma foto ou PDF nítido do verso."
+                    description="Envie uma foto nítida do verso do RG. Será validado automaticamente."
                     accept="image/*,application/pdf"
                     file={files.document_back}
                     onChange={(file) => setFiles((f) => ({ ...f, document_back: file }))}
@@ -870,7 +883,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
               {/* 1.6 Finalizar */}
               {step === 5 && (
                 <p className="text-muted-foreground text-sm">
-                  Ao clicar em Finalizar, seus dados serão enviados e nossa equipe entrará em contato.
+                  Ao clicar em Finalizar, seus dados e documentos serão enviados. Os documentos serão validados automaticamente (frente/verso, legibilidade e correspondência com seus dados). Em seguida nossa equipe entrará em contato.
                 </p>
               )}
             </div>

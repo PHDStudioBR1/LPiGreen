@@ -124,8 +124,6 @@ router.post('/', uploadFields, async (req, res) => {
       });
     }
 
-    const leadId = await insertLead(parsed.data);
-
     const documentosParaValidacao = [
       {
         slot: 'document_front',
@@ -133,6 +131,7 @@ router.post('/', uploadFields, async (req, res) => {
         tipo_esperado: 'rg_ou_cnh_frente',
         mimetype: req.files?.document_front?.[0]?.mimetype || null,
         size_bytes: req.files?.document_front?.[0]?.size ?? null,
+        content_base64: parsed.data.document_front_base64 || null,
         ocr_text: null,
         metadata: { field: 'document_front' },
       },
@@ -142,6 +141,7 @@ router.post('/', uploadFields, async (req, res) => {
         tipo_esperado: 'rg_verso',
         mimetype: req.files?.document_back?.[0]?.mimetype || null,
         size_bytes: req.files?.document_back?.[0]?.size ?? null,
+        content_base64: parsed.data.document_back_base64 || null,
         ocr_text: null,
         metadata: { field: 'document_back' },
       },
@@ -151,6 +151,7 @@ router.post('/', uploadFields, async (req, res) => {
         tipo_esperado: 'conta_de_luz',
         mimetype: req.files?.energy_bill?.[0]?.mimetype || null,
         size_bytes: req.files?.energy_bill?.[0]?.size ?? null,
+        content_base64: parsed.data.energy_bill_base64 || null,
         ocr_text: null,
         metadata: { field: 'energy_bill' },
       },
@@ -165,11 +166,37 @@ router.post('/', uploadFields, async (req, res) => {
           power_company: parsed.data.power_company,
           installation_number: parsed.data.installation_number,
           has_pending_debts: parsed.data.has_pending_debts,
+          name: parsed.data.name || null,
+          document_number: parsed.data.document_number || null,
         },
       });
     } catch (error) {
       console.error('Lead document validation error:', error.message);
+      return res.status(502).json({
+        error: 'Validação de documentos temporariamente indisponível',
+        details: { document_validation: null },
+      });
     }
+
+    const reprovado =
+      documentValidation?.status_final === 'reprovado' ||
+      documentValidation?.recomendacao === 'solicitar_reenvio';
+    if (reprovado && documentValidation?.documentos?.length) {
+      const problemas = documentValidation.documentos
+        .filter((d) => d.problemas_encontrados?.length)
+        .flatMap((d) =>
+          (d.problemas_encontrados || []).map((p) => `[${d.slot}] ${p}`)
+        );
+      return res.status(422).json({
+        error: 'Documentos não aprovados. Corrija e reenvie.',
+        document_validation: documentValidation,
+        details: {
+          document_validation: problemas.length ? problemas : ['Um ou mais documentos não passaram na validação.'],
+        },
+      });
+    }
+
+    const leadId = await insertLead(parsed.data);
 
     await registerLeadProgressLog(req, {
       sessionId: typeof body.session_id === 'string' ? body.session_id.slice(0, MAX_SESSION_ID_LENGTH) : null,

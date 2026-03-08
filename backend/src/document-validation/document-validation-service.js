@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { config } from '../config.js';
-import { callOpenAI } from './providers/openai-provider.js';
+import { callOpenAI, callOpenAIVision } from './providers/openai-provider.js';
 import { callDeepSeek } from './providers/deepseek-provider.js';
+
+const IMAGE_MIMETYPE_PREFIX = 'image/';
 
 // ---------- Schemas ----------
 
@@ -79,6 +81,7 @@ function getProviderConfig() {
     openai: {
       apiKey: docAi.openai?.apiKey || process.env.OPENAI_API_KEY || '',
       model: docAi.openai?.model || process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      modelVision: docAi.openai?.modelVision || process.env.OPENAI_VISION_MODEL || 'gpt-4o',
     },
     deepseek: {
       apiKey: docAi.deepseek?.apiKey || process.env.DEEPSEEK_API_KEY || '',
@@ -99,7 +102,7 @@ export class DocumentValidationService {
     return false;
   }
 
-  buildPrompt({ documentos, formContext }) {
+  buildPrompt({ documentos, formContext, imageOrder }) {
     const entrada = {
       documentos: documentos.map((d) => ({
         slot: d.slot,
@@ -107,10 +110,13 @@ export class DocumentValidationService {
         tipo_esperado: d.tipo_esperado,
         mimetype: d.mimetype || null,
         tamanho_bytes: d.size_bytes ?? null,
+        tem_imagem_anexada: !!(d.content_base64 && String(d.mimetype || '').startsWith(IMAGE_MIMETYPE_PREFIX)),
         ocr_text_preview: d.ocr_text ? String(d.ocr_text).slice(0, 4000) : null,
         metadata: d.metadata || null,
       })),
       formulario: {
+        name: formContext.name || null,
+        document_number: formContext.document_number || null,
         document_type: formContext.document_type || null,
         power_company: formContext.power_company || null,
         installation_number: formContext.installation_number || null,
@@ -120,22 +126,9 @@ export class DocumentValidationService {
 
     const jsonExemplo = {
       documentos: [
-        {
-          slot: 'document_front',
-          tipo_detectado: 'rg_frente',
-          legivel: true,
-          documento_esperado: true,
-          confianca: 0.95,
-          problemas_encontrados: ['exemplo de problema, se houver'],
-        },
-        {
-          slot: 'energy_bill',
-          tipo_detectado: 'conta_de_luz',
-          legivel: true,
-          documento_esperado: true,
-          confianca: 0.92,
-          problemas_encontrados: [],
-        },
+        { slot: 'document_front', tipo_detectado: 'rg_frente', legivel: true, documento_esperado: true, confianca: 0.95, problemas_encontrados: [] },
+        { slot: 'document_back', tipo_detectado: 'rg_verso', legivel: true, documento_esperado: true, confianca: 0.95, problemas_encontrados: [] },
+        { slot: 'energy_bill', tipo_detectado: 'conta_de_luz', legivel: true, documento_esperado: true, confianca: 0.92, problemas_encontrados: [] },
       ],
       status_final: 'aprovado',
       faltantes: [],
@@ -143,25 +136,40 @@ export class DocumentValidationService {
       recomendacao: 'aprovar',
     };
 
+    let imageHint = '';
+    if (imageOrder && imageOrder.length > 0) {
+      imageHint = [
+        '',
+        'As imagens anexadas nesta mensagem correspondem, NA ORDEM, aos seguintes slots:',
+        imageOrder.map((slot, i) => `  Imagem ${i + 1} = ${slot}`).join('\n'),
+        'Analise cada imagem e preencha o documento do slot correspondente.',
+      ].join('\n');
+    }
+
     return [
       'Você é um sistema de validação de documentos para onboarding de clientes de energia.',
-      'Analise os documentos enviados e responda ESTRITAMENTE em JSON válido, sem comentários e sem texto extra.',
+      'Analise os documentos (e as imagens quando anexadas) e responda ESTRITAMENTE em JSON válido, sem comentários e sem texto extra.',
       '',
-      'Regras de negócio principais:',
-      '- Tipos esperados: RG (frente/verso) ou CNH; e conta de luz recente (até 90 dias, quando possível inferir).',
-      '- Considere os slots: "document_front", "document_back", "energy_bill".',
-      '- Para cada documento, preencha: tipo_detectado, legivel (true/false ou null se não conseguir avaliar), documento_esperado (true/false ou null), confianca (0 a 1) e problemas_encontrados (lista de strings).',
-      '- status_final deve ser um de: "aprovado", "reprovado", "necessita_revisao_manual".',
-      '- recomendacao deve ser um de: "aprovar", "solicitar_reenvio", "revisao_manual".',
-      '- Quando não houver dados suficientes (por exemplo, sem texto OCR ou metadados claros), use status_final = "necessita_revisao_manual" e recomendacao = "revisao_manual".',
+      'Regras OBRIGATÓRIAS:',
+      '1) document_front: deve ser a Frente do RG ou a CNH (frente). Verifique se é realmente a frente do documento e se está legível.',
+      '2) document_back: deve ser o Verso do RG. Se o usuário informou CNH, o verso pode não existir; caso não haja imagem para document_back, use documento_esperado e legivel conforme o que tiver.',
+      '3) energy_bill: deve ser a conta de luz (conta de energia). Verifique se está legível e se parece completo (não cortado).',
+      '4) Correspondência com o formulário: compare nome e número do documento (CPF/RG) lidos nas imagens com os dados do formulário (name, document_number). Se não bater, indique em problemas_encontrados e documento_esperado=false.',
+      '5) Legibilidade: para cada documento, legivel=true apenas se for possível ler claramente os dados; se estiver borrado, cortado ou ilegível, legivel=false.',
+      '6) PDF: se um slot for PDF (tem_imagem_anexada=false e mimetype application/pdf), use status necessita_revisao_manual para esse documento e recomendacao revisao_manual (não é possível analisar PDF aqui).',
       '',
-      'Formato EXATO de saída (exemplo, adapte os valores):',
+      'Slots: "document_front", "document_back", "energy_bill". Para cada um: tipo_detectado, legivel (true/false ou null), documento_esperado (true/false ou null), confianca (0 a 1), problemas_encontrados (lista de strings).',
+      'status_final: "aprovado" | "reprovado" | "necessita_revisao_manual". recomendacao: "aprovar" | "solicitar_reenvio" | "revisao_manual".',
+      'Reprovado quando: documento não corresponde ao esperado, ilegível, ou dados não batem com o formulário. Aprovado quando tudo estiver correto e legível.',
+      '',
+      'Formato EXATO de saída:',
       JSON.stringify(jsonExemplo, null, 2),
+      imageHint,
       '',
-      'Agora, considere a seguinte entrada em JSON:',
+      'Entrada (dados do formulário e metadados dos documentos):',
       JSON.stringify(entrada, null, 2),
       '',
-      'Responda apenas com o JSON final, sem qualquer explicação adicional.',
+      'Responda apenas com o JSON final, sem explicação.',
     ].join('\n');
   }
 
@@ -191,13 +199,37 @@ export class DocumentValidationService {
     };
   }
 
-  async callProvider(prompt) {
+  buildVisionImages(documentos) {
+    const images = [];
+    const order = [];
+    for (const d of documentos) {
+      const base64 = d.content_base64;
+      const mimetype = (d.mimetype || '').toLowerCase();
+      if (base64 && mimetype.startsWith(IMAGE_MIMETYPE_PREFIX)) {
+        images.push({ mimetype, base64 });
+        order.push(d.slot);
+      }
+    }
+    return { images, imageOrder: order };
+  }
+
+  async callProvider(prompt, options = {}) {
     const { provider, timeoutMs, openai, deepseek } = this.config;
+    const { images = [] } = options;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
+      if (provider === 'openai' && images.length > 0) {
+        return await callOpenAIVision({
+          prompt,
+          images,
+          model: openai.modelVision,
+          apiKey: openai.apiKey,
+          signal: controller.signal,
+        });
+      }
       if (provider === 'openai') {
         return await callOpenAI({
           prompt,
@@ -236,12 +268,16 @@ export class DocumentValidationService {
       return this.buildManualReviewFallback(documentos);
     }
 
-    console.info(`Document validation: usando provider "${this.config.provider}" para ${knownSlots.length} documento(s).`);
+    const { images, imageOrder } = this.buildVisionImages(documentos);
+    const useVision = this.config.provider === 'openai' && images.length > 0;
+    console.info(
+      `Document validation: provider="${this.config.provider}", ${knownSlots.length} documento(s), vision=${useVision} (${images.length} imagens).`
+    );
 
-    const basePrompt = this.buildPrompt({ documentos, formContext });
+    const basePrompt = this.buildPrompt({ documentos, formContext, imageOrder });
 
     try {
-      const firstRaw = await this.callProvider(basePrompt);
+      const firstRaw = await this.callProvider(basePrompt, { images });
       if (!firstRaw) {
         console.error('Document validation: provider não retornou conteúdo');
         return this.buildManualReviewFallback(documentos);
@@ -255,9 +291,8 @@ export class DocumentValidationService {
         console.error('Document validation: erro ao parsear primeira resposta da LLM:', err.message);
       }
 
-      // Retry único com prompt reforçado
       const retryPrompt = this.buildRetryPrompt(basePrompt);
-      const secondRaw = await this.callProvider(retryPrompt);
+      const secondRaw = await this.callProvider(retryPrompt, { images });
       if (!secondRaw) {
         console.error('Document validation: provider não retornou conteúdo no retry');
         return this.buildManualReviewFallback(documentos);
