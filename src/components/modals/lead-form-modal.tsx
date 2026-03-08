@@ -946,7 +946,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   <FileUploadField
                     label="Documento pessoal – Frente (obrigatório)"
                     description="Envie uma foto nítida da frente do documento (RG ou CNH). Será validado automaticamente."
-                    accept="image/*,application/pdf"
+                    accept="image/*"
                     file={files.document_front}
                     onChange={(file) => {
                       setFiles((f) => ({ ...f, document_front: file }));
@@ -958,7 +958,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   <FileUploadField
                     label="Documento pessoal – Verso (obrigatório)"
                     description="Envie uma foto nítida do verso do RG. Será validado automaticamente."
-                    accept="image/*,application/pdf"
+                    accept="image/*"
                     file={files.document_back}
                     onChange={(file) => {
                       setFiles((f) => ({ ...f, document_back: file }));

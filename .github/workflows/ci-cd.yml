@@ -157,7 +157,7 @@ jobs:
             --from-literal=DEEPSEEK_API_KEY="${{ secrets.DEEPSEEK_API_KEY || '' }}" \
             --from-literal=DEEPSEEK_MODEL="${{ secrets.DEEPSEEK_MODEL || 'deepseek-chat' }}" \
             --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
-          echo "Doc AI: provider=${{ secrets.DOC_AI_PROVIDER || '(vazio=desativado)' }}"
+          echo "Secret doc-ai-secret criado/atualizado (valores vêm do Environment production: DOC_AI_PROVIDER, OPENAI_API_KEY, etc.). Confira no passo 'Verificar variáveis Doc AI no Pod' se o pod recebeu as variáveis."
 
       - name: Deploy API (backend)
         run: |
@@ -167,6 +167,18 @@ jobs:
             api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+
+      - name: Verificar variáveis Doc AI no Pod da API
+        run: |
+          echo "Verificando se DOC_AI_PROVIDER e OPENAI_API_KEY estão no pod lpigreen-api..."
+          POD=$(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+          if [ -z "$POD" ]; then
+            echo "⚠️ Pod da API ainda não listado (rollout pode estar em andamento)."
+            exit 0
+          fi
+          echo "Pod: $POD"
+          kubectl exec -n ${{ env.K8S_NAMESPACE }} "$POD" -- env 2>/dev/null | grep -E '^DOC_AI_PROVIDER=|^OPENAI_API_KEY=' | sed 's/=.*/=*** (valor definido)/' || echo "⚠️ Variáveis Doc AI não encontradas no container."
+          echo "✅ Se DOC_AI_PROVIDER e OPENAI_API_KEY aparecerem acima com 'valor definido', a validação de documentos está configurada no pod."
 
       - name: Deploy aplicação (frontend)
         run: |

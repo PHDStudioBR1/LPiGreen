@@ -179,13 +179,38 @@ router.post('/', uploadFields, async (req, res) => {
     }
 
     const docs = documentValidation?.documentos || [];
+    const validacaoExecutada = documentValidation?.validacao_executada === true;
+
+    if (!validacaoExecutada) {
+      const motivo = documentValidation?.motivo_falha || '';
+      let mensagem =
+        'Não foi possível validar os documentos no momento. Tente novamente mais tarde.';
+      if (motivo === 'VALIDAÇÃO_DESABILITADA') {
+        mensagem =
+          'Validação de documentos não está configurada no servidor. Entre em contato com o suporte ou tente novamente mais tarde.';
+      } else if (motivo === 'SEM_IMAGENS') {
+        mensagem =
+          'Envie fotos (imagens) dos documentos, não apenas PDFs. A validação exige imagens em JPEG ou PNG do documento de identidade e da conta de luz.';
+      } else if (motivo === 'PROVIDER_NAO_OPENAI') {
+        mensagem =
+          'Validação de documentos exige o provedor OpenAI. Entre em contato com o suporte.';
+      }
+      return res.status(422).json({
+        error: 'Validação de documentos indisponível',
+        document_validation: documentValidation,
+        details: {
+          document_validation: [mensagem],
+        },
+      });
+    }
+
+    const algumDocReprovado = docs.some(
+      (d) => d.legivel === false || d.documento_esperado === false
+    );
     const reprovadoPelaIA =
       documentValidation?.status_final === 'reprovado' ||
       documentValidation?.recomendacao === 'solicitar_reenvio';
-    const aprovadoMasAlgumDocFalhou =
-      documentValidation?.status_final === 'aprovado' &&
-      docs.some((d) => d.legivel === false || d.documento_esperado === false);
-    const deveReprovar = reprovadoPelaIA || aprovadoMasAlgumDocFalhou;
+    const deveReprovar = reprovadoPelaIA || algumDocReprovado;
 
     if (deveReprovar && docs.length > 0) {
       const problemas = documentValidation.documentos

@@ -227,7 +227,7 @@ export class DocumentValidationService {
     ].join('\n');
   }
 
-  buildManualReviewFallback(documentos) {
+  buildManualReviewFallback(documentos, motivo) {
     return {
       documentos: documentos.map((d) => ({
         slot: d.slot,
@@ -241,6 +241,8 @@ export class DocumentValidationService {
       faltantes: [],
       conflitos_duplicados: [],
       recomendacao: 'revisao_manual',
+      validacao_executada: false,
+      motivo_falha: motivo || null,
     };
   }
 
@@ -303,20 +305,28 @@ export class DocumentValidationService {
 
     if (!this.isEnabled()) {
       console.warn(
-        'Document validation: desabilitado. Defina DOC_AI_PROVIDER (openai|deepseek) e a API key correspondente (OPENAI_API_KEY ou DEEPSEEK_API_KEY).'
+        'Document validation: desabilitado. Defina DOC_AI_PROVIDER=openai e OPENAI_API_KEY para validar documentos.'
       );
-      return this.buildManualReviewFallback(documentos);
+      return this.buildManualReviewFallback(documentos, 'VALIDAÇÃO_DESABILITADA');
     }
 
     if (knownSlots.length === 0) {
       console.warn('Document validation: nenhum documento para validar.');
-      return this.buildManualReviewFallback(documentos);
+      return this.buildManualReviewFallback(documentos, 'NENHUM_DOCUMENTO');
     }
 
     const { images, imageOrder } = this.buildVisionImages(documentos);
-    const useVision = this.config.provider === 'openai' && images.length > 0;
+
+    if (this.config.provider !== 'openai' || images.length === 0) {
+      const motivo = this.config.provider !== 'openai'
+        ? 'PROVIDER_NAO_OPENAI'
+        : 'SEM_IMAGENS';
+      console.warn('Document validation:', motivo === 'SEM_IMAGENS' ? 'Nenhuma imagem enviada (envie fotos JPEG/PNG).' : motivo);
+      return this.buildManualReviewFallback(documentos, motivo);
+    }
+
     console.info(
-      `Document validation: provider="${this.config.provider}", ${knownSlots.length} documento(s), vision=${useVision} (${images.length} imagens).`
+      `Document validation: enviando ${images.length} imagem(ns) para OpenAI Vision (slots: ${imageOrder.join(', ')}).`
     );
 
     const basePrompt = this.buildPrompt({ documentos, formContext, imageOrder });
@@ -325,14 +335,14 @@ export class DocumentValidationService {
       const firstRaw = await this.callProvider(basePrompt, { images });
       if (!firstRaw) {
         console.error('Document validation: provider não retornou conteúdo');
-        return this.buildManualReviewFallback(documentos);
+        return this.buildManualReviewFallback(documentos, 'PROVIDER_SEM_RESPOSTA');
       }
 
       try {
         const parsed = parseAndNormalizeModelResponse(firstRaw, knownSlots);
         const result = applyStrictValidation(parsed);
         console.info(`Document validation: sucesso. status_final=${result.status_final} (strict applied)`);
-        return result;
+        return { ...result, validacao_executada: true };
       } catch (err) {
         console.error('Document validation: erro ao parsear primeira resposta da LLM:', err.message);
       }
@@ -341,21 +351,21 @@ export class DocumentValidationService {
       const secondRaw = await this.callProvider(retryPrompt, { images });
       if (!secondRaw) {
         console.error('Document validation: provider não retornou conteúdo no retry');
-        return this.buildManualReviewFallback(documentos);
+        return this.buildManualReviewFallback(documentos, 'PROVIDER_SEM_RESPOSTA_RETRY');
       }
 
       try {
         const parsed = parseAndNormalizeModelResponse(secondRaw, knownSlots);
         const result = applyStrictValidation(parsed);
         console.info(`Document validation: sucesso no retry. status_final=${result.status_final} (strict applied)`);
-        return result;
+        return { ...result, validacao_executada: true };
       } catch (err) {
         console.error('Document validation: erro ao parsear resposta de retry da LLM:', err.message);
-        return this.buildManualReviewFallback(documentos);
+        return this.buildManualReviewFallback(documentos, 'ERRO_PARSING_RESPOSTA');
       }
     } catch (error) {
       console.error('Document validation: erro ao chamar provider de IA:', error.message);
-      return this.buildManualReviewFallback(documentos);
+      return this.buildManualReviewFallback(documentos, 'ERRO_CHAMADA_IA');
     }
   }
 }
