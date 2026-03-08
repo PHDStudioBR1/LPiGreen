@@ -30,7 +30,54 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { maskCep, maskPhone, maskCpfCnpj, maskCurrency, maskBirthDate } from "@/lib/masks";
+
+/** Rótulos amigáveis para exibir erros (não técnicos). */
+const FIELD_LABELS: Record<string, string> = {
+  cep_landing: "CEP",
+  valor_conta: "Valor da conta",
+  document_number: "Número do documento (CPF/RG)",
+  name: "Nome",
+  birth_date: "Data de nascimento",
+  phone: "Celular",
+  phone_confirm: "Confirmação de celular",
+  email: "E-mail",
+  email_confirm: "Confirmação de e-mail",
+  cep: "CEP do endereço",
+  address: "Endereço",
+  number: "Número",
+  neighborhood: "Bairro",
+  city: "Cidade",
+  state: "Estado",
+  complement: "Complemento",
+  power_company: "Distribuidora de energia",
+  installation_number: "Número da instalação",
+  document_type: "Tipo de documento",
+  energy_bill_password: "Senha do arquivo",
+  energy_bill: "Conta de energia",
+  has_pending_debts: "Débitos em aberto",
+  payment_proof: "Comprovante de pagamento",
+  document_front: "Documento pessoal – Frente",
+  document_back: "Documento pessoal – Verso",
+};
+
+/** Passo do formulário em que cada campo aparece (0–5). */
+const FIELD_STEP: Record<string, number> = {
+  cep_landing: 0, valor_conta: 0,
+  document_number: 1, name: 1, birth_date: 1, phone: 1, phone_confirm: 1, email: 1, email_confirm: 1,
+  cep: 2, address: 2, number: 2, neighborhood: 2, city: 2, state: 2, complement: 2,
+  power_company: 3, installation_number: 3, document_type: 3, document_front: 3, document_back: 3,
+  document_front_base64: 3, document_back_base64: 3,
+  energy_bill_password: 4, energy_bill: 4, energy_bill_base64: 4, has_pending_debts: 4, payment_proof: 4, payment_proof_base64: 4,
+};
+
+/** Campos de documento que vêm do backend como _base64; exibir no FileUploadField correspondente. */
+const DOCUMENT_FIELD_TO_SLOT: Record<string, "document_front" | "document_back" | "energy_bill"> = {
+  document_front_base64: "document_front",
+  document_back_base64: "document_back",
+  energy_bill_base64: "energy_bill",
+};
 
 const UFS = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
@@ -117,18 +164,25 @@ function FileUploadField(props: {
   accept?: string;
   file?: File;
   onChange: (file?: File) => void;
+  errors?: string[];
+  requirement?: string;
 }) {
-  const { label, description, accept, file, onChange } = props;
+  const { label, description, accept, file, onChange, errors = [], requirement } = props;
   const id = React.useId();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const hasError = errors.length > 0;
 
   return (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel className={hasError ? "text-destructive" : undefined}>{label}</FormLabel>
       <FormControl>
         <label
           htmlFor={id}
-          className="flex items-center justify-between rounded-md border border-dashed border-muted-foreground/30 px-3 py-2 text-sm cursor-pointer hover:bg-muted/60 transition-colors"
+          className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
+            hasError
+              ? "border-destructive border-dashed bg-destructive/5 hover:bg-destructive/10"
+              : "border-dashed border-muted-foreground/30 hover:bg-muted/60"
+          }`}
         >
           <div className="flex flex-col">
             <span className="font-medium truncate max-w-[220px]">
@@ -164,6 +218,18 @@ function FileUploadField(props: {
           />
         </label>
       </FormControl>
+      {requirement && !hasError && (
+        <p className="text-xs text-muted-foreground">Requisito: {requirement}</p>
+      )}
+      {hasError && (
+        <div className="text-sm text-destructive space-y-0.5">
+          {errors.map((msg, i) => (
+            <p key={i} role="alert">
+              {msg}
+            </p>
+          ))}
+        </div>
+      )}
     </FormItem>
   );
 }
@@ -182,7 +248,15 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const [distribuidorasError, setDistribuidorasError] = useState<string | null>(null);
   const [showDistribuidoraSuggestions, setShowDistribuidoraSuggestions] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submissionErrors, setSubmissionErrors] = useState<{
+    items: { stepIndex: number; label: string; message: string }[];
+    documentErrors: Record<string, string[]>;
+  } | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isOpen) setSubmissionErrors(null);
+  }, [isOpen]);
 
   const form = useForm<LeadFormValues>({ defaultValues });
   const watchHasPendingDebts = form.watch("has_pending_debts");
@@ -367,6 +441,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   }, [form, files]);
 
   const onSubmit = async () => {
+    setSubmissionErrors(null);
     setSubmitting(true);
     try {
       const fd = buildFormData();
@@ -376,14 +451,71 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
       const res = await fetch("/api/leads", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const details = data.details;
-        const message = details && typeof details === "object"
-          ? Object.values(details).flat().filter(Boolean).join(". ") || data.error
-          : (data.error || "Falha ao enviar.");
-        const isDocumentRejection = res.status === 422 && data.document_validation;
+        const details = (data.details && typeof data.details === "object") ? data.details : {};
+        const items: { stepIndex: number; label: string; message: string }[] = [];
+        const documentErrors: Record<string, string[]> = { document_front: [], document_back: [], energy_bill: [] };
+
+        for (const [key, value] of Object.entries(details)) {
+          const messages = Array.isArray(value) ? value.filter(Boolean).map(String) : [];
+          if (!messages.length) continue;
+
+          const docSlot = DOCUMENT_FIELD_TO_SLOT[key];
+          if (docSlot) {
+            const friendly = messages.map((m) =>
+              m.replace(/documento ilegível/i, "Documento ilegível. Envie uma foto nítida e completa.")
+                .replace(/não é o documento esperado/i, "Não é o documento esperado. Envie o documento correto para este campo.")
+            );
+            documentErrors[docSlot].push(...friendly);
+            const stepIndex = docSlot === "energy_bill" ? 4 : 3;
+            const label = FIELD_LABELS[docSlot] || docSlot;
+            friendly.forEach((msg) => items.push({ stepIndex, label, message: msg }));
+            continue;
+          }
+
+          if (key === "document_validation") {
+            for (const raw of messages) {
+              const matchBracket = raw.match(/^\s*\[(\w+)\]\s*(.+)$/);
+              const matchColon = raw.match(/^\s*(\w+):\s*(.+)$/);
+              let slot = "";
+              let msg = raw;
+              if (matchBracket) {
+                slot = matchBracket[1];
+                msg = matchBracket[2].trim();
+              } else if (matchColon && ["document_front", "document_back", "energy_bill"].includes(matchColon[1])) {
+                slot = matchColon[1];
+                msg = matchColon[2].trim();
+              }
+              const friendlyMsg = msg
+                .replace(/documento ilegível/i, "Documento ilegível. Envie uma foto nítida e completa.")
+                .replace(/não é o documento esperado/i, "Não é o documento esperado. Envie o documento correto para este campo.");
+              if (slot && documentErrors[slot as keyof typeof documentErrors]) {
+                documentErrors[slot as keyof typeof documentErrors].push(friendlyMsg);
+                const stepIndex = slot === "energy_bill" ? 4 : 3;
+                const label = FIELD_LABELS[slot] || slot;
+                items.push({ stepIndex, label, message: friendlyMsg });
+              } else {
+                items.push({ stepIndex: 3, label: "Documentos", message: friendlyMsg });
+              }
+            }
+            continue;
+          }
+
+          const label = FIELD_LABELS[key] || key;
+          const stepIndex = FIELD_STEP[key] ?? 0;
+          const message = messages.join(". ");
+          items.push({ stepIndex, label, message });
+          if (key in defaultValues) {
+            form.setError(key as keyof LeadFormValues, { type: "server", message });
+          }
+        }
+
+        const firstStep = items.length > 0 ? Math.min(...items.map((i) => i.stepIndex)) : step;
+        setStep(firstStep);
+        setSubmissionErrors({ items, documentErrors });
+
         toast({
-          title: isDocumentRejection ? "Documentos não aprovados" : "Erro de validação",
-          description: message,
+          title: "Corrija os itens indicados",
+          description: "O formulário permanece aberto. Veja a lista abaixo e em cada campo.",
           variant: "destructive",
         });
         return;
@@ -441,6 +573,20 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
         <Form {...form}>
           <form className="flex flex-col flex-1 min-h-0">
             <div className="overflow-y-auto flex-1 min-h-0 px-6 py-4 space-y-4">
+              {submissionErrors && submissionErrors.items.length > 0 && (
+                <Alert variant="destructive" className="mb-2">
+                  <AlertTitle>Corrija os itens abaixo para continuar</AlertTitle>
+                  <AlertDescription>
+                    <ul className="mt-2 list-disc list-inside space-y-1 text-sm">
+                      {submissionErrors.items.map((item, i) => (
+                        <li key={i}>
+                          <strong>{item.label}:</strong> {item.message}
+                        </li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* 1.1 Landing */}
               {step === 0 && (
                 <>
@@ -802,14 +948,24 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     description="Envie uma foto nítida da frente do documento (RG ou CNH). Será validado automaticamente."
                     accept="image/*,application/pdf"
                     file={files.document_front}
-                    onChange={(file) => setFiles((f) => ({ ...f, document_front: file }))}
+                    onChange={(file) => {
+                      setFiles((f) => ({ ...f, document_front: file }));
+                      setSubmissionErrors((e) => e ? { ...e, documentErrors: { ...e.documentErrors, document_front: [] } } : null);
+                    }}
+                    errors={submissionErrors?.documentErrors?.document_front}
+                    requirement="Foto nítida da frente do RG ou da CNH; nome e número do documento devem estar legíveis."
                   />
                   <FileUploadField
                     label="Documento pessoal – Verso (obrigatório)"
                     description="Envie uma foto nítida do verso do RG. Será validado automaticamente."
                     accept="image/*,application/pdf"
                     file={files.document_back}
-                    onChange={(file) => setFiles((f) => ({ ...f, document_back: file }))}
+                    onChange={(file) => {
+                      setFiles((f) => ({ ...f, document_back: file }));
+                      setSubmissionErrors((e) => e ? { ...e, documentErrors: { ...e.documentErrors, document_back: [] } } : null);
+                    }}
+                    errors={submissionErrors?.documentErrors?.document_back}
+                    requirement="Foto nítida do verso do RG (se for CNH, este campo pode não ser obrigatório)."
                   />
                 </>
               )}
@@ -834,7 +990,12 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     description="Envie a conta recente em PDF ou imagem."
                     accept="application/pdf,image/*"
                     file={files.energy_bill}
-                    onChange={(file) => setFiles((f) => ({ ...f, energy_bill: file }))}
+                    onChange={(file) => {
+                      setFiles((f) => ({ ...f, energy_bill: file }));
+                      setSubmissionErrors((e) => e ? { ...e, documentErrors: { ...e.documentErrors, energy_bill: [] } } : null);
+                    }}
+                    errors={submissionErrors?.documentErrors?.energy_bill}
+                    requirement="Conta de luz recente (até 90 dias); deve conter nome da distribuidora e valor."
                   />
                   <FormField
                     control={form.control}
