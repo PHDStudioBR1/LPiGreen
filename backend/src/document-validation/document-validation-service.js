@@ -68,6 +68,50 @@ export function parseAndNormalizeModelResponse(raw, knownSlots = []) {
   };
 }
 
+/** Confiança mínima para considerar documento aprovado (0 a 1). */
+const MIN_CONFIANCA_APROVADO = 0.75;
+
+/**
+ * Aplica regras rígidas: a IA pode ser permissiva demais. Só aceitamos "aprovado"
+ * se TODOS os documentos tiverem legivel=true, documento_esperado=true e confiança mínima.
+ * Qualquer falha ou incerteza → reprovado ou revisão manual.
+ */
+function applyStrictValidation(result) {
+  const { documentos } = result;
+  let statusFinal = result.status_final;
+  let recomendacao = result.recomendacao;
+
+  const algumReprovado = documentos.some(
+    (d) => d.legivel === false || d.documento_esperado === false
+  );
+  const algumIncerteza = documentos.some(
+    (d) => d.legivel === null || d.documento_esperado === null
+  );
+  const algumaConfiancaBaixa = documentos.some(
+    (d) => typeof d.confianca === 'number' && d.confianca < MIN_CONFIANCA_APROVADO
+  );
+  const todosAprovadosPelaIA = documentos.every(
+    (d) => d.legivel === true && d.documento_esperado === true
+  );
+
+  if (algumReprovado) {
+    statusFinal = 'reprovado';
+    recomendacao = 'solicitar_reenvio';
+  } else if (algumIncerteza || algumaConfiancaBaixa || !todosAprovadosPelaIA) {
+    // Em dúvida ou confiança baixa: não aprovar automaticamente
+    if (statusFinal === 'aprovado') {
+      statusFinal = 'necessita_revisao_manual';
+      recomendacao = 'revisao_manual';
+    }
+  }
+
+  return {
+    ...result,
+    status_final: statusFinal,
+    recomendacao,
+  };
+}
+
 // ---------- Serviço principal ----------
 
 function getProviderConfig() {
@@ -147,26 +191,27 @@ export class DocumentValidationService {
     }
 
     return [
-      'Você é um sistema de validação de documentos para onboarding de clientes de energia.',
-      'Analise os documentos (e as imagens quando anexadas) e responda ESTRITAMENTE em JSON válido, sem comentários e sem texto extra.',
+      'Você é um validador RIGOROSO de documentos. Seja ESTRITO: em dúvida, reprove ou marque para revisão. Não aprove documentos que não sejam claramente o esperado.',
+      'Analise as imagens e responda ESTRITAMENTE em JSON válido, sem comentários e sem texto extra.',
       '',
-      'Regras OBRIGATÓRIAS:',
-      '1) document_front: deve ser a Frente do RG ou a CNH (frente). Verifique se é realmente a frente do documento e se está legível.',
-      '2) document_back: deve ser o Verso do RG. Se o usuário informou CNH, o verso pode não existir; caso não haja imagem para document_back, use documento_esperado e legivel conforme o que tiver.',
-      '3) energy_bill: deve ser a conta de luz (conta de energia). Verifique se está legível e se parece completo (não cortado).',
-      '4) Correspondência com o formulário: compare nome e número do documento (CPF/RG) lidos nas imagens com os dados do formulário (name, document_number). Se não bater, indique em problemas_encontrados e documento_esperado=false.',
-      '5) Legibilidade: para cada documento, legivel=true apenas se for possível ler claramente os dados; se estiver borrado, cortado ou ilegível, legivel=false.',
-      '6) PDF: se um slot for PDF (tem_imagem_anexada=false e mimetype application/pdf), use status necessita_revisao_manual para esse documento e recomendacao revisao_manual (não é possível analisar PDF aqui).',
+      'REGRAS OBRIGATÓRIAS (seja conservador):',
+      '1) document_front: SÓ documento_esperado=true se a imagem for CLARAMENTE a frente de RG ou da CNH. Se for outra coisa (carteira, selfie, outro documento, imagem genérica), documento_esperado=false. legivel=true SÓ se der para ler nome, número e dados principais.',
+      '2) document_back: SÓ documento_esperado=true se for CLARAMENTE o verso do RG. Se o usuário escolheu CNH no formulário, o verso pode não existir; avalie conforme o tipo. Se a imagem não for verso de RG, documento_esperado=false.',
+      '3) energy_bill: SÓ documento_esperado=true se for CLARAMENTE uma conta de luz/energia (nome da distribuidora, valor, consumo). Qualquer outro documento (água, gás, boleto genérico) = documento_esperado=false. legivel=true SÓ se a conta estiver legível e completa (não cortada).',
+      '4) Correspondência: compare nome e número do documento (CPF/RG) visíveis na imagem com name e document_number do formulário. Se não conseguir conferir ou os dados não baterem, documento_esperado=false e coloque em problemas_encontrados.',
+      '5) Legibilidade: legivel=false se estiver borrado, escuro, cortado, de lado, ou ilegível. Em dúvida, use legivel=false. confianca: use valores baixos (ex: 0.5) quando não tiver certeza.',
+      '6) status_final: use "aprovado" SOMENTE quando TODOS os documentos estiverem corretos, legíveis e batendo com o formulário. Se qualquer um falhar ou houver dúvida, use "reprovado" ou "necessita_revisao_manual". recomendacao: "solicitar_reenvio" quando algo estiver errado; "revisao_manual" quando não conseguir avaliar (ex.: PDF).',
+      '7) Se a imagem não corresponder ao slot (ex.: na imagem 1 veio conta de luz em vez de documento), documento_esperado=false e descreva em problemas_encontrados.',
       '',
-      'Slots: "document_front", "document_back", "energy_bill". Para cada um: tipo_detectado, legivel (true/false ou null), documento_esperado (true/false ou null), confianca (0 a 1), problemas_encontrados (lista de strings).',
+      'Slots: document_front, document_back, energy_bill. Para cada um: tipo_detectado, legivel (true/false/null), documento_esperado (true/false/null), confianca (0 a 1), problemas_encontrados (array de strings).',
       'status_final: "aprovado" | "reprovado" | "necessita_revisao_manual". recomendacao: "aprovar" | "solicitar_reenvio" | "revisao_manual".',
-      'Reprovado quando: documento não corresponde ao esperado, ilegível, ou dados não batem com o formulário. Aprovado quando tudo estiver correto e legível.',
+      'Seja RIGOROSO: na dúvida, reprove ou marque revisão. Não aprove fotos de coisas que não sejam o documento esperado.',
       '',
       'Formato EXATO de saída:',
       JSON.stringify(jsonExemplo, null, 2),
       imageHint,
       '',
-      'Entrada (dados do formulário e metadados dos documentos):',
+      'Entrada (formulário e metadados):',
       JSON.stringify(entrada, null, 2),
       '',
       'Responda apenas com o JSON final, sem explicação.',
@@ -284,8 +329,9 @@ export class DocumentValidationService {
       }
 
       try {
-        const result = parseAndNormalizeModelResponse(firstRaw, knownSlots);
-        console.info(`Document validation: sucesso. status_final=${result.status_final}`);
+        const parsed = parseAndNormalizeModelResponse(firstRaw, knownSlots);
+        const result = applyStrictValidation(parsed);
+        console.info(`Document validation: sucesso. status_final=${result.status_final} (strict applied)`);
         return result;
       } catch (err) {
         console.error('Document validation: erro ao parsear primeira resposta da LLM:', err.message);
@@ -299,8 +345,9 @@ export class DocumentValidationService {
       }
 
       try {
-        const result = parseAndNormalizeModelResponse(secondRaw, knownSlots);
-        console.info(`Document validation: sucesso no retry. status_final=${result.status_final}`);
+        const parsed = parseAndNormalizeModelResponse(secondRaw, knownSlots);
+        const result = applyStrictValidation(parsed);
+        console.info(`Document validation: sucesso no retry. status_final=${result.status_final} (strict applied)`);
         return result;
       } catch (err) {
         console.error('Document validation: erro ao parsear resposta de retry da LLM:', err.message);

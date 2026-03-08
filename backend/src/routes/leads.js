@@ -178,20 +178,31 @@ router.post('/', uploadFields, async (req, res) => {
       });
     }
 
-    const reprovado =
+    const docs = documentValidation?.documentos || [];
+    const reprovadoPelaIA =
       documentValidation?.status_final === 'reprovado' ||
       documentValidation?.recomendacao === 'solicitar_reenvio';
-    if (reprovado && documentValidation?.documentos?.length) {
+    const aprovadoMasAlgumDocFalhou =
+      documentValidation?.status_final === 'aprovado' &&
+      docs.some((d) => d.legivel === false || d.documento_esperado === false);
+    const deveReprovar = reprovadoPelaIA || aprovadoMasAlgumDocFalhou;
+
+    if (deveReprovar && docs.length > 0) {
       const problemas = documentValidation.documentos
         .filter((d) => d.problemas_encontrados?.length)
         .flatMap((d) =>
           (d.problemas_encontrados || []).map((p) => `[${d.slot}] ${p}`)
         );
+      const mensagemExtra = [];
+      docs.forEach((d) => {
+        if (d.legivel === false) mensagemExtra.push(`${d.slot}: documento ilegível`);
+        if (d.documento_esperado === false) mensagemExtra.push(`${d.slot}: não é o documento esperado`);
+      });
       return res.status(422).json({
         error: 'Documentos não aprovados. Corrija e reenvie.',
         document_validation: documentValidation,
         details: {
-          document_validation: problemas.length ? problemas : ['Um ou mais documentos não passaram na validação.'],
+          document_validation: [...mensagemExtra, ...(problemas.length ? problemas : ['Um ou mais documentos não passaram na validação.'])],
         },
       });
     }
