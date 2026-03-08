@@ -560,7 +560,12 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] flex flex-col gap-0 overflow-hidden p-0" aria-describedby="lead-form-description">
+      <DialogContent
+        className="max-w-lg max-h-[90vh] flex flex-col gap-0 overflow-hidden p-0"
+        aria-describedby="lead-form-description"
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-2 border-b">
           <DialogTitle className="text-xl font-headline font-bold text-primary">
             {STEPS[step].title} ({step + 1}/{STEPS.length})
