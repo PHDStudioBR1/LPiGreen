@@ -72,7 +72,7 @@ export function SocialProofSection() {
         <div className="mt-12 text-center">
           <Button
             size="lg"
-            className="h-14 px-10 rounded-2xl font-black"
+            className="h-14 px-10 rounded-2xl font-black whitespace-normal md:whitespace-nowrap text-center w-full max-w-full md:w-auto h-auto min-h-14 md:min-h-0 md:h-14 py-3 md:py-0"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             Faça parte da maior transição energética do Brasil agora

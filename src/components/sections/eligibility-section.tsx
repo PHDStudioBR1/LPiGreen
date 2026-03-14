@@ -21,7 +21,7 @@ export function EligibilitySection({ onCTAClick }: EligibilitySectionProps) {
           <Button
             size="lg"
             onClick={onCTAClick}
-            className="h-16 px-10 text-xl font-black rounded-2xl shadow-xl hover:scale-[1.02] transition-transform"
+            className="h-16 px-10 text-xl font-black rounded-2xl shadow-xl hover:scale-[1.02] transition-transform whitespace-normal md:whitespace-nowrap text-center w-full max-w-full md:w-auto h-auto min-h-16 md:min-h-0 md:h-16 py-3 md:py-0"
           >
             Faça parte da maior transição energética do Brasil — Verificar Agora
           </Button>
