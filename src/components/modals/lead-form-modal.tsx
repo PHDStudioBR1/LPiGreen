@@ -32,6 +32,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { maskCep, maskPhone, maskCpfCnpj, maskCurrency, maskBirthDate } from "@/lib/masks";
+import { validateBirthDateMinAge } from "@/lib/validation";
 
 /** Rótulos amigáveis para exibir erros (não técnicos). */
 const FIELD_LABELS: Record<string, string> = {
@@ -676,7 +677,10 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   <FormField
                     control={form.control}
                     name="birth_date"
-                    rules={{ required: "Data de nascimento é obrigatória" }}
+                    rules={{
+                      required: "Data de nascimento é obrigatória",
+                      validate: (value) => validateBirthDateMinAge(value ?? ""),
+                    }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Data de nascimento</FormLabel>
