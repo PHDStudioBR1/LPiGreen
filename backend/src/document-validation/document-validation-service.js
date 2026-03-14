@@ -246,6 +246,12 @@ export class DocumentValidationService {
     };
   }
 
+  /**
+   * Monta a lista de imagens enviadas à API de visão. Apenas arquivos com mimetype image/* (JPEG, PNG, etc.)
+   * são incluídos. PDFs (application/pdf) não são enviados à IA — o slot correspondente ficará sem imagem
+   * e a validação retornará documento_esperado=false; a rota de leads substitui a mensagem por uma
+   * orientação para o usuário enviar foto/imagem.
+   */
   buildVisionImages(documentos) {
     const images = [];
     const order = [];

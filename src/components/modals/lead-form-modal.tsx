@@ -1001,7 +1001,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   />
                   <FileUploadField
                     label="Faça o anexo da sua conta de energia"
-                    description="Envie a conta recente em PDF ou imagem."
+                    description="Para validação automática, envie uma foto ou imagem (JPEG/PNG). PDF é aceito, mas será enviado apenas para revisão manual."
                     accept="application/pdf,image/*"
                     file={files.energy_bill}
                     onChange={(file) => {

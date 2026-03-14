@@ -180,6 +180,20 @@ router.post('/', uploadFields, async (req, res) => {
       });
     }
 
+    // Quando a conta de energia foi enviada em PDF, a IA não recebe o arquivo (só imagens são enviadas).
+    // Deixar a mensagem clara para o usuário em vez de "não é o documento esperado" / "imagem não anexada".
+    const energyBillDoc = documentosParaValidacao.find((d) => d.slot === 'energy_bill');
+    const energyBillMime = (energyBillDoc?.mimetype || '').toLowerCase();
+    const energyBillWasPdf = energyBillMime === 'application/pdf';
+    if (documentValidation?.documentos && energyBillWasPdf) {
+      const energyBillResult = documentValidation.documentos.find((d) => d.slot === 'energy_bill');
+      if (energyBillResult && (energyBillResult.documento_esperado === false || energyBillResult.legivel === null)) {
+        energyBillResult.problemas_encontrados = [
+          'Conta de energia em PDF não é analisada automaticamente. Envie uma foto ou imagem (JPEG/PNG) da conta para validação imediata.',
+        ];
+      }
+    }
+
     const docs = documentValidation?.documentos || [];
     const validacaoExecutada = documentValidation?.validacao_executada === true;
 
