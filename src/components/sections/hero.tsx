@@ -38,7 +38,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
 
       <div className="container relative z-10 mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12 items-center w-full max-w-full">
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-left duration-1000 min-w-0">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full text-primary-foreground font-semibold text-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full text-primary-foreground font-semibold text-sm dark:text-white">
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" />
             <span className="truncate">Representante iGreen Energy</span>
           </div>
@@ -64,7 +64,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             <Button
               size="lg"
               onClick={onCTAClick}
-              className="h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all w-full sm:w-auto text-center"
+              className="h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-xl font-black rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105 transition-all w-full sm:w-auto text-center dark:text-white"
             >
               <span className="sm:hidden">Quero economizar na conta de luz</span>
               <span className="hidden sm:inline">Faça parte da maior transição energética do Brasil agora</span>

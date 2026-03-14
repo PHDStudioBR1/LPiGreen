@@ -24,7 +24,7 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
       <div className="flex items-center gap-3 sm:gap-4 shrink-0">
         <Button
           onClick={onCTAClick}
-          className="shrink-0 rounded-full font-bold shadow-lg bg-primary hover:bg-primary/90 transition-all text-sm sm:text-base px-4 sm:px-6 py-2"
+          className="shrink-0 rounded-full font-bold shadow-lg bg-primary hover:bg-primary/90 transition-all text-sm sm:text-base px-4 sm:px-6 py-2 dark:text-white"
         >
           <span className="sm:hidden">Quero economizar</span>
           <span className="hidden sm:inline">

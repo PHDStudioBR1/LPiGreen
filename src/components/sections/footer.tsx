@@ -21,7 +21,7 @@ export function Footer({ onCTAClick }: { onCTAClick?: () => void }) {
             <div className="pt-4">
               <Link
                 href="/formulario"
-                className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all"
+                className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
               >
                 Faça parte da transição energética
               </Link>

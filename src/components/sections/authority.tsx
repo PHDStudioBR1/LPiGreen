@@ -66,7 +66,7 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
           <div className="mt-6 text-center">
             <Link
               href="/formulario"
-              className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all"
+              className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
             >
               Quero economizar na conta de luz
             </Link>
