@@ -107,7 +107,7 @@ export const leadSchema = z.object({
   .refine((data) => String(data.phone).replace(/\D/g, '') === String(data.phone_confirm).replace(/\D/g, ''), { message: 'Celular e confirmação devem ser iguais', path: ['phone_confirm'] })
   .refine((data) => (data.email || '').toLowerCase() === (data.email_confirm || '').toLowerCase(), { message: 'E-mail e confirmação devem ser iguais', path: ['email_confirm'] })
   .refine((data) => data.document_front_base64, { message: 'Documento pessoal – Frente é obrigatório', path: ['document_front_base64'] })
-  .refine((data) => data.document_back_base64, { message: 'Documento pessoal – Verso é obrigatório', path: ['document_back_base64'] })
+  .refine((data) => data.document_type === 'CNH' || data.document_back_base64, { message: 'Documento pessoal – Verso é obrigatório (RG exige frente e verso)', path: ['document_back_base64'] })
   .refine((data) => data.has_pending_debts !== 1 || data.payment_proof_base64, {
     message: 'Comprovante de pagamento é obrigatório quando há débitos em aberto',
     path: ['payment_proof_base64'],

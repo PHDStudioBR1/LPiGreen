@@ -135,16 +135,18 @@ router.post('/', uploadFields, async (req, res) => {
         ocr_text: null,
         metadata: { field: 'document_front' },
       },
-      {
-        slot: 'document_back',
-        label: 'Documento pessoal – Verso',
-        tipo_esperado: 'rg_verso',
-        mimetype: req.files?.document_back?.[0]?.mimetype || null,
-        size_bytes: req.files?.document_back?.[0]?.size ?? null,
-        content_base64: parsed.data.document_back_base64 || null,
-        ocr_text: null,
-        metadata: { field: 'document_back' },
-      },
+      ...(parsed.data.document_type !== 'CNH'
+        ? [{
+            slot: 'document_back',
+            label: 'Documento pessoal – Verso',
+            tipo_esperado: 'rg_verso',
+            mimetype: req.files?.document_back?.[0]?.mimetype || null,
+            size_bytes: req.files?.document_back?.[0]?.size ?? null,
+            content_base64: parsed.data.document_back_base64 || null,
+            ocr_text: null,
+            metadata: { field: 'document_back' },
+          }]
+        : []),
       {
         slot: 'energy_bill',
         label: 'Conta de luz',

@@ -260,6 +260,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
 
   const form = useForm<LeadFormValues>({ defaultValues });
   const watchHasPendingDebts = form.watch("has_pending_debts");
+  const watchDocumentType = form.watch("document_type");
 
   const getOrCreateSessionId = useCallback(() => {
     const fromStorage = window.localStorage.getItem(FORM_SESSION_STORAGE_KEY);
@@ -305,6 +306,12 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
     },
     [form, sessionId]
   );
+
+  useEffect(() => {
+    if (watchDocumentType === "CNH" && files.document_back) {
+      setFiles((f) => ({ ...f, document_back: undefined }));
+    }
+  }, [watchDocumentType]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -960,18 +967,20 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     errors={submissionErrors?.documentErrors?.document_front}
                     requirement="Foto nítida da frente do RG ou da CNH; nome e número do documento devem estar legíveis."
                   />
-                  <FileUploadField
-                    label="Documento pessoal – Verso (obrigatório)"
-                    description="Envie uma foto nítida do verso do RG. Será validado automaticamente."
-                    accept="image/*"
-                    file={files.document_back}
-                    onChange={(file) => {
-                      setFiles((f) => ({ ...f, document_back: file }));
-                      setSubmissionErrors((e) => e ? { ...e, documentErrors: { ...e.documentErrors, document_back: [] } } : null);
-                    }}
-                    errors={submissionErrors?.documentErrors?.document_back}
-                    requirement="Foto nítida do verso do RG (se for CNH, este campo pode não ser obrigatório)."
-                  />
+                  {watchDocumentType !== "CNH" && (
+                    <FileUploadField
+                      label="Documento pessoal – Verso (obrigatório)"
+                      description="Envie uma foto nítida do verso do RG. Será validado automaticamente."
+                      accept="image/*"
+                      file={files.document_back}
+                      onChange={(file) => {
+                        setFiles((f) => ({ ...f, document_back: file }));
+                        setSubmissionErrors((e) => e ? { ...e, documentErrors: { ...e.documentErrors, document_back: [] } } : null);
+                      }}
+                      errors={submissionErrors?.documentErrors?.document_back}
+                      requirement="Foto nítida do verso do RG; nome e número do documento devem estar legíveis."
+                    />
+                  )}
                 </>
               )}
 
