@@ -197,6 +197,11 @@ jobs:
             echo "Para o login admin funcionar: em Settings > Secrets and variables > Actions, crie ADMIN_USER, ADMIN_PASSWORD e ADMIN_JWT_SECRET e rode o deploy novamente."
           fi
 
+      - name: Reiniciar frontend para carregar credenciais admin (se secret foi atualizado)
+        run: |
+          kubectl rollout restart deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} || true
+          kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s || true
+
       - name: Deploy aplicação (frontend)
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
