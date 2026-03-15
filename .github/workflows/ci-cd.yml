@@ -182,8 +182,20 @@ jobs:
 
       - name: Secret CRM Admin (login /admin)
         run: |
-          kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
-          echo "Se usar placeholders, troque a senha: kubectl edit secret admin-secret -n ${{ env.K8S_NAMESPACE }} (ou recrie o secret e faça rollout restart do lpigreen-web)."
+          if [ -n "${{ secrets.ADMIN_USER }}" ] && [ -n "${{ secrets.ADMIN_PASSWORD }}" ] && [ -n "${{ secrets.ADMIN_JWT_SECRET }}" ]; then
+            echo "Criando/atualizando admin-secret a partir dos GitHub Secrets (ADMIN_USER, ADMIN_PASSWORD, ADMIN_JWT_SECRET)."
+            kubectl create secret generic admin-secret -n ${{ env.K8S_NAMESPACE }} \
+              --from-literal=admin-user="${{ secrets.ADMIN_USER }}" \
+              --from-literal=admin-password="${{ secrets.ADMIN_PASSWORD }}" \
+              --from-literal=admin-jwt-secret="${{ secrets.ADMIN_JWT_SECRET }}" \
+              --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
+            echo "✅ admin-secret atualizado com as credenciais do GitHub."
+          else
+            echo "⚠️ GitHub Secrets ADMIN_USER, ADMIN_PASSWORD ou ADMIN_JWT_SECRET não configurados."
+            echo "Aplicando admin-secret.yaml com valores de exemplo (login não funcionará até configurar os secrets)."
+            kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+            echo "Para o login admin funcionar: em Settings > Secrets and variables > Actions, crie ADMIN_USER, ADMIN_PASSWORD e ADMIN_JWT_SECRET e rode o deploy novamente."
+          fi
 
       - name: Deploy aplicação (frontend)
         run: |
