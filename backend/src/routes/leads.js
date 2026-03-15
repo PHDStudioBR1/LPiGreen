@@ -5,8 +5,11 @@ import {
   listLeadsByEligibilityStatus,
   updateLeadEligibilityByDocument,
   getLeadById,
+  getLeadBySessionId,
   updateLeadById,
+  updateLeadFull,
   softDeleteLeadById,
+  upsertLeadDraft,
 } from '../leads-repository.js';
 import { validateLead } from '../validation.js';
 import { uploadFields } from '../middleware/upload.js';
@@ -21,7 +24,7 @@ import {
 import { documentValidationService } from '../document-validation/index.js';
 
 const router = Router();
-const CACHE_START_STEP_INDEX = 1;
+const CACHE_START_STEP_INDEX = 0;
 const MAX_SESSION_ID_LENGTH = 64;
 
 const ALLOWED_PROGRESS_FIELDS = [
@@ -248,10 +251,19 @@ router.post('/', uploadFields, async (req, res) => {
       });
     }
 
-    const leadId = await insertLead(parsed.data);
+    const sessionIdParam = typeof body.session_id === 'string' ? body.session_id.trim().slice(0, MAX_SESSION_ID_LENGTH) : null;
+    let leadId;
+
+    const existingDraft = sessionIdParam ? await getLeadBySessionId(sessionIdParam) : null;
+    if (existingDraft) {
+      await updateLeadFull(existingDraft.id, { ...parsed.data, status: 'new' });
+      leadId = existingDraft.id;
+    } else {
+      leadId = await insertLead(parsed.data);
+    }
 
     await registerLeadProgressLog(req, {
-      sessionId: typeof body.session_id === 'string' ? body.session_id.slice(0, MAX_SESSION_ID_LENGTH) : null,
+      sessionId: sessionIdParam,
       eventType: 'lead_submitted',
       stepIndex: 5,
       stepId: 'final',
@@ -297,6 +309,13 @@ router.post('/progress', async (req, res) => {
     };
 
     await saveLeadProgress(sessionId, snapshot);
+
+    try {
+      await upsertLeadDraft(sessionId, safeValues);
+    } catch (draftErr) {
+      console.error('Upsert lead draft error (progress still saved in cache):', draftErr.message);
+    }
+
     await registerLeadProgressLog(req, {
       sessionId,
       eventType: 'step_progress_saved',

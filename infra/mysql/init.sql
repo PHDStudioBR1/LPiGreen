@@ -47,28 +47,29 @@ ON DUPLICATE KEY UPDATE
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS leads (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  session_id VARCHAR(64) NULL UNIQUE COMMENT 'Sessão do formulário (draft por etapa)',
   -- 1.1 Landing
-  cep_landing VARCHAR(10) NOT NULL,
-  valor_conta DECIMAL(12,2) NOT NULL,
+  cep_landing VARCHAR(10) NULL,
+  valor_conta DECIMAL(12,2) NULL,
   -- 1.2 Cadastro pessoal
-  document_number VARCHAR(18) NOT NULL COMMENT 'CPF ou CNPJ',
-  name VARCHAR(255) NOT NULL,
-  birth_date DATE NOT NULL,
-  phone VARCHAR(20) NOT NULL,
-  phone_confirm VARCHAR(20) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  email_confirm VARCHAR(255) NOT NULL,
+  document_number VARCHAR(18) NULL COMMENT 'CPF ou CNPJ',
+  name VARCHAR(255) NULL,
+  birth_date DATE NULL,
+  phone VARCHAR(20) NULL,
+  phone_confirm VARCHAR(20) NULL,
+  email VARCHAR(255) NULL,
+  email_confirm VARCHAR(255) NULL,
   -- 1.3 Endereço
-  cep VARCHAR(10) NOT NULL,
-  address VARCHAR(255) NOT NULL,
-  number VARCHAR(20) NOT NULL,
-  neighborhood VARCHAR(120) NOT NULL,
-  city VARCHAR(120) NOT NULL,
-  state VARCHAR(2) NOT NULL,
+  cep VARCHAR(10) NULL,
+  address VARCHAR(255) NULL,
+  number VARCHAR(20) NULL,
+  neighborhood VARCHAR(120) NULL,
+  city VARCHAR(120) NULL,
+  state VARCHAR(2) NULL,
   complement VARCHAR(255) DEFAULT NULL,
   -- 1.4 Energia e documento
   power_company VARCHAR(120) DEFAULT NULL,
-  installation_number VARCHAR(60) NOT NULL,
+  installation_number VARCHAR(60) NULL,
   discount_option VARCHAR(10) DEFAULT NULL COMMENT '8, 10, 12, 14',
   document_type VARCHAR(60) DEFAULT NULL COMMENT 'ex: RG (Novo)',
   document_front_base64 LONGTEXT DEFAULT NULL COMMENT 'Documento frente (imagem/PDF) em base64',
@@ -82,7 +83,7 @@ CREATE TABLE IF NOT EXISTS leads (
   -- metadados
   representante_id BIGINT UNSIGNED NOT NULL,
   eligibility_status VARCHAR(32) NOT NULL DEFAULT 'nao_verificado',
-  status VARCHAR(32) DEFAULT 'new',
+  status VARCHAR(32) DEFAULT 'new' COMMENT 'new=completo, draft=parcial',
   source VARCHAR(64) DEFAULT 'web',
   id_campaign VARCHAR(64) DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -93,6 +94,7 @@ CREATE TABLE IF NOT EXISTS leads (
   KEY idx_email (email(64)),
   KEY idx_document (document_number(14)),
   KEY idx_representante (representante_id),
+  KEY idx_session_id (session_id),
   CONSTRAINT fk_leads_representante FOREIGN KEY (representante_id) REFERENCES representantes(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

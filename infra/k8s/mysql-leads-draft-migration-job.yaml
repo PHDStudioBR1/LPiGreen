@@ -1,0 +1,51 @@
+# Job para adicionar session_id e campos nullable na tabela leads (leads parciais/draft).
+# Executar uma vez em bancos já existentes. Bancos criados com init.sql atualizado já possuem o schema.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-leads-draft-migration
+  namespace: lpigreen
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: mysql:8.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mysql -h mysql -u root -p"$MYSQL_ROOT_PASSWORD" -D igreen_captacao -e "
+              ALTER TABLE leads
+                ADD COLUMN session_id VARCHAR(64) NULL UNIQUE COMMENT 'Sessão do formulário (draft)' AFTER id;
+              "
+              mysql -h mysql -u root -p"$MYSQL_ROOT_PASSWORD" -D igreen_captacao -e "
+              ALTER TABLE leads
+                MODIFY COLUMN cep_landing VARCHAR(10) NULL,
+                MODIFY COLUMN valor_conta DECIMAL(12,2) NULL,
+                MODIFY COLUMN document_number VARCHAR(18) NULL COMMENT 'CPF ou CNPJ',
+                MODIFY COLUMN name VARCHAR(255) NULL,
+                MODIFY COLUMN birth_date DATE NULL,
+                MODIFY COLUMN phone VARCHAR(20) NULL,
+                MODIFY COLUMN phone_confirm VARCHAR(20) NULL,
+                MODIFY COLUMN email VARCHAR(255) NULL,
+                MODIFY COLUMN email_confirm VARCHAR(255) NULL,
+                MODIFY COLUMN cep VARCHAR(10) NULL,
+                MODIFY COLUMN address VARCHAR(255) NULL,
+                MODIFY COLUMN number VARCHAR(20) NULL,
+                MODIFY COLUMN neighborhood VARCHAR(120) NULL,
+                MODIFY COLUMN city VARCHAR(120) NULL,
+                MODIFY COLUMN state VARCHAR(2) NULL,
+                MODIFY COLUMN installation_number VARCHAR(60) NULL;
+              "
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+---
+# Se o banco já tiver session_id (init atualizado ou job já rodado), o primeiro ALTER falhará.
+# Nesse caso ignorar ou rodar apenas o segundo bloco (MODIFY) manualmente se necessário.

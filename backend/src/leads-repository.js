@@ -95,7 +95,7 @@ export async function insertLead(lead, _retry = false) {
 }
 
 const LEAD_SELECT_ALL = `
-  id, cep_landing, valor_conta, document_number, name, birth_date, phone, phone_confirm,
+  id, session_id, cep_landing, valor_conta, document_number, name, birth_date, phone, phone_confirm,
   email, email_confirm, cep, address, number, neighborhood, city, state, complement,
   power_company, installation_number, discount_option, document_type,
   document_front_base64, document_back_base64, has_procurator, energy_bill_password,
@@ -199,6 +199,125 @@ export async function getLeadById(id) {
   return rows[0];
 }
 
+export async function getLeadBySessionId(sessionId) {
+  const pool = getPool();
+  const [rows] = await pool.query(
+    `SELECT ${LEAD_SELECT_ALL} FROM leads WHERE session_id = ?`,
+    [sessionId]
+  );
+
+  if (!rows || rows.length === 0) {
+    return null;
+  }
+
+  return rows[0];
+}
+
+/** Normaliza valores do formulário (progress) para o banco (draft). */
+function normalizeDraftValue(key, value) {
+  if (value === undefined || value === null || value === '') return null;
+  if (key === 'valor_conta') {
+    const num = parseFloat(String(value).replace(/\./g, '').replace(',', '.')) || null;
+    return num;
+  }
+  if (key === 'birth_date') {
+    const s = String(value).trim();
+    const match = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+    return s || null;
+  }
+  if (key === 'has_pending_debts') {
+    return String(value).toLowerCase() === 'sim' ? 1 : 0;
+  }
+  return typeof value === 'string' ? value.trim() : value;
+}
+
+const DRAFT_UPSERT_FIELDS = [
+  'cep_landing', 'valor_conta', 'document_number', 'name', 'birth_date',
+  'phone', 'phone_confirm', 'email', 'email_confirm', 'cep', 'address',
+  'number', 'neighborhood', 'city', 'state', 'complement', 'power_company',
+  'installation_number', 'discount_option', 'document_type', 'energy_bill_password',
+  'has_pending_debts',
+];
+
+/**
+ * Cria ou atualiza um lead rascunho (draft) na tabela leads a partir dos dados
+ * salvos a cada passo do formulário. Usado quando o usuário avança de página
+ * mesmo sem completar o cadastro.
+ */
+export async function upsertLeadDraft(sessionId, values, _retry = false) {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  let released = false;
+
+  try {
+    await connection.beginTransaction();
+
+    const [existing] = await connection.query(
+      'SELECT id FROM leads WHERE session_id = ?',
+      [sessionId]
+    );
+
+    const normalized = {};
+    for (const key of DRAFT_UPSERT_FIELDS) {
+      if (!Object.prototype.hasOwnProperty.call(values, key)) continue;
+      const v = normalizeDraftValue(key, values[key]);
+      if (v !== undefined) normalized[key] = v;
+    }
+
+    if (existing && existing.length > 0) {
+      const id = existing[0].id;
+      const setParts = [];
+      const params = [];
+      for (const key of DRAFT_UPSERT_FIELDS) {
+        if (!Object.prototype.hasOwnProperty.call(normalized, key)) continue;
+        setParts.push(`${key} = ?`);
+        params.push(normalized[key]);
+      }
+      if (setParts.length > 0) {
+        params.push(id);
+        await connection.execute(
+          `UPDATE leads SET ${setParts.join(', ')} WHERE id = ?`,
+          params
+        );
+      }
+      await connection.commit();
+      return id;
+    }
+
+    const representanteId = await getNextRepresentativeId(connection);
+
+    const fields = ['session_id', 'representante_id', 'eligibility_status', 'status', 'source'];
+    const placeholders = ['?', '?', '?', '?', '?'];
+    const params = [sessionId, representanteId, 'nao_verificado', 'draft', 'web'];
+
+    for (const key of DRAFT_UPSERT_FIELDS) {
+      if (!Object.prototype.hasOwnProperty.call(normalized, key)) continue;
+      fields.push(key);
+      placeholders.push('?');
+      params.push(normalized[key]);
+    }
+
+    const [result] = await connection.execute(
+      `INSERT INTO leads (${fields.join(', ')}) VALUES (${placeholders.join(', ')})`,
+      params
+    );
+
+    await connection.commit();
+    return result.insertId;
+  } catch (error) {
+    await connection.rollback().catch(() => {});
+    if (isConnectionClosedError(error) && !_retry) {
+      connection.release();
+      released = true;
+      return upsertLeadDraft(sessionId, values, true);
+    }
+    throw error;
+  } finally {
+    if (!released) connection.release();
+  }
+}
+
 export async function updateLeadById(id, fields) {
   const pool = getPool();
 
@@ -224,6 +343,43 @@ export async function updateLeadById(id, fields) {
       WHERE id = ?
     `,
     [...params, id]
+  );
+
+  return result.affectedRows;
+}
+
+const FULL_UPDATE_FIELDS = [
+  'cep_landing', 'valor_conta', 'document_number', 'name', 'birth_date',
+  'phone', 'phone_confirm', 'email', 'email_confirm', 'cep', 'address',
+  'number', 'neighborhood', 'city', 'state', 'complement', 'power_company',
+  'installation_number', 'discount_option', 'document_type',
+  'document_front_base64', 'document_back_base64', 'has_procurator',
+  'energy_bill_password', 'energy_bill_base64', 'has_pending_debts',
+  'payment_proof_base64', 'eligibility_status', 'source', 'id_campaign',
+];
+
+/**
+ * Atualiza um lead existente (ex.: draft) com todos os dados do submit final.
+ * Limpa session_id e define status = 'new' para virar lead definitivo.
+ */
+export async function updateLeadFull(id, lead) {
+  const pool = getPool();
+
+  const setParts = ['session_id = NULL', 'status = ?'];
+  const params = [lead.status ?? 'new'];
+
+  for (const key of FULL_UPDATE_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(lead, key)) continue;
+    setParts.push(`${key} = ?`);
+    const v = lead[key];
+    params.push(v === undefined ? null : v);
+  }
+
+  params.push(id);
+
+  const [result] = await pool.execute(
+    `UPDATE leads SET ${setParts.join(', ')} WHERE id = ?`,
+    params
   );
 
   return result.affectedRows;
