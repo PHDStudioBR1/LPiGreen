@@ -39,6 +39,22 @@ spec:
             secretKeyRef:
               name: api-secret
               key: api-key
+        # CRM Admin: login em /admin (obrigatório para o login funcionar)
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: admin-secret
+              key: admin-user
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: admin-secret
+              key: admin-password
+        - name: ADMIN_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: admin-secret
+              key: admin-jwt-secret
         livenessProbe:
           httpGet:
             path: /

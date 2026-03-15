@@ -34,8 +34,8 @@ spec:
   entryPoints:
     - websecure
   routes:
-    # Apenas POST /api/leads vai para o frontend (Next.js), que faz proxy com API Key
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/leads`) && Method(`POST`)
+    # /api/leads (todas as requisições) -> frontend (Next.js): POST do formulário e GET/PATCH/DELETE do CRM
+    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
         - name: web-service
@@ -43,7 +43,25 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    # Demais /api (GET/PATCH/DELETE /api/leads, /api/health, etc.) -> backend
+    # CRM Admin: login, logout, me, export -> frontend (Next.js)
+    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/admin`)
+      kind: Rule
+      services:
+        - name: web-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
+    # /api/representantes -> frontend (Next.js), usado pelo CRM na edição de lead
+    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/representantes`)
+      kind: Rule
+      services:
+        - name: web-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
+    # Demais /api (/api/health, /api/aneel/distribuidoras, etc.) -> backend
     - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api`)
       kind: Rule
       services:

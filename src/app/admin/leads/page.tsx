@@ -43,6 +43,7 @@ type Lead = {
 export default function AdminLeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [status, setStatus] = useState<string>('');
   const [eligibilityStatus, setEligibilityStatus] = useState<string>('');
@@ -52,6 +53,7 @@ export default function AdminLeadsPage() {
 
   const fetchLeads = useCallback(async () => {
     setLoading(true);
+    setApiError(null);
     const params = new URLSearchParams();
     params.set('limit', String(PAGE_SIZE));
     params.set('offset', String(page * PAGE_SIZE));
@@ -62,9 +64,20 @@ export default function AdminLeadsPage() {
     if (createdTo) params.set('created_to', createdTo);
     try {
       const res = await fetch(`/api/leads?${params.toString()}`);
-      const data = await res.json();
-      setLeads(Array.isArray(data) ? data : []);
-    } catch {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setApiError(typeof data?.error === 'string' ? data.error : `Erro ao carregar leads (${res.status})`);
+        setLeads([]);
+        return;
+      }
+      if (!Array.isArray(data)) {
+        setApiError(typeof data?.error === 'string' ? data.error : 'Resposta inválida da API');
+        setLeads([]);
+        return;
+      }
+      setLeads(data);
+    } catch (e) {
+      setApiError('Falha de conexão ao carregar os leads.');
       setLeads([]);
     } finally {
       setLoading(false);
@@ -163,6 +176,17 @@ export default function AdminLeadsPage() {
         </Button>
       </div>
 
+      {apiError && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-destructive text-sm">
+          {apiError}
+          {apiError.includes('autorizado') && (
+            <p className="mt-2 text-muted-foreground">
+              Verifique se o frontend está com a variável LEAD_API_KEY igual à API_KEY do backend (secret api-secret no cluster).
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="rounded-md border">
         {loading ? (
           <div className="p-8 text-center text-muted-foreground">Carregando...</div>
@@ -214,7 +238,7 @@ export default function AdminLeadsPage() {
                 ))}
               </TableBody>
             </Table>
-            {leads.length === 0 && (
+            {leads.length === 0 && !apiError && (
               <div className="p-8 text-center text-muted-foreground">
                 Nenhum lead encontrado com os filtros atuais.
               </div>

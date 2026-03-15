@@ -39,6 +39,35 @@ const BASE64_KEYS = [
   'payment_proof_base64',
 ];
 
+/** Detecta o MIME type a partir do conteúdo base64 (cabeçalho do arquivo). */
+function getMimeFromBase64(base64: string): string {
+  const raw = base64.replace(/^data:[^;]+;base64,/, '');
+  try {
+    const bin = atob(raw);
+    if (bin.length < 4) return 'application/octet-stream';
+    // PDF: %PDF
+    if (bin.startsWith('%PDF')) return 'application/pdf';
+    // JPEG: FF D8 FF
+    if (bin.charCodeAt(0) === 0xff && bin.charCodeAt(1) === 0xd8) return 'image/jpeg';
+    // PNG: 89 50 4E 47 0D 0A 1A 0A
+    if (bin.charCodeAt(0) === 0x89 && bin.slice(1, 4) === 'PNG') return 'image/png';
+    // GIF: GIF87a ou GIF89a
+    if (bin.startsWith('GIF87a') || bin.startsWith('GIF89a')) return 'image/gif';
+    return 'image/jpeg';
+  } catch {
+    return 'application/octet-stream';
+  }
+}
+
+/** Extrai apenas o payload base64 (sem prefixo data:). */
+function getBase64Payload(base64: string): string {
+  if (base64.startsWith('data:')) {
+    const i = base64.indexOf(',');
+    return i >= 0 ? base64.slice(i + 1) : base64;
+  }
+  return base64;
+}
+
 function DocLink({
   label,
   base64,
@@ -47,18 +76,41 @@ function DocLink({
   base64: string | null | undefined;
 }) {
   if (!base64 || typeof base64 !== 'string') return null;
-  const dataUrl = base64.startsWith('data:') ? base64 : `data:image/jpeg;base64,${base64}`;
+
+  const payload = getBase64Payload(base64);
+  const mime = getMimeFromBase64(base64);
+
+  function openDocument() {
+    try {
+      const binary = atob(payload);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, '_blank', 'noopener,noreferrer');
+      // Revoke após um tempo para o navegador carregar; evita vazamento de memória
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      if (!w) {
+        URL.revokeObjectURL(url);
+        // Fallback: abrir como data URL (pode ser bloqueado se for muito grande)
+        const dataUrl = `data:${mime};base64,${payload}`;
+        window.open(dataUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch (e) {
+      console.error('Erro ao abrir documento:', e);
+    }
+  }
+
   return (
     <div className="flex items-center gap-2">
-      <a
-        href={dataUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary underline text-sm flex items-center gap-1"
+      <button
+        type="button"
+        onClick={openDocument}
+        className="text-primary underline text-sm flex items-center gap-1 hover:no-underline focus:outline-none focus:underline"
       >
         <FileText className="h-3 w-3" />
         {label}
-      </a>
+      </button>
     </div>
   );
 }

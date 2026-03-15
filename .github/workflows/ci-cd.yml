@@ -180,6 +180,11 @@ jobs:
           kubectl exec -n ${{ env.K8S_NAMESPACE }} "$POD" -- env 2>/dev/null | grep -E '^DOC_AI_PROVIDER=|^OPENAI_API_KEY=' | sed 's/=.*/=*** (valor definido)/' || echo "⚠️ Variáveis Doc AI não encontradas no container."
           echo "✅ Se DOC_AI_PROVIDER e OPENAI_API_KEY aparecerem acima com 'valor definido', a validação de documentos está configurada no pod."
 
+      - name: Secret CRM Admin (login /admin)
+        run: |
+          kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+          echo "Se usar placeholders, troque a senha: kubectl edit secret admin-secret -n ${{ env.K8S_NAMESPACE }} (ou recrie o secret e faça rollout restart do lpigreen-web)."
+
       - name: Deploy aplicação (frontend)
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
