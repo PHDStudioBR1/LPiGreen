@@ -4,20 +4,20 @@ const BACKEND_URL = process.env.LEAD_API_URL || "http://api-service";
 const API_KEY = process.env.LEAD_API_KEY || process.env.API_KEY || "";
 
 type Params = {
-  params: { sessionId: string };
+  params: Promise<{ sessionId: string }>;
 };
 
-function buildTargetUrl(params: Params["params"]) {
-  const { sessionId } = params;
+function buildTargetUrl(sessionId: string) {
   return `${BACKEND_URL.replace(/\/$/, "")}/api/leads/progress/${encodeURIComponent(sessionId)}`;
 }
 
 export async function GET(_request: NextRequest, { params }: Params) {
   try {
+    const { sessionId } = await params;
     const headers: HeadersInit = {};
     if (API_KEY) headers["X-API-Key"] = API_KEY;
 
-    const url = buildTargetUrl(params);
+    const url = buildTargetUrl(sessionId);
     const res = await fetch(url, {
       method: "GET",
       headers,
@@ -40,10 +40,11 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
   try {
+    const { sessionId } = await params;
     const headers: HeadersInit = {};
     if (API_KEY) headers["X-API-Key"] = API_KEY;
 
-    const url = buildTargetUrl(params);
+    const url = buildTargetUrl(sessionId);
     const res = await fetch(url, {
       method: "DELETE",
       headers,

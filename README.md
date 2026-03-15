@@ -6,6 +6,20 @@ To get started, take a look at src/app/page.tsx.
 
 ---
 
+## CRM Admin (`/admin`)
+
+O mini CRM em `/admin` permite gerenciar leads (listar, filtrar, ver detalhe, editar, exportar CSV) com login e senha.
+
+### Variáveis de ambiente (Next.js)
+
+- **ADMIN_USER** – usuário para login no admin (obrigatório).
+- **ADMIN_PASSWORD** – senha em texto (uso em dev). Em produção prefira **ADMIN_PASSWORD_HASH** (hash bcrypt da senha).
+- **ADMIN_JWT_SECRET** (ou **JWT_SECRET**) – segredo para assinar o JWT da sessão (obrigatório em produção).
+
+Proteções: rate limit no login (5 tentativas / 15 min por IP), cookie HTTP-only e Secure em produção, headers de segurança (X-Frame-Options, etc.), e middleware que exige sessão válida em todas as rotas `/admin` e `/api/admin` (exceto login). As rotas de detalhe/edição de lead (`/api/leads/:id`, `/api/leads/:id/logs`) também exigem sessão admin.
+
+---
+
 ## Validação de documentos com IA (backend)
 
 O backend Express (`backend/`) suporta uma camada opcional de validação de documentos via IA (LLM) logo após o upload do formulário de lead.
