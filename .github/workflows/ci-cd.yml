@@ -189,15 +189,17 @@ jobs:
 
       - name: Secret CRM Admin DEV
         run: |
-          if [ -n "${{ secrets.ADMIN_USER_DEV }}" ] && [ -n "${{ secrets.ADMIN_PASSWORD_DEV }}" ] && [ -n "${{ secrets.ADMIN_JWT_SECRET_DEV }}" ]; then
-            kubectl create secret generic admin-secret-dev -n ${{ env.K8S_NAMESPACE }} \
-              --from-literal=admin-user="${{ secrets.ADMIN_USER_DEV }}" \
-              --from-literal=admin-password="${{ secrets.ADMIN_PASSWORD_DEV }}" \
-              --from-literal=admin-jwt-secret="${{ secrets.ADMIN_JWT_SECRET_DEV }}" \
-              --dry-run=client -o yaml | kubectl apply -f -
-          else
-            kubectl apply -f infra/k8s/admin-secret-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          if [ -z "${{ secrets.ADMIN_USER_DEV }}" ] || [ -z "${{ secrets.ADMIN_PASSWORD_DEV }}" ] || [ -z "${{ secrets.ADMIN_JWT_SECRET_DEV }}" ]; then
+            echo "❌ Secrets ADMIN_USER_DEV, ADMIN_PASSWORD_DEV ou ADMIN_JWT_SECRET_DEV não configurados ou vazios."
+            echo "Configure os três em Settings > Secrets and variables > Actions e rode o workflow novamente."
+            exit 1
           fi
+          echo "✅ Usando secrets ADMIN_USER_DEV / ADMIN_PASSWORD_DEV / ADMIN_JWT_SECRET_DEV para criar admin-secret-dev."
+          kubectl create secret generic admin-secret-dev -n ${{ env.K8S_NAMESPACE }} \
+            --from-literal=admin-user="${{ secrets.ADMIN_USER_DEV }}" \
+            --from-literal=admin-password="${{ secrets.ADMIN_PASSWORD_DEV }}" \
+            --from-literal=admin-jwt-secret="${{ secrets.ADMIN_JWT_SECRET_DEV }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy API DEV
         run: |
