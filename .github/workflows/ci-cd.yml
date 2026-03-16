@@ -221,6 +221,19 @@ jobs:
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} --timeout=300s || true
 
+      - name: Verificar variáveis ADMIN_* no Pod DEV
+        run: |
+          echo "Procurando pod do frontend DEV..."
+          POD=$(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-web-dev -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+          if [ -z "$POD" ]; then
+            echo "⚠️ Nenhum pod lpigreen-web-dev encontrado em ${{ env.K8S_NAMESPACE }}."
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }}
+            exit 0
+          fi
+          echo "Pod: $POD"
+          echo "Variáveis ADMIN_* dentro do container:"
+          kubectl exec -n ${{ env.K8S_NAMESPACE }} "$POD" -- env 2>/dev/null | grep '^ADMIN_' || echo "⚠️ Nenhuma variável ADMIN_ encontrada no pod."
+
       - name: Aplicar Middlewares DEV
         run: |
           kubectl apply -f infra/k8s/middlewares/redirect-https-dev.yaml -n ${{ env.K8S_NAMESPACE }}
