@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: lpigreendev-tls
+  namespace: lpigreendev
+spec:
+  secretName: lpigreendev-546digitalservices-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - lpigreendev.546digitalservices.com
+  commonName: lpigreendev.546digitalservices.com

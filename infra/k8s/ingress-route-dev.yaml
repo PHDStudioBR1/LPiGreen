@@ -1,0 +1,76 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: lpigreendev-http
+  namespace: lpigreendev
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/.well-known/acme-challenge`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+      middlewares:
+        - name: redirect-https
+          namespace: lpigreendev
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: lpigreendev-https
+  namespace: lpigreendev
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/leads`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreendev
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/admin`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreendev
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreendev
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: api-service-dev
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreendev
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: web-service-dev
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreendev
+        - name: compress
+          namespace: lpigreendev
+  tls:
+    certResolver: le

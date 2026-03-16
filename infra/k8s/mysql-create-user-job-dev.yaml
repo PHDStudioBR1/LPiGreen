@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-create-app-user-dev
+  namespace: lpigreendev
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: create-user
+          image: mysql:8.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mysql -h mysql-dev -u root -p"$MYSQL_ROOT_PASSWORD" -e "
+              CREATE DATABASE IF NOT EXISTS igreen_captacao_dev;
+              CREATE USER IF NOT EXISTS 'igreen_app'@'%' IDENTIFIED BY '$MYSQL_APP_PASSWORD';
+              GRANT SELECT, INSERT, UPDATE, DELETE ON igreen_captacao_dev.* TO 'igreen_app'@'%';
+              FLUSH PRIVILEGES;
+              "
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-dev
+                  key: mysql-root-password
+            - name: MYSQL_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-dev
+                  key: mysql-app-password

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config-dev
+  namespace: lpigreendev
+data:
+  MYSQL_DATABASE: "igreen_captacao_dev"
