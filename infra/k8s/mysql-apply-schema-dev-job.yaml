@@ -1,0 +1,36 @@
+# Aplica o schema (init-dev.sql) no MySQL DEV. Idempotente: seguro rodar após
+# o MySQL já estar no ar (ex.: quando o PVC já existia e o init do container não rodou).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-apply-schema-dev
+  namespace: lpigreendev
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: apply-schema
+          image: mysql:8.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Aplicando schema em mysql-dev..."
+              mysql -h mysql-dev -u root -p"$MYSQL_ROOT_PASSWORD" < /scripts/init.sql
+              echo "Schema aplicado."
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-dev
+                  key: mysql-root-password
+          volumeMounts:
+            - name: schema
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: schema
+          configMap:
+            name: mysql-init

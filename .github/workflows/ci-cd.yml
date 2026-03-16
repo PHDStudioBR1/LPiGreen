@@ -140,7 +140,7 @@ jobs:
       - name: ConfigMap mysql-init (DEV)
         run: |
           kubectl create configmap mysql-init -n ${{ env.K8S_NAMESPACE }} \
-            --from-file=init.sql=infra/mysql/init.sql \
+            --from-file=init.sql=infra/mysql/init-dev.sql \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy MySQL DEV (secret, config, pvc, deployment)
@@ -150,6 +150,13 @@ jobs:
           kubectl apply -f infra/k8s/mysql-pvc-dev.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/mysql-deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/mysql-dev -n ${{ env.K8S_NAMESPACE }} --timeout=300s || true
+
+      - name: Aplicar schema DEV no MySQL (igreen_captacao_dev + tabelas)
+        run: |
+          kubectl delete job mysql-apply-schema-dev -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
+          sleep 2
+          kubectl apply -f infra/k8s/mysql-apply-schema-dev-job.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl wait --for=condition=complete job/mysql-apply-schema-dev -n ${{ env.K8S_NAMESPACE }} --timeout=120s || true
 
       - name: Job criar usuário MySQL DEV (idempotente)
         run: |
