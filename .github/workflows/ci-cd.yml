@@ -217,9 +217,9 @@ jobs:
 
       - name: Aplicar Middlewares DEV
         run: |
-          if [ -d "infra/k8s/middlewares" ]; then
-            kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
-          fi
+          kubectl apply -f infra/k8s/middlewares/redirect-https-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/middlewares/security-headers-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/middlewares/compress-dev.yaml -n ${{ env.K8S_NAMESPACE }}
 
       - name: Aplicar Certificate e Ingress DEV
         run: |
