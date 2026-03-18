@@ -4,6 +4,7 @@ import { config } from './config.js';
 import { apiKeyAuth } from './middleware/auth.js';
 import leadsRouter from './routes/leads.js';
 import representantesRouter from './routes/representantes.js';
+import configRouter from './routes/config.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/', limiter);
 app.get(['/health', '/api/health'], (req, res) => res.status(200).json({ status: 'ok' }));
 app.use('/api/leads', apiKeyAuth, leadsRouter);
 app.use('/api/representantes', apiKeyAuth, representantesRouter);
+app.use('/api/config', apiKeyAuth, configRouter);
 
 // ---------- ANEEL distribuidoras ----------
 const ANEEL_DISTRIBUIDORAS_URL =

@@ -130,3 +130,8 @@ CREATE TABLE IF NOT EXISTS config_api (
   PRIMARY KEY (id),
   UNIQUE KEY uq_key (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Feature flags
+INSERT INTO config (namespace, `key`, value) VALUES
+('doc_ai', 'enabled', 'true')
+ON DUPLICATE KEY UPDATE value = VALUES(value);

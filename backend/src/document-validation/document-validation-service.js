@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { config } from '../config.js';
+import { getConfigValue } from '../config-repository.js';
 import { callOpenAI, callOpenAIVision } from './providers/openai-provider.js';
 import { callDeepSeek } from './providers/deepseek-provider.js';
 
@@ -139,7 +140,13 @@ export class DocumentValidationService {
     this.config = getProviderConfig();
   }
 
-  isEnabled() {
+  async isEnabled() {
+    try {
+      const dbFlag = await getConfigValue('doc_ai', 'enabled');
+      if (dbFlag === 'false') return false;
+    } catch (err) {
+      console.warn('config-repository: falha ao ler doc_ai.enabled, usando fallback env vars:', err.message);
+    }
     const { provider, openai, deepseek } = this.config;
     if (provider === 'openai') return !!openai.apiKey;
     if (provider === 'deepseek') return !!deepseek.apiKey;
@@ -309,7 +316,7 @@ export class DocumentValidationService {
   async validateDocuments({ documentos, formContext }) {
     const knownSlots = documentos.map((d) => d.slot);
 
-    if (!this.isEnabled()) {
+    if (!(await this.isEnabled())) {
       console.warn(
         'Document validation: desabilitado. Defina DOC_AI_PROVIDER=openai e OPENAI_API_KEY para validar documentos.'
       );

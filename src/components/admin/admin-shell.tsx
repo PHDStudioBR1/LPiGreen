@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Users,
+  Settings,
   LogOut,
 } from 'lucide-react';
 
@@ -86,6 +87,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <Users className="h-4 w-4" />
             Leads
+          </Link>
+          <Link
+            href="/admin/configuracoes"
+            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              pathname?.startsWith('/admin/configuracoes') ? 'bg-muted' : 'hover:bg-muted'
+            }`}
+          >
+            <Settings className="h-4 w-4" />
+            Configurações
           </Link>
         </nav>
         <div className="p-2 border-t">
