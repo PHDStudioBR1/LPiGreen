@@ -1,76 +1,80 @@
-"use client"
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ctaGlowClasses } from "@/lib/cro-cta";
 
-const NEWS_ITEMS = [
+const PILLARS = [
   {
-    outlet: 'CNN Brasil',
-    title: 'Contas de luz vão subir até o triplo do IPCA em 2026',
+    title: "Mercado em alta",
+    text: "Energia e telecom são serviços essenciais: demanda recorrente e ticket previsível para a sua carteira.",
   },
   {
-    outlet: 'Canal Solar',
-    title: 'Conta de luz acumula alta de 16% e deve subir 8% em 2026',
+    title: "Marca forte",
+    text: "Você representa uma empresa com presença nacional e expansão global — credibilidade na abordagem.",
   },
   {
-    outlet: 'Gazeta do Povo',
-    title: 'Conta de luz deve subir em 2026 para bancar R$ 47,8 bilhões em subsídios',
+    title: "Modelo regulado",
+    text: "Atuação amparada por marco legal e regulação — transparência para você e para o cliente final.",
   },
   {
-    outlet: 'Portal Solar',
-    title: 'Tarifa residencial de energia deve subir 5,4% em média em 2026',
+    title: "Tecnologia",
+    text: "App, materiais e jornada digital pensados para quem prospecta majoritariamente pelo smartphone.",
   },
-];
+] as const;
 
 export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
   return (
-    <section className="py-20 bg-white dark:bg-neutral-950 border-y border-border dark:border-neutral-800">
-      <div className="container mx-auto px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-4 mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-red-50 dark:bg-neutral-900 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-red-700 dark:text-red-400">
-            <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            Atenção
+    <section className="py-20 md:py-28 bg-white dark:bg-zinc-950 border-y border-border">
+      <div className="container mx-auto px-4 sm:px-6">
+        <ScrollReveal className="max-w-4xl mx-auto text-center space-y-4 mb-12 md:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Visão de negócio
           </div>
-          <h2 className="text-2xl md:text-3xl font-headline font-black text-gray-900 dark:text-gray-100">
-            A imprensa já alertou: a conta de luz em 2026 subiu e pode chegar a aumentos de até 8% a 13% na tarifa!
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
+            Por que empreender com a iGreen em 2026?
           </h2>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
-            Proteja-se dos aumentos: veja o que a mídia está dizendo:
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+            O momento combina escala (+450 mil clientes), expansão internacional e múltiplas linhas de receita. Quem entra agora posiciona a rede antes da próxima onda de crescimento.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
-          {NEWS_ITEMS.map((item) => (
-            <Link key={item.outlet} href="/formulario">
-              <Card className="group overflow-hidden rounded-2xl border border-border dark:border-neutral-800 shadow-lg hover:shadow-xl transition-shadow h-full bg-white dark:bg-neutral-900">
-                <CardContent className="flex h-full flex-col justify-between p-6 space-y-4">
-                  <div className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-                    {item.outlet}
-                  </div>
-                  <p className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-snug">
-                    {item.title}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2"></div>
+        <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+          {PILLARS.map((item, i) => (
+            <ScrollReveal key={item.title} delayMs={i * 70}>
+              <Card className="h-full rounded-3xl border border-border shadow-md bg-card hover:border-primary/30 transition-colors">
+                <CardContent className="p-6 space-y-3">
+                  <h3 className="text-base font-black text-foreground">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
                 </CardContent>
               </Card>
-            </Link>
+            </ScrollReveal>
           ))}
         </div>
 
-        <p className="mt-10 text-center text-sm text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Faça parte da maior transição energética do Brasil: descubra como se proteger desses aumentos e economizar na sua conta de luz.
-        </p>
         {onCTAClick && (
-          <div className="mt-6 text-center">
-            <Link
-              href="/formulario"
-              className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
-            >
-              Quero economizar na conta de luz
-            </Link>
-          </div>
+          <ScrollReveal className="mt-12 text-center space-y-4">
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              Solicite o material completo do plano de negócios e veja como licenciar na sua região.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+              <Link
+                href="/formulario"
+                className={`inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 ${ctaGlowClasses}`}
+              >
+                Quero ser um Licenciado
+              </Link>
+              <button
+                type="button"
+                onClick={onCTAClick}
+                className="inline-flex h-12 px-8 items-center justify-center rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary/10 transition-colors"
+              >
+                Conhecer o Plano de Negócios
+              </button>
+            </div>
+          </ScrollReveal>
         )}
       </div>
     </section>

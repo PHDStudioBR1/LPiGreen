@@ -77,7 +77,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
                     <Button 
                       size="lg"
                       onClick={onCTAClick}
-                      className="h-16 px-12 text-xl font-black rounded-2xl w-full max-w-full md:w-auto shadow-xl hover:scale-[1.02] transition-all whitespace-normal md:whitespace-nowrap text-center h-auto min-h-16 md:min-h-0 md:h-16 py-3 md:py-0 dark:text-white"
+                      className="h-16 px-12 text-xl font-black rounded-2xl w-full max-w-full md:w-auto shadow-xl hover:scale-[1.02] transition-all whitespace-normal md:whitespace-nowrap text-center h-auto min-h-16 md:min-h-0 md:h-16 py-3 md:py-0"
                     >
                       <span className="min-w-0 text-center">Faça parte da maior transição energética do Brasil agora</span>
                       <Zap className="ml-2 fill-current shrink-0" />

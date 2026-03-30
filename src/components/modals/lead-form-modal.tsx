@@ -579,7 +579,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
             {STEPS[step].title} ({step + 1}/{STEPS.length})
           </DialogTitle>
           <DialogDescription id="lead-form-description" className="sr-only">
-            Formulário de captação de leads em {STEPS.length} etapas. Preencha seus dados para solicitar economia na conta de luz.
+            Formulário em {STEPS.length} etapas para interesse em licenciamento iGreen e plano de negócios. Preencha seus dados para continuar.
           </DialogDescription>
         </DialogHeader>
 

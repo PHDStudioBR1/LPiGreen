@@ -1,8 +1,8 @@
 /**
  * Auth helpers usados apenas no middleware (Edge Runtime).
- * Não importar bcrypt nem o pacote 'jose' completo aqui.
+ * Import único de `jose` (entry principal) — compatível com Turbopack/Edge.
  */
-import { jwtVerify } from 'jose/jwt/verify';
+import { jwtVerify } from 'jose';
 
 export const ADMIN_COOKIE_NAME = 'admin_session';
 
