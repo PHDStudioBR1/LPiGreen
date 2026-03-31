@@ -9,19 +9,19 @@ import { ctaGlowClasses } from "@/lib/cro-cta";
 
 const GALLERY = [
   {
-    src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+    src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
     alt: "Equipe comercial em reunião estratégica",
   },
   {
-    src: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
+    src: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
     alt: "Liderança analisando indicadores de crescimento",
   },
   {
-    src: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80",
+    src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80",
     alt: "Executivos em negociação B2B",
   },
   {
-    src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    src: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80",
     alt: "Profissional usando aplicativo no smartphone",
   },
 ] as const;
@@ -39,12 +39,12 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             <span className="truncate text-white">[ NOVO MARCO 2026: OPERAÇÃO GLOBAL INICIADA ]</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-headline font-black text-white leading-[1.12] break-words">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[3.4rem] xl:text-7xl font-headline font-black text-white leading-[1.12] break-words">
             Lidere a Transição Energética. Construa sua Renda Recorrente Vitalícia com a{" "}
             <span className="text-primary">iGreen Energy.</span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-zinc-300 max-w-xl leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-zinc-300 max-w-xl leading-relaxed">
             Torne-se o "iFood da Energia". Ganhe comissões todos os meses conectando fazendas solares a
             consumidores, sem que seu cliente precise investir 1 centavo. Junte-se à plataforma com mais de
             500 mil clientes.
@@ -54,7 +54,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             <Button
               size="lg"
               onClick={onCTAClick}
-              className={`h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-lg font-black rounded-2xl w-full sm:w-auto text-center text-primary-foreground ${ctaGlowClasses}`}
+              className={`h-14 sm:h-16 px-6 sm:px-8 text-lg sm:text-xl font-black rounded-2xl w-full sm:w-auto text-center text-primary-foreground ${ctaGlowClasses}`}
             >
               <span className="sm:hidden">Quero Ser um Licenciado iGreen</span>
               <span className="hidden sm:inline">Quero Ser um Licenciado iGreen</span>
@@ -63,13 +63,13 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
               size="lg"
               variant="outline"
               onClick={onCTAClick}
-              className="h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-lg font-bold rounded-2xl w-full sm:w-auto border-white/25 text-white bg-white/5 hover:bg-white/10 hover:text-white"
+              className="h-14 sm:h-16 px-6 sm:px-8 text-lg sm:text-xl font-bold rounded-2xl w-full sm:w-auto border-white/25 text-white bg-white/5 hover:bg-white/10 hover:text-white"
             >
               Quero ser um Licenciado
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-zinc-400 text-sm sm:text-base">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-zinc-400 text-base sm:text-lg">
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5 shrink-0" />
               <span>Sem investimento em infraestrutura ou placas.</span>
@@ -103,7 +103,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-center text-xs text-zinc-500">
+          <p className="mt-4 text-center text-sm text-zinc-500">
             Operação real: expansão comercial, tecnologia e recorrência via iGreen Connect
           </p>
         </ScrollReveal>

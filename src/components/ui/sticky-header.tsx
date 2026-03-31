@@ -18,14 +18,14 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
         <div className="w-8 h-8 shrink-0 bg-primary rounded-full flex items-center justify-center">
           <span className="text-primary-foreground font-bold text-xs">iG</span>
         </div>
-        <span className="font-headline font-bold text-lg sm:text-xl text-primary truncate">
+        <span className="font-headline font-bold text-xl sm:text-2xl text-primary truncate">
           iGreen Energy
         </span>
       </div>
       <div className="flex items-center gap-3 sm:gap-4 shrink-0">
         <Button
           onClick={onCTAClick}
-          className={`shrink-0 rounded-full font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base px-4 sm:px-6 py-2 h-auto min-h-10 ${ctaGlowClasses}`}
+          className={`shrink-0 rounded-full font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-base sm:text-lg px-4 sm:px-6 py-2 h-auto min-h-10 ${ctaGlowClasses}`}
         >
           <span className="sm:hidden">Quero ser um Licenciado</span>
           <span className="hidden sm:inline">Conhecer o Plano de Negócios</span>

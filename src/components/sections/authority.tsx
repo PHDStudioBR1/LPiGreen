@@ -29,10 +29,10 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
             Prova social e autoridade
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-black text-foreground leading-tight">
             O Mercado Bilionário Apoiado por Gigantes
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
             Estrutura, escala e credibilidade para você vender com segurança e acelerar sua operação no B2B.
           </p>
         </ScrollReveal>
@@ -42,8 +42,8 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
             <ScrollReveal key={item.title} delayMs={i * 70}>
               <Card className="h-full rounded-3xl border border-border shadow-md bg-card hover:border-primary/30 transition-colors">
                 <CardContent className="p-6 space-y-3">
-                  <h3 className="text-base font-black text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                  <h3 className="text-lg font-black text-foreground">{item.title}</h3>
+                  <p className="text-base text-muted-foreground leading-relaxed">{item.text}</p>
                 </CardContent>
               </Card>
             </ScrollReveal>
@@ -52,20 +52,20 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
 
         {onCTAClick && (
           <ScrollReveal className="mt-12 text-center space-y-4">
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
               Solicite o material completo do plano de negócios e veja como licenciar na sua região.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
               <Link
                 href="/formulario"
-                className={`inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 ${ctaGlowClasses}`}
+                className={`inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground text-base font-bold hover:bg-primary/90 ${ctaGlowClasses}`}
               >
                 Quero ser um Licenciado
               </Link>
               <button
                 type="button"
                 onClick={onCTAClick}
-                className="inline-flex h-12 px-8 items-center justify-center rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary/10 transition-colors"
+                className="inline-flex h-12 px-8 items-center justify-center rounded-xl border-2 border-primary text-primary text-base font-bold hover:bg-primary/10 transition-colors"
               >
                 Conhecer o Plano de Negócios
               </button>

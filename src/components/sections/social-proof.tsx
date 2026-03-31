@@ -60,7 +60,7 @@ export function SocialProofSection({ onCTAClick }: { onCTAClick: () => void }) {
         <ScrollReveal delayMs={80} className="grid grid-cols-3 gap-2 sm:gap-4 max-w-4xl mx-auto mb-14 rounded-2xl overflow-hidden">
           <div className="relative aspect-[3/4] col-span-1">
             <Image
-              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80"
+              src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80"
               alt="Público em convenção corporativa"
               fill
               className="object-cover"
@@ -69,7 +69,7 @@ export function SocialProofSection({ onCTAClick }: { onCTAClick: () => void }) {
           </div>
           <div className="relative aspect-[3/4] col-span-1">
             <Image
-              src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80"
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
               alt="Equipe comemorando em evento"
               fill
               className="object-cover"
@@ -78,7 +78,7 @@ export function SocialProofSection({ onCTAClick }: { onCTAClick: () => void }) {
           </div>
           <div className="relative aspect-[3/4] col-span-1">
             <Image
-              src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80"
+              src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80"
               alt="Uso de aplicativo no smartphone"
               fill
               className="object-cover"

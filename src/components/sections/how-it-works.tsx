@@ -32,10 +32,10 @@ export function HowItWorksSection() {
     <section className="py-20 md:py-28 bg-zinc-50 dark:bg-zinc-950/80">
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-3xl mx-auto text-center mb-12 md:mb-16 space-y-4">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-black text-foreground">
             Como você lucra sendo o "iFood da Energia"?
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
             Um fluxo simples para vender sem atrito e construir renda recorrente.
           </p>
         </ScrollReveal>
@@ -48,8 +48,8 @@ export function HowItWorksSection() {
                   <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary text-primary-foreground font-black text-lg">
                     {step.n}
                   </span>
-                  <h3 className="text-xl font-black text-foreground">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{step.text}</p>
+                  <h3 className="text-2xl font-black text-foreground">{step.title}</h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{step.text}</p>
                 </CardContent>
               </Card>
             </ScrollReveal>

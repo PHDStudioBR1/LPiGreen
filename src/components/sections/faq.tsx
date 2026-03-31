@@ -34,10 +34,10 @@ export function FAQSection() {
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-3xl mx-auto">
           <div className="text-center mb-12 md:mb-16 space-y-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-black text-foreground">
               Tudo o que você precisa para começar hoje.
             </h2>
-            <p className="text-base md:text-lg text-muted-foreground">
+            <p className="text-lg md:text-xl text-muted-foreground">
               Quebra de objeções para você entrar com clareza e segurança.
             </p>
           </div>
@@ -49,10 +49,10 @@ export function FAQSection() {
                 value={`item-${idx}`}
                 className="border border-border rounded-2xl px-4 md:px-6 bg-card shadow-sm overflow-hidden"
               >
-                <AccordionTrigger className="text-left font-bold py-5 hover:no-underline hover:text-primary transition-colors text-sm md:text-base">
+                <AccordionTrigger className="text-left font-bold py-5 hover:no-underline hover:text-primary transition-colors text-base md:text-lg">
                   {faq.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed text-sm md:text-base">
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed text-base md:text-lg">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

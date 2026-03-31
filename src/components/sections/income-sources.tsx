@@ -38,13 +38,13 @@ export function IncomeSourcesSection() {
     <section className="py-20 md:py-28 bg-zinc-50 dark:bg-zinc-950 border-y border-border">
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-3xl mx-auto text-center space-y-4 mb-12 md:mb-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
+          <p className="text-base font-bold uppercase tracking-[0.2em] text-primary">
             Ecossistema iGreen
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-black text-foreground leading-tight">
             Muito além da energia: Um portfólio completo para você lucrar.
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
             Cinco frentes de receita para acelerar o faturamento imediato e a recorrência mensal.
           </p>
         </ScrollReveal>
@@ -57,8 +57,8 @@ export function IncomeSourcesSection() {
                   <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center text-primary">
                     <item.icon className="w-6 h-6" strokeWidth={2.25} />
                   </div>
-                  <h3 className="text-lg font-black text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                  <h3 className="text-xl font-black text-foreground">{item.title}</h3>
+                  <p className="text-base text-muted-foreground leading-relaxed">{item.text}</p>
                 </CardContent>
               </Card>
             </ScrollReveal>
