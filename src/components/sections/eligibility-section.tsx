@@ -15,10 +15,13 @@ export function EligibilitySection({ onCTAClick }: EligibilitySectionProps) {
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
-            Pronto para licenciar e liderar a expansão?
+            Acesso imediato à Plataforma iGreen Connect
           </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            Preencha o cadastro e fale com o time: vagas e condições podem variar por região. Garanta seu lugar na maior onda de crescimento da iGreen.
+            Uma franquia tradicional no setor solar custaria dezenas de milhares de reais. Torne-se um
+            Licenciado iGreen, tenha seu negócio próprio e acesso a todo o ecossistema por um valor
+            incomparável. <span className="font-bold text-foreground">12x de R$ 197,41</span> (ou R$ 1.997,00 à
+            vista. Licença válida por 1 ano).
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center pt-2">
             <Button
@@ -26,7 +29,7 @@ export function EligibilitySection({ onCTAClick }: EligibilitySectionProps) {
               onClick={onCTAClick}
               className={`h-16 px-10 text-xl font-black rounded-2xl shadow-xl whitespace-normal md:whitespace-nowrap text-center w-full max-w-full sm:w-auto h-auto min-h-16 md:min-h-0 md:h-16 py-3 md:py-0 text-primary-foreground ${ctaGlowClasses}`}
             >
-              Quero ser um Licenciado
+              Garantir Minha Licença
             </Button>
             <Button
               size="lg"

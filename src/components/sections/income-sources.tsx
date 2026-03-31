@@ -2,29 +2,34 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Leaf, Smartphone, Sun, Users } from "lucide-react";
+import { Building2, Leaf, Smartphone, Sun, Users } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const SOURCES = [
   {
     icon: Leaf,
-    title: "Green",
-    text: "Ganhos sobre a economia mensal de terceiros — recorrência ligada à Conexão Green e ao ecossistema de energia limpa.",
+    title: "Conexão Green",
+    text: "Desconto para residências (baixa tensão). Você ganha até 4% de recorrência todo mês.",
+  },
+  {
+    icon: Building2,
+    title: "Conexão Livre",
+    text: "Até 30% de desconto para grandes empresas. Ganhe bônus imediato de 10% sobre a conta líquida + até 2% de recorrência (contratos longos).",
   },
   {
     icon: Smartphone,
-    title: "Telecom",
-    text: "Recorrência sobre planos de internet e celular — comissões que se renovam mês a mês na sua base.",
+    title: "Conexão Telecom",
+    text: "A maior cobertura 5G do Brasil. Ganhe 100% da primeira fatura na portabilidade + até R$ 14,00 mensais por linha.",
   },
   {
     icon: Sun,
-    title: "Livre / Solar",
-    text: "Altas comissões em projetos de grande escala e usinas sem investimento do cliente final.",
+    title: "Conexão Placas & Solar",
+    text: "Venda de usinas para quem quer gerar a própria energia (com ou sem investimento do cliente). Comissões de até 10% sobre o projeto.",
   },
   {
     icon: Users,
-    title: "Expansão",
-    text: "Bônus por novos licenciados na equipe — cresça a rede e potencialize os ganhos indiretos.",
+    title: "Conexão Expansão",
+    text: "Construa seu time comercial. Ganhe R$ 300 imediatos por novo licenciado direto + royalties sobre a produção da sua equipe.",
   },
 ] as const;
 
@@ -37,10 +42,10 @@ export function IncomeSourcesSection() {
             Ecossistema iGreen
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
-            Suas fontes de ganho
+            Muito além da energia: Um portfólio completo para você lucrar.
           </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            Um portfólio completo para você monetizar energia, telecom e expansão — com o peso de uma marca líder em sustentabilidade.
+            Cinco frentes de receita para acelerar o faturamento imediato e a recorrência mensal.
           </p>
         </ScrollReveal>
 

@@ -8,20 +8,16 @@ import { ctaGlowClasses } from "@/lib/cro-cta";
 
 const PILLARS = [
   {
-    title: "Mercado em alta",
-    text: "Energia e telecom são serviços essenciais: demanda recorrente e ticket previsível para a sua carteira.",
+    title: "Abertura do Mercado",
+    text: "O Mercado Livre de Energia abriu. São mais de 90 milhões de unidades consumidoras prontas para escolherem seu fornecedor até 2028.",
   },
   {
-    title: "Marca forte",
-    text: "Você representa uma empresa com presença nacional e expansão global — credibilidade na abordagem.",
+    title: "Sociedade Forte",
+    text: "A iGreen é sócia da Comerc/Vibra, que aportou bilhões em capacidade energética para garantir a nossa liderança isolada no Brasil.",
   },
   {
-    title: "Modelo regulado",
-    text: "Atuação amparada por marco legal e regulação — transparência para você e para o cliente final.",
-  },
-  {
-    title: "Tecnologia",
-    text: "App, materiais e jornada digital pensados para quem prospecta majoritariamente pelo smartphone.",
+    title: "Expansão 2026",
+    text: "Saímos de 100 mil para mais de 500 mil clientes rapidamente e, em 2026, iniciamos nossa Expansão Internacional começando pelos Estados Unidos.",
   },
 ] as const;
 
@@ -31,13 +27,13 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-4xl mx-auto text-center space-y-4 mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            Visão de negócio
+            Prova social e autoridade
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground leading-tight">
-            Por que empreender com a iGreen em 2026?
+            O Mercado Bilionário Apoiado por Gigantes
           </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            O momento combina escala (+450 mil clientes), expansão internacional e múltiplas linhas de receita. Quem entra agora posiciona a rede antes da próxima onda de crescimento.
+            Estrutura, escala e credibilidade para você vender com segurança e acelerar sua operação no B2B.
           </p>
         </ScrollReveal>
 

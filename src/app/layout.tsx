@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'iGreen Energy | Economize até 50% na sua Conta de Luz',
+  title: 'Seja um Licenciado iGreen Energy - B2B',
   description:
-    'Descubra como economizar até 50% na sua conta de luz usando energia limpa por assinatura. Sem obras e sem investimento. Garantido pela Lei 14.300/2022.',
+    'Seja um Licenciado iGreen Energy - B2B. Construa renda recorrente vitalícia conectando consumidores a fazendas solares, com operação digital e modelo regulamentado.',
   icons: {
     icon: '/favicon.svg',
   },

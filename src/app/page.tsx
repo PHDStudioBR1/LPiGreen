@@ -3,10 +3,7 @@
 import React, { useState } from "react";
 import { HeroSection } from "@/components/sections/hero";
 import { AuthoritySection } from "@/components/sections/authority";
-import { LegalSection } from "@/components/sections/legal";
 import { IncomeSourcesSection } from "@/components/sections/income-sources";
-import { LicenciadoProSection } from "@/components/sections/licenciado-pro-section";
-import { CareerPlanSection } from "@/components/sections/career-plan-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works";
 import { EligibilitySection } from "@/components/sections/eligibility-section";
 import { FAQSection } from "@/components/sections/faq";
@@ -26,13 +23,10 @@ export default function Home() {
       <main className="flex-grow w-full min-w-0 pt-20">
         <HeroSection onCTAClick={handleCTAClick} />
         <AuthoritySection onCTAClick={handleCTAClick} />
-        <LegalSection />
-        <IncomeSourcesSection />
-        <LicenciadoProSection />
-        <CareerPlanSection />
         <HowItWorksSection />
-        <EligibilitySection onCTAClick={handleCTAClick} />
+        <IncomeSourcesSection />
         <FAQSection />
+        <EligibilitySection onCTAClick={handleCTAClick} />
       </main>
 
       <Footer onCTAClick={handleCTAClick} />

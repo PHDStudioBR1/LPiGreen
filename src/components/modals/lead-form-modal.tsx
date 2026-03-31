@@ -669,7 +669,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Nome completo</FormLabel>
-                        <FormControl><Input placeholder="Seu nome" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Seu Nome" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -704,7 +704,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>Número do seu WhatsApp</FormLabel>
                         <FormControl>
-                          <Input placeholder="(00) 00000-0000" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
+                          <Input placeholder="Seu WhatsApp" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -718,7 +718,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                       <FormItem>
                         <FormLabel>Confirme seu celular</FormLabel>
                         <FormControl>
-                          <Input placeholder="(00) 00000-0000" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
+                          <Input placeholder="Seu WhatsApp" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -731,7 +731,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>E-mail</FormLabel>
-                        <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                        <FormControl><Input type="email" placeholder="Seu E-mail" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -743,7 +743,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Confirme seu E-mail</FormLabel>
-                        <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                        <FormControl><Input type="email" placeholder="Seu E-mail" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -1090,7 +1090,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                   disabled={submitting}
                   className="gap-1.5 bg-primary"
                 >
-                  {submitting ? "Enviando..." : "Finalizar"}
+                  {submitting ? "Enviando..." : "Garantir Minha Licença"}
                 </Button>
               ) : (
                 <Button type="button" onClick={next} className="gap-1.5 bg-primary">

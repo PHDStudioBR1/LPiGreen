@@ -7,18 +7,23 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 const STEPS = [
   {
     n: "01",
-    title: "Cadastro e onboarding",
-    text: "Você formaliza o licenciamento e recebe acesso a treinamentos, app e materiais de prospecção.",
+    title: "A Usina",
+    text: "Fazendas solares parceiras injetam energia limpa e mais barata na rede elétrica.",
   },
   {
     n: "02",
-    title: "Prospecção multicanal",
-    text: "Ofereça Green, Telecom e Solar com o apoio da marca — do físico ao digital, com foco em mobile.",
+    title: "A Conexão",
+    text: "Pelo app iGreen Connect, você aprova a conta de luz do cliente em segundos, sem burocracia.",
   },
   {
     n: "03",
-    title: "Recorrência e expansão",
-    text: "Monetize vendas e rede: bônus diretos, indiretos e evolução no plano de carreira até o topo.",
+    title: "A Economia",
+    text: "O cliente passa a receber desconto garantido na fatura, sem precisar fazer obras ou pagar taxas.",
+  },
+  {
+    n: "04",
+    title: "Seu Lucro",
+    text: "Você recebe o comissionamento imediato e ganha um percentual (recorrência) todos os meses enquanto o cliente pagar a conta.",
   },
 ] as const;
 
@@ -28,10 +33,10 @@ export function HowItWorksSection() {
       <div className="container mx-auto px-4 sm:px-6">
         <ScrollReveal className="max-w-3xl mx-auto text-center mb-12 md:mb-16 space-y-4">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground">
-            Como funciona para o licenciado
+            Como você lucra sendo o "iFood da Energia"?
           </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            Três etapas claras — da entrada ao crescimento da sua operação com a iGreen.
+            Um fluxo simples para vender sem atrito e construir renda recorrente.
           </p>
         </ScrollReveal>
 

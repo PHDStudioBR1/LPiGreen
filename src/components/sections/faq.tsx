@@ -11,28 +11,20 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const FAQS = [
   {
-    q: "Como faço para me tornar licenciado iGreen?",
-    a: "Preencha o formulário de interesse ou fale com o time de expansão. Você passará por cadastro, validação de região e onboarding com treinamentos e acesso ao app e materiais oficiais.",
+    q: "Preciso ter experiência no setor elétrico?",
+    a: "Não. A iGreen Academy oferece treinamentos online completos e encontros práticos semanais ao vivo. Você aprende faturando.",
   },
   {
-    q: "Preciso de escritório ou equipe para começar?",
-    a: "Não necessariamente. Muitos licenciados começam prospectando de forma independente, com foco em mobile. Conforme sua rede cresce, você pode estruturar equipe e metas maiores.",
+    q: "O cliente paga algo para aderir?",
+    a: "Zero. Na Conexão Green e Livre, o cliente não paga taxa de adesão, não faz obras e não precisa comprar placas. A venda é sem atrito.",
   },
   {
-    q: "Quais são as fontes de ganho disponíveis?",
-    a: "O ecossistema inclui Green (economia de energia), Telecom (planos recorrentes), projetos Livre/Solar de maior ticket e bônus de Expansão com novos licenciados. O plano de negócios detalha percentuais e regras vigentes.",
+    q: "É seguro e legalizado?",
+    a: "100% amparado pela Lei Federal nº 14.300/2022 (Marco Legal da Geração Distribuída) e Lei 9.074/95 (Mercado Livre).",
   },
   {
-    q: "O modelo é regulamentado?",
-    a: "Sim. A oferta de energia limpa na rede segue a Lei 14.300/2022 e a regulação da ANEEL. Isso reforça a seriedade da proposta para você e para o cliente final.",
-  },
-  {
-    q: "Como funcionam viagens e premiações?",
-    a: "A iGreen reconhece o desempenho com experiências como cruzeiro, snow e viagens internacionais, conforme metas do plano de carreira (Sênior a Acionista). Detalhes são comunicados nos canais oficiais e eventos.",
-  },
-  {
-    q: "Posso conciliar com outro trabalho?",
-    a: "Sim. A flexibilidade é um dos atrativos: você define ritmo e canais, priorizando o que funciona melhor na sua região e perfil.",
+    q: "E se eu quiser recuperar meu investimento rápido?",
+    a: "Temos a 'Missão 7 Dias': indique 2 novos licenciados na sua primeira semana e recupere 100% do valor da sua licença em bônus garantidos.",
   },
 ] as const;
 
@@ -43,10 +35,10 @@ export function FAQSection() {
         <ScrollReveal className="max-w-3xl mx-auto">
           <div className="text-center mb-12 md:mb-16 space-y-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black text-foreground">
-              Dúvidas frequentes — Licenciados
+              Tudo o que você precisa para começar hoje.
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
-              Transparência para você decidir com segurança.
+              Quebra de objeções para você entrar com clareza e segurança.
             </p>
           </div>
 

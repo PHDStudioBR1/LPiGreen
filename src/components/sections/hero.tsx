@@ -9,20 +9,20 @@ import { ctaGlowClasses } from "@/lib/cro-cta";
 
 const GALLERY = [
   {
-    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
-    alt: "Equipe colaborando em escritório moderno",
+    src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+    alt: "Equipe comercial em reunião estratégica",
   },
   {
-    src: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80",
-    alt: "Profissionais em evento e convenção",
+    src: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
+    alt: "Liderança analisando indicadores de crescimento",
   },
   {
-    src: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80",
-    alt: "Time celebrando resultados em reunião",
+    src: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80",
+    alt: "Executivos em negociação B2B",
   },
   {
-    src: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80",
-    alt: "Pessoa usando smartphone no trabalho",
+    src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    alt: "Profissional usando aplicativo no smartphone",
   },
 ] as const;
 
@@ -36,18 +36,18 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
         <ScrollReveal className="space-y-6 sm:space-y-8 min-w-0">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/15 backdrop-blur-sm border border-primary/35 rounded-full text-primary font-semibold text-sm">
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" />
-            <span className="truncate text-white">Oportunidade Licenciado iGreen 2026</span>
+            <span className="truncate text-white">[ NOVO MARCO 2026: OPERAÇÃO GLOBAL INICIADA ]</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-headline font-black text-white leading-[1.12] break-words">
-            Lidere a transição energética global e construa sua{" "}
-            <span className="text-primary">recorrência vitalícia</span>
+            Lidere a Transição Energética. Construa sua Renda Recorrente Vitalícia com a{" "}
+            <span className="text-primary">iGreen Energy.</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-zinc-300 max-w-xl leading-relaxed">
-            A maior plataforma de energia sustentável do Brasil, agora em{" "}
-            <span className="text-white font-bold">Expansão Internacional (2026)</span>. Monte sua rede,
-            ofereça Green, Telecom e Solar — com modelo regulado e marca de peso.
+            Torne-se o "iFood da Energia". Ganhe comissões todos os meses conectando fazendas solares a
+            consumidores, sem que seu cliente precise investir 1 centavo. Junte-se à plataforma com mais de
+            500 mil clientes.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
@@ -56,8 +56,8 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
               onClick={onCTAClick}
               className={`h-14 sm:h-16 px-6 sm:px-8 text-base sm:text-lg font-black rounded-2xl w-full sm:w-auto text-center text-primary-foreground ${ctaGlowClasses}`}
             >
-              <span className="sm:hidden">Quero ser um Licenciado</span>
-              <span className="hidden sm:inline">Conhecer o Plano de Negócios</span>
+              <span className="sm:hidden">Quero Ser um Licenciado iGreen</span>
+              <span className="hidden sm:inline">Quero Ser um Licenciado iGreen</span>
             </Button>
             <Button
               size="lg"
@@ -72,15 +72,15 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-zinc-400 text-sm sm:text-base">
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5 shrink-0" />
-              <span>Regulamentação ANEEL</span>
+              <span>Sem investimento em infraestrutura ou placas.</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5 shrink-0" />
-              <span>Múltiplas fontes de renda</span>
+              <span>Negócio 100% Digital via App (iGreen Connect).</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5 shrink-0" />
-              <span>Suporte e treinamento</span>
+              <span>Ganhos Imediatos e Recorrência Mensal.</span>
             </div>
           </div>
         </ScrollReveal>
@@ -104,7 +104,7 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             ))}
           </div>
           <p className="mt-4 text-center text-xs text-zinc-500">
-            Rede real: trabalho em equipe, convenções e app iGreen Connect
+            Operação real: expansão comercial, tecnologia e recorrência via iGreen Connect
           </p>
         </ScrollReveal>
       </div>
