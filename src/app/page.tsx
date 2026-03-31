@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { HeroSection } from "@/components/sections/hero";
 import { AuthoritySection } from "@/components/sections/authority";
 import { LegalSection } from "@/components/sections/legal";
-import { SocialProofSection } from "@/components/sections/social-proof";
 import { IncomeSourcesSection } from "@/components/sections/income-sources";
 import { LicenciadoProSection } from "@/components/sections/licenciado-pro-section";
 import { CareerPlanSection } from "@/components/sections/career-plan-section";
@@ -28,7 +27,6 @@ export default function Home() {
         <HeroSection onCTAClick={handleCTAClick} />
         <AuthoritySection onCTAClick={handleCTAClick} />
         <LegalSection />
-        <SocialProofSection onCTAClick={handleCTAClick} />
         <IncomeSourcesSection />
         <LicenciadoProSection />
         <CareerPlanSection />
