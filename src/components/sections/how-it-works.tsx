@@ -40,7 +40,7 @@ export function HowItWorksSection() {
           </p>
         </ScrollReveal>
 
-        <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           {STEPS.map((step, i) => (
             <ScrollReveal key={step.n} delayMs={i * 100}>
               <Card className="h-full rounded-[2rem] border border-border shadow-lg bg-card">

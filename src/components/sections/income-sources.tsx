@@ -49,7 +49,7 @@ export function IncomeSourcesSection() {
           </p>
         </ScrollReveal>
 
-        <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
           {SOURCES.map((item, i) => (
             <ScrollReveal key={item.title} delayMs={i * 80}>
               <Card className="h-full rounded-3xl border border-border bg-white dark:bg-zinc-900/80 shadow-lg hover:shadow-xl hover:border-primary/40 transition-all duration-300">

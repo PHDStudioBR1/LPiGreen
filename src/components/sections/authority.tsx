@@ -37,7 +37,7 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
           </p>
         </ScrollReveal>
 
-        <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+        <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
           {PILLARS.map((item, i) => (
             <ScrollReveal key={item.title} delayMs={i * 70}>
               <Card className="h-full rounded-3xl border border-border shadow-md bg-card hover:border-primary/30 transition-colors">
