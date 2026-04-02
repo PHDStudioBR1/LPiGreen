@@ -9,20 +9,20 @@ import { ctaGlowClasses } from "@/lib/cro-cta";
 
 const GALLERY = [
   {
-    src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    alt: "Equipe comercial em reunião estratégica",
+    src: "/images/hero/solar-1.png",
+    alt: "Fazenda solar em operação com placas fotovoltaicas",
   },
   {
-    src: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
-    alt: "Liderança analisando indicadores de crescimento",
+    src: "/images/hero/solar-2.png",
+    alt: "Painéis solares para geração de energia limpa",
   },
   {
-    src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80",
-    alt: "Executivos em negociação B2B",
+    src: "/images/hero/solar-3.png",
+    alt: "Usina fotovoltaica com foco em sustentabilidade",
   },
   {
-    src: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80",
-    alt: "Profissional usando aplicativo no smartphone",
+    src: "/images/hero/solar-4.png",
+    alt: "Energia solar renovável em escala comercial",
   },
 ] as const;
 
