@@ -385,9 +385,8 @@ jobs:
             kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
           fi
 
-      - name: Aplicar Certificate e Ingress
+      - name: Aplicar IngressRoute
         run: |
-          kubectl apply -f infra/k8s/certificate.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/ingress-route.yaml -n ${{ env.K8S_NAMESPACE }}
 
       - name: Status final

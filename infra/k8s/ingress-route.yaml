@@ -8,14 +8,8 @@ spec:
   entryPoints:
     - web
   routes:
-    # ACME challenge em HTTP para validação Let's Encrypt
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/.well-known/acme-challenge`)
-      kind: Rule
-      services:
-        - name: web-service
-          port: 80
-    # Demais rotas redirecionam para HTTPS
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/`)
+    # Demais rotas redirecionam para HTTPS (exceto ACME challenge, tratado pelo solver do cert-manager)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
       kind: Rule
       services:
         - name: web-service
@@ -35,7 +29,7 @@ spec:
     - websecure
   routes:
     # /api/leads (todas as requisições) -> frontend (Next.js): POST do formulário e GET/PATCH/DELETE do CRM
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/leads`)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
         - name: web-service
@@ -44,7 +38,7 @@ spec:
         - name: security-headers
           namespace: lpigreen
     # CRM Admin: login, logout, me, export -> frontend (Next.js)
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/admin`)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/api/admin`)
       kind: Rule
       services:
         - name: web-service
@@ -53,7 +47,7 @@ spec:
         - name: security-headers
           namespace: lpigreen
     # /api/representantes -> frontend (Next.js), usado pelo CRM na edição de lead
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api/representantes`)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/api/representantes`)
       kind: Rule
       services:
         - name: web-service
@@ -62,7 +56,7 @@ spec:
         - name: security-headers
           namespace: lpigreen
     # Demais /api (/api/health, /api/aneel/distribuidoras, etc.) -> backend
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/api`)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/api`)
       kind: Rule
       services:
         - name: api-service
@@ -71,7 +65,7 @@ spec:
         - name: security-headers
           namespace: lpigreen
     # Frontend (web)
-    - match: Host(`lpigreen.546digitalservices.com`) && PathPrefix(`/`)
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`)) && PathPrefix(`/`)
       kind: Rule
       services:
         - name: web-service
@@ -83,3 +77,6 @@ spec:
           namespace: lpigreen
   tls:
     certResolver: le
+    domains:
+      - main: lpigreen.546digitalservices.com
+      - main: centraldobeneficioenergia.com.br
