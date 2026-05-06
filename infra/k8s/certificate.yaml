@@ -1,16 +1,9 @@
-# Certificate para lpigreen.546digitalservices.com
-# Gerenciado automaticamente pelo cert-manager (Let's Encrypt)
-# Requer ClusterIssuer letsencrypt-prod no cluster (ex.: infra do phd-crm)
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: lpigreen-tls
-  namespace: lpigreen
-spec:
-  secretName: lpigreen-546digitalservices-tls
-  issuerRef:
-    name: letsencrypt-prod
-    kind: ClusterIssuer
-  dnsNames:
-    - lpigreen.546digitalservices.com
-  commonName: lpigreen.546digitalservices.com
+# TLS é gerenciado automaticamente pelo Traefik certResolver (Let's Encrypt)
+# via a diretiva tls.certResolver: le no IngressRoute.
+#
+# Domínios ativos:
+#   - lpigreen.546digitalservices.com (prod)
+#   - centraldobeneficioenergia.com.br (prod)
+#
+# NÃO usar cert-manager Certificate para estes domínios
+# pois conflita com o certResolver do Traefik (ambos usam HTTP-01 challenge).
