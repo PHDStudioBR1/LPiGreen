@@ -55,6 +55,13 @@ spec:
             secretKeyRef:
               name: admin-secret
               key: admin-jwt-secret
+        # Conexão Green → n8n (proxy em /api/conexao-green/n8n). Crie o Secret opcional ou omita se usar só NEXT_PUBLIC no build.
+        - name: N8N_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: n8n-webhook-secret
+              key: webhook-url
+              optional: true
         livenessProbe:
           httpGet:
             path: /

@@ -17,10 +17,11 @@ import { StepsSection } from '@/components/sections/steps';
 import { BenefitsSection } from '@/components/sections/benefits';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { StickyHeader } from '@/components/ui/sticky-header';
-import { LeadFormModal } from '@/components/modals/lead-form-modal';
+import { ConexaoGreenQualificationModal } from '@/components/modals/conexao-green-qualification-modal';
 
 export default function Home() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [simulatedMonthlyBill, setSimulatedMonthlyBill] = useState(400);
   const handleCTAClick = () => setIsFormModalOpen(true);
 
   return (
@@ -35,7 +36,11 @@ export default function Home() {
         <PressProofSection />
         <HowItWorksSection />
         <EligibilitySection onCTAClick={handleCTAClick} />
-        <SimulatorSection onCTAClick={handleCTAClick} />
+        <SimulatorSection
+          onCTAClick={handleCTAClick}
+          billValue={simulatedMonthlyBill}
+          onBillValueChange={setSimulatedMonthlyBill}
+        />
         <ScarcitySection />
         <StepsSection />
         <SocialProofSection />
@@ -45,7 +50,11 @@ export default function Home() {
 
       <Footer onCTAClick={handleCTAClick} />
 
-      <LeadFormModal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)} />
+      <ConexaoGreenQualificationModal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        simulatedMonthlyBill={simulatedMonthlyBill}
+      />
       
       <WhatsAppButton />
     </div>

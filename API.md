@@ -8,14 +8,49 @@
   - `GET /api/health` – healthcheck da API.
   - `GET /api/representantes` – lista os representantes comerciais.
   - `POST /api/leads` – criação de lead.
+  - `POST /api/conexao-green/n8n` – proxy Next.js para o webhook n8n (funil Conexão Green).
 
-Todas as respostas são em **JSON**.
+Todas as respostas são em **JSON** (salvo quando o n8n devolver texto puro).
+
+---
+
+## Conexão Green → n8n (Next.js)
+
+### `POST /api/conexao-green/n8n`
+
+Encaminha o corpo JSON recebido para a URL definida em **`N8N_WEBHOOK_URL`** no ambiente do **Next.js** (variável só no servidor). Assim o browser não precisa de CORS no n8n nem expõe o URL completo do webhook no bundle.
+
+- **Autenticação**: não utiliza a API Key do backend. Recomenda-se incluir um token na própria URL do webhook no n8n, se quiser evitar chamadas abusivas.
+- **Configuração**: `N8N_WEBHOOK_URL` (obrigatória para esta rota responder 2xx). Alternativa na landing: `NEXT_PUBLIC_N8N_WEBHOOK_URL` faz o cliente enviar **direto** ao n8n, sem passar por aqui.
+
+#### Exemplo de corpo (gerado pela LP)
+
+```json
+{
+  "funil": "conexao_green",
+  "nome": "Maria",
+  "whatsapp": "(11) 91234-5678",
+  "whatsapp_apenas_numeros": "11912345678",
+  "valor_medio_fatura_mensal": 400,
+  "valor_medio_fatura_formatado": "R$ 400,00",
+  "poupanca_anual_projetada": 720,
+  "enviado_em": "2026-05-09T12:00:00.000Z"
+}
+```
+
+#### Respostas de erro comuns
+
+| HTTP | Significado |
+|------|-------------|
+| `400` | JSON inválido ou `nome` ausente / muito curto |
+| `502` | Falha de rede ao contactar o n8n |
+| `503` | `N8N_WEBHOOK_URL` não configurada no servidor |
 
 ---
 
 ## Autenticação (API Key)
 
-Os endpoints sob `/api` (exceto `/api/health`) são protegidos por **API Key**.
+Os endpoints do **backend** sob `/api` (exceto `/api/health`) são protegidos por **API Key**. Rotas implementadas no **Next.js** (por exemplo `POST /api/conexao-green/n8n`) seguem as regras descritas na secção desse endpoint.
 
 - A API espera uma chave secreta configurada na variável de ambiente `API_KEY` do backend.
 - Em produção, essa chave vem do Secret Kubernetes `api-secret` (campo `api-key`).
