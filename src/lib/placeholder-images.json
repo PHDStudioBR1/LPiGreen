@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "Equipe em ambiente de trabalho colaborativo",
-      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1080&q=80",
-      "imageHint": "team collaboration office"
+      "description": "Happy family in a modern illuminated home",
+      "imageUrl": "https://images.unsplash.com/photo-1606932250069-62f395a08602?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxoYXBweSUyMGZhbWlseSUyMGhvbWV8ZW58MHx8fHwxNzcxODg2ODU5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "happy family home"
     },
     {
       "id": "testimonial-1",

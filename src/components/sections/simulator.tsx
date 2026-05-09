@@ -1,18 +1,35 @@
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Zap } from 'lucide-react';
 import { HeroVideo } from '@/components/sections/hero-video';
+import {
+  monthlyDiscountFromBill,
+  projectedAnnualSavingsFromMonthly,
+} from '@/lib/conexao-green-savings';
 
-export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
-  const [billValue, setBillValue] = useState(400);
+export interface SimulatorSectionProps {
+  onCTAClick: () => void;
+  /** Valor mensal da conta (R$), entre 100 e 3000 — controlado pela página */
+  billValue: number;
+  onBillValueChange: (value: number) => void;
+}
 
-  // Simulação baseada em desconto de 14%
-  const monthlySavings = billValue * 0.14;
-  const yearlySavings = monthlySavings * 12;
+export {
+  monthlyDiscountFromBill,
+  projectedAnnualSavingsFromMonthly,
+} from '@/lib/conexao-green-savings';
+
+export function SimulatorSection({
+  onCTAClick,
+  billValue,
+  onBillValueChange,
+}: SimulatorSectionProps) {
+  const monthlySavings = monthlyDiscountFromBill(billValue);
+  const yearlySavings = projectedAnnualSavingsFromMonthly(billValue);
 
   return (
     <>
@@ -41,36 +58,34 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
                       </span>
                     </div>
                     <Slider
-                      defaultValue={[400]}
-                      max={2000}
+                      value={[billValue]}
+                      max={3000}
                       min={100}
-                      step={50}
-                      onValueChange={(vals) => setBillValue(vals[0])}
+                      step={10}
+                      onValueChange={(vals) => onBillValueChange(vals[0])}
                       className="py-4"
                     />
                     <div className="flex justify-between text-xs font-bold text-muted-foreground">
                       <span>R$ 100</span>
-                      <span>R$ 2.000+</span>
+                      <span>R$ 3.000</span>
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-primary/10 rounded-3xl p-8 text-center space-y-2 border border-primary/20">
-                      <p className="text-sm font-bold text-primary uppercase tracking-widest">
-                        Economia mensal
-                      </p>
-                      <p className="text-5xl font-black text-primary">
+                  <div className="rounded-3xl p-8 md:p-10 text-center space-y-3 bg-emerald-600 text-white shadow-xl shadow-emerald-200/40 border border-emerald-500/30">
+                    <p className="text-sm font-bold opacity-90 uppercase tracking-widest">
+                      Poupança anual projetada (15% na fatura)
+                    </p>
+                    <p className="text-4xl sm:text-6xl font-black tracking-tight">
+                      R$ {yearlySavings.toFixed(2).replace('.', ',')}
+                    </p>
+                    <p className="text-sm opacity-90 max-w-md mx-auto">
+                      Equivale a cerca de{' '}
+                      <span className="font-bold">
                         R$ {monthlySavings.toFixed(2).replace('.', ',')}
-                      </p>
-                    </div>
-                    <div className="bg-emerald-600 rounded-3xl p-8 text-center space-y-2 text-white shadow-xl shadow-emerald-200">
-                      <p className="text-sm font-bold opacity-80 uppercase tracking-widest">
-                        Economia em 1 ano
-                      </p>
-                      <p className="text-5xl font-black">
-                        R$ {yearlySavings.toFixed(2).replace('.', ',')}
-                      </p>
-                    </div>
+                      </span>{' '}
+                      por mês a menos na conta — só para você ter uma ideia do
+                      tamanho do benefício antes de deixar o WhatsApp.
+                    </p>
                   </div>
 
                   <div className="text-center pt-4">
@@ -91,7 +106,7 @@ export function SimulatorSection({ onCTAClick }: { onCTAClick: () => void }) {
                         <li>Ou simplesmente ter mais tranquilidade no fim do mês</li>
                       </ul>
                       <p className="text-xs italic">
-                        * Simulação ilustrativa. Conexão Green: economia na conta sem investimento. Valores podem variar conforme região e consumo.
+                        * Simulação ilustrativa (15% ao ano sobre o valor mensal × 12). Conexão Green: sem investimento em instalação. Valores podem variar conforme região e consumo.
                       </p>
                     </div>
                   </div>
