@@ -1,60 +1,81 @@
-"use client";
+"use client"
 
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
-
-const STEPS = [
-  {
-    n: "01",
-    title: "A Usina",
-    text: "Fazendas solares parceiras injetam energia limpa e mais barata na rede elétrica.",
-  },
-  {
-    n: "02",
-    title: "A Conexão",
-    text: "Pelo app iGreen Connect, você aprova a conta de luz do cliente em segundos, sem burocracia.",
-  },
-  {
-    n: "03",
-    title: "A Economia",
-    text: "O cliente passa a receber desconto garantido na fatura, sem precisar fazer obras ou pagar taxas.",
-  },
-  {
-    n: "04",
-    title: "Seu Lucro",
-    text: "Você recebe o comissionamento imediato e ganha um percentual (recorrência) todos os meses enquanto o cliente pagar a conta.",
-  },
-] as const;
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function HowItWorksSection() {
   return (
-    <section className="py-20 md:py-28 bg-zinc-50 dark:bg-zinc-950/80">
-      <div className="container mx-auto px-4 sm:px-6">
-        <ScrollReveal className="max-w-3xl mx-auto text-center mb-12 md:mb-16 space-y-4">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-black text-foreground">
-            Como você lucra sendo o "iFood da Energia"?
+    <section className="py-24 bg-background">
+      <div className="container mx-auto px-6">
+        <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
+          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
+            Veja o exemplo abaixo para entender:
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Um fluxo simples para vender sem atrito e construir renda recorrente.
-          </p>
-        </ScrollReveal>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
-          {STEPS.map((step, i) => (
-            <ScrollReveal key={step.n} delayMs={i * 100}>
-              <Card className="h-full rounded-[2rem] border border-border shadow-lg bg-card">
-                <CardContent className="p-8 space-y-4">
-                  <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary text-primary-foreground font-black text-lg">
-                    {step.n}
-                  </span>
-                  <h3 className="text-2xl font-black text-foreground">{step.title}</h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">{step.text}</p>
-                </CardContent>
-              </Card>
-            </ScrollReveal>
-          ))}
         </div>
+
+        <Card className="max-w-4xl mx-auto mb-12 rounded-[2.5rem] border-none shadow-2xl bg-white dark:bg-neutral-800">
+          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
+            <p>
+              Você conhece operadora de celular, certo? Claro, Vivo, TIM, Oi...
+            </p>
+            <p>
+              Todas elas <span className="font-bold">não produzem a internet</span>. A internet não é "fabricada" por elas. Elas usam a infraestrutura de antenas e cabos (que muitas vezes nem são delas) para entregar o sinal até você.
+            </p>
+            <p>
+              Mas cada operadora tem parcerias, acordos e formas diferentes de te cobrar pelo mesmo serviço.
+            </p>
+            <p>
+              É por isso que:
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>A Claro pode te oferecer 50GB por R$ 100</li>
+              <li>A Vivo pode te oferecer 50GB por R$ 120</li>
+            </ul>
+            <p>
+              É a mesma internet. A mesma rede. O mesmo sinal.{' '}
+              <span className="font-bold">A diferença está em quem está intermediando e qual é o modelo de negócio.</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="max-w-4xl mx-auto rounded-[2.5rem] border border-primary/20 shadow-xl bg-primary/5">
+          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
+            <h3 className="text-2xl font-bold text-primary">
+              Agora transfere isso para a energia elétrica
+            </h3>
+            <p>
+              A energia que chega na sua casa <span className="font-bold">não é "produzida" pela distribuidora</span>. A distribuidora (Cemig, CPFL, Equatorial, Enel, Light...) é só o "entregador" da energia.
+            </p>
+            <p>
+              Essas empresas pegam energia de fontes (hidrelétricas), ou seja, onde o consumo é muito maior, e consequentemente o lucro deles também será muito maior ao repassar para a sua casa.
+            </p>
+            <h3 className="text-2xl font-bold text-primary mt-6">
+              Entra a iGreen Energy
+            </h3>
+            <p>
+              E aí que nós entramos.
+            </p>
+            <p>
+              A iGreen tem <span className="font-bold">usinas de energia limpa</span>; a energia é produzida e <span className="font-bold">injetada na rede da distribuidora</span> (Cemig, CPFL, Equatorial e outras) — a mesma rede que já existe.
+            </p>
+            <p>
+              E a gente faz um <span className="font-bold">acordo com a distribuidora</span> para vincular créditos de energia à sua conta.
+            </p>
+            <p className="font-medium">
+              Resultado?
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Você continua recebendo energia da mesma distribuidora</li>
+              <li>Pela mesma fiação</li>
+              <li>Com a mesma qualidade</li>
+              <li>Mas paga menos, porque agora está usando energia limpa</li>
+            </ul>
+            <p>
+              Nada vai mudar na qualidade da sua energia, pelo contrário, será uma energia{' '}
+              <span className="font-bold">mais limpa, sustentável e barata</span>!
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );
