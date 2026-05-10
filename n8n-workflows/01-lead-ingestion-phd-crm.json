@@ -1,0 +1,211 @@
+{
+  "name": "01 · Ingestão de Leads → PHD CRM + Deal + Evolution",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-ingestion",
+        "responseMode": "onReceived",
+        "options": { "responseCode": 200 }
+      },
+      "id": "ing-webhook",
+      "name": "Webhook Lead Ingestion",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "lead-ingestion"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.funnel_source }}",
+                    "rightValue": "verde",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "r-verde"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "verde"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.funnel_source }}",
+                    "rightValue": "licenciado",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "r-lic"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "licenciado"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.funnel_source }}",
+                    "rightValue": "b2b",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "r-b2b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "b2b"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.funnel_source }}",
+                    "rightValue": "placas",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "r-placas"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "placas"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ing-switch",
+      "name": "Switch Funil",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [280, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.B2B_ENRICH_URL || 'https://api.exemplo.com/enrich').replace(/\\/$/, '') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "empresa",
+              "value": "={{ $json.body.empresa }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ing-b2b",
+      "name": "HTTP Enriquecimento B2B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [560, 140]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.PHD_CRM_BASE_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/crm/v1/leads' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + ($env.PHD_CRM_ACCESS_TOKEN || '') }}"
+            },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $('Webhook Lead Ingestion').item.json.body.email, phone: $('Webhook Lead Ingestion').item.json.body.whatsapp || $('Webhook Lead Ingestion').item.json.body.phone || undefined, first_name: $('Webhook Lead Ingestion').item.json.body.first_name, last_name: $('Webhook Lead Ingestion').item.json.body.last_name, source: $('Webhook Lead Ingestion').item.json.body.funnel_source, stage: $('Webhook Lead Ingestion').item.json.body.stage || 'Curioso', marketing_consent: $('Webhook Lead Ingestion').item.json.body.marketing_consent === true, tenant_slug: $env.PHD_CRM_TENANT_SLUG || undefined, custom_values: { funnel_source: $('Webhook Lead Ingestion').item.json.body.funnel_source, empresa: $('Webhook Lead Ingestion').item.json.body.empresa, enrich: $('Webhook Lead Ingestion').item.json.body.funnel_source === 'b2b' ? $json : null } }) }}",
+        "options": {}
+      },
+      "id": "ing-crm-lead",
+      "name": "HTTP PHD CRM — Upsert Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [840, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.PHD_CRM_BASE_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/crm/v1/deals' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + ($env.PHD_CRM_ACCESS_TOKEN || '') }}"
+            },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ lead_id: $json.data?.id, pipeline_id: $env.PHD_CRM_DEFAULT_PIPELINE_ID, title: 'Oportunidade — ' + ($json.data?.id || 'lead'), value: 0, currency: 'BRL' }) }}",
+        "options": {}
+      },
+      "id": "ing-crm-deal",
+      "name": "HTTP PHD CRM — Criar Deal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.EVOLUTION_API_BASE_URL || '').replace(/\\/$/, '') + '/message/sendText/' + ($env.EVOLUTION_INSTANCE || '') }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: $('Webhook Lead Ingestion').item.json.body.whatsapp, text: 'Olá! Recebemos o seu contacto. Um especialista da equipa irá responder em breve.' }) }}",
+        "options": {}
+      },
+      "id": "ing-evolution",
+      "name": "HTTP EvolutionAPI Boas-vindas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Lead Ingestion": {
+      "main": [[{ "node": "Switch Funil", "type": "main", "index": 0 }]]
+    },
+    "Switch Funil": {
+      "main": [
+        [{ "node": "HTTP PHD CRM — Upsert Lead", "type": "main", "index": 0 }],
+        [{ "node": "HTTP PHD CRM — Upsert Lead", "type": "main", "index": 0 }],
+        [{ "node": "HTTP Enriquecimento B2B", "type": "main", "index": 0 }],
+        [{ "node": "HTTP PHD CRM — Upsert Lead", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP Enriquecimento B2B": {
+      "main": [[{ "node": "HTTP PHD CRM — Upsert Lead", "type": "main", "index": 0 }]]
+    },
+    "HTTP PHD CRM — Upsert Lead": {
+      "main": [[{ "node": "HTTP PHD CRM — Criar Deal", "type": "main", "index": 0 }]]
+    },
+    "HTTP PHD CRM — Criar Deal": {
+      "main": [[{ "node": "HTTP EvolutionAPI Boas-vindas", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [],
+  "meta": { "templateCredsSetupCompleted": false },
+  "versionId": "01-lead-ingestion-phd-crm"
+}

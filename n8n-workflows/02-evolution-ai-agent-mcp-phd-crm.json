@@ -1,0 +1,137 @@
+{
+  "name": "02 · Evolution Webhook → Filtro → AI Agent (MCP) → Evolution",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-webhook",
+        "responseMode": "onReceived",
+        "options": { "responseCode": 200 }
+      },
+      "id": "evo-wh",
+      "name": "Webhook Evolution",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "evolution-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "rej",
+              "leftValue": "={{ ($json.body.data.messages[0].fromMe === true) || (String($json.body.data.messages[0].key.remoteJid || '').includes('@g.us')) }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "evo-if",
+      "name": "IF Filtro Segurança",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.messages[0].message?.conversation || $json.body.data.messages[0].message?.extendedTextMessage?.text || $json.body.data.messages[0].message?.imageMessage?.caption || '' }}",
+        "options": {
+          "systemMessage": "={{ ($json.funnel_context || $json.body.funnel_context || $env.DEFAULT_FUNNEL_CONTEXT || 'Assistente comercial integrado ao PHD CRM. Responde em português de forma útil e objetiva.') }}",
+          "enableStreaming": false
+        }
+      },
+      "id": "evo-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [540, 300]
+    },
+    {
+      "parameters": {
+        "model": { "__rl": true, "mode": "list", "value": "gpt-4o-mini" },
+        "options": {}
+      },
+      "id": "evo-openai",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [540, 120],
+      "credentials": {
+        "openAiApi": {
+          "id": "SUBSTITUIR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "={{ $env.MCP_SERVER_URL }}",
+        "authentication": "bearerAuth",
+        "include": "all"
+      },
+      "id": "evo-mcp",
+      "name": "MCP Client Tool",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [540, 520],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "SUBSTITUIR_MCP_BEARER_CREDENTIAL_ID",
+          "name": "MCP Bearer Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.EVOLUTION_API_BASE_URL || '').replace(/\\/$/, '') + '/message/sendText/' + ($env.EVOLUTION_INSTANCE || '') }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: $('Webhook Evolution').item.json.body.data.messages[0].key.remoteJid, text: $json.output }) }}",
+        "options": {}
+      },
+      "id": "evo-reply",
+      "name": "HTTP Evolution Resposta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [820, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Evolution": {
+      "main": [[{ "node": "IF Filtro Segurança", "type": "main", "index": 0 }]]
+    },
+    "IF Filtro Segurança": {
+      "main": [
+        [],
+        [{ "node": "AI Agent", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "MCP Client Tool": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "AI Agent": {
+      "main": [[{ "node": "HTTP Evolution Resposta", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [],
+  "meta": { "templateCredsSetupCompleted": false },
+  "versionId": "02-evolution-ai-mcp-phd-crm"
+}

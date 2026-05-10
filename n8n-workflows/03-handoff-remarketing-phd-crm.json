@@ -1,0 +1,206 @@
+{
+  "name": "03 · Handoff Score + Remarketing Meta (PHD CRM)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "score-update",
+        "responseMode": "onReceived",
+        "options": { "responseCode": 200 }
+      },
+      "id": "sc-wh",
+      "name": "Webhook CRM Score Update",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "score-update"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "sc1",
+              "leftValue": "={{ Number($json.body.lead_score) }}",
+              "rightValue": 90,
+              "operator": { "type": "number", "operation": "gte" }
+            },
+            {
+              "id": "stg",
+              "leftValue": "={{ $json.body.stage }}",
+              "rightValue": "Avaliando",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "sc-if",
+      "name": "IF Handoff CRM",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [280, 0]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ ($env.PHD_CRM_BASE_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/crm/v1/leads/' + $json.body.lead_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + ($env.PHD_CRM_ACCESS_TOKEN || '') }}"
+            },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ stage: 'Pronto para agir', custom_values: { handoff_requested: 'true', handoff_reason: 'score>=90', lead_score: String($json.body.lead_score) }, tags: ['handoff-humano'] }) }}",
+        "options": {}
+      },
+      "id": "sc-patch",
+      "name": "HTTP PHD CRM — Handoff Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [560, -80]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ALERT_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '*Handoff humano (PHD CRM)*\\n• Lead ID: ' + $('Webhook CRM Score Update').item.json.body.lead_id + '\\n• Score: ' + $('Webhook CRM Score Update').item.json.body.lead_score + '\\n• Estágio anterior: ' + ($('Webhook CRM Score Update').item.json.body.stage || '—') }) }}",
+        "options": {}
+      },
+      "id": "sc-alert",
+      "name": "HTTP Alerta Slack ou Evolution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [840, -80]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 2 * * *" }]
+        }
+      },
+      "id": "rm-cron",
+      "name": "Cron Remarketing 02h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 420]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.PHD_CRM_BASE_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/crm/v1/leads?status=lost&limit=500&page=1' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + ($env.PHD_CRM_ACCESS_TOKEN || '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "rm-get",
+      "name": "HTTP PHD CRM — Leads perdidos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [280, 420]
+    },
+    {
+      "parameters": {
+        "resource": "itemList",
+        "operation": "splitOutItems",
+        "fieldToSplitOut": "data",
+        "include": "noOtherFields",
+        "options": {}
+      },
+      "id": "rm-splitlist",
+      "name": "Item Lists — data[]",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3.1,
+      "position": [560, 420]
+    },
+    {
+      "parameters": { "batchSize": 1, "options": {} },
+      "id": "rm-batch",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [840, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://graph.facebook.com/v21.0/' + $env.META_PIXEL_ID + '/events' }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "access_token", "value": "={{ $env.META_CAPI_ACCESS_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ data: [{ event_name: 'Funnel_Dropoff', event_time: Math.floor(Date.now() / 1000), action_source: 'system_generic', user_data: { em: $json.email_hash ? [String($json.email_hash)] : [], ph: $json.phone_hash ? [String($json.phone_hash)] : [] }, custom_data: { lead_id: String($json.id), source: 'phd_crm_remarketing' } }] }) }}",
+        "options": {}
+      },
+      "id": "rm-meta",
+      "name": "HTTP Meta CAPI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 540]
+    }
+  ],
+  "connections": {
+    "Webhook CRM Score Update": {
+      "main": [[{ "node": "IF Handoff CRM", "type": "main", "index": 0 }]]
+    },
+    "IF Handoff CRM": {
+      "main": [
+        [{ "node": "HTTP PHD CRM — Handoff Lead", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "HTTP PHD CRM — Handoff Lead": {
+      "main": [[{ "node": "HTTP Alerta Slack ou Evolution", "type": "main", "index": 0 }]]
+    },
+    "Cron Remarketing 02h": {
+      "main": [[{ "node": "HTTP PHD CRM — Leads perdidos", "type": "main", "index": 0 }]]
+    },
+    "HTTP PHD CRM — Leads perdidos": {
+      "main": [[{ "node": "Item Lists — data[]", "type": "main", "index": 0 }]]
+    },
+    "Item Lists — data[]": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    },
+    "Split In Batches": {
+      "main": [
+        [],
+        [{ "node": "HTTP Meta CAPI", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP Meta CAPI": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [],
+  "meta": { "templateCredsSetupCompleted": false },
+  "versionId": "03-handoff-remarketing-phd-crm"
+}

@@ -2,36 +2,68 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Building2, Leaf, Smartphone, Sun, Users } from "lucide-react";
+import { Building2, Leaf, Smartphone, Sun, Users, type LucideIcon } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-const SOURCES = [
+type IncomeSourceItem = {
+  icon: LucideIcon;
+  title: string;
+  text: React.ReactNode;
+};
+
+const SOURCES: IncomeSourceItem[] = [
   {
     icon: Leaf,
     title: "Conexão Green",
-    text: "Desconto para residências (baixa tensão). Você ganha até 4% de recorrência todo mês.",
+    text: (
+      <>
+        Renda recorrente de até{" "}
+        <span className="font-bold text-primary">4%</span> todos os meses sobre faturas de residências.
+      </>
+    ),
   },
   {
     icon: Building2,
     title: "Conexão Livre",
-    text: "Até 30% de desconto para grandes empresas. Ganhe bônus imediato de 10% sobre a conta líquida + até 2% de recorrência (contratos longos).",
+    text: (
+      <>
+        Bônus imediato de <span className="font-bold text-primary">10%</span> + recorrência de{" "}
+        <span className="font-bold text-primary">2%</span> em grandes indústrias.
+      </>
+    ),
   },
   {
     icon: Smartphone,
     title: "Conexão Telecom",
-    text: "A maior cobertura 5G do Brasil. Ganhe 100% da primeira fatura na portabilidade + até R$ 14,00 mensais por linha.",
+    text: (
+      <>
+        A maior cobertura 5G do Brasil. Ganhe{" "}
+        <span className="font-bold text-primary">100% da primeira fatura</span> na portabilidade +{" "}
+        <span className="font-bold text-primary">até R$ 14,00 mensais</span> por linha.
+      </>
+    ),
   },
   {
     icon: Sun,
     title: "Conexão Placas & Solar",
-    text: "Venda de usinas para quem quer gerar a própria energia (com ou sem investimento do cliente). Comissões de até 10% sobre o projeto.",
+    text: (
+      <>
+        Comissões agressivas de até{" "}
+        <span className="font-bold text-primary">10%</span> sobre vendas de usinas de alto valor.
+      </>
+    ),
   },
   {
     icon: Users,
     title: "Conexão Expansão",
-    text: "Construa seu time comercial. Ganhe R$ 300 imediatos por novo licenciado direto + royalties sobre a produção da sua equipe.",
+    text: (
+      <>
+        Ganhe <span className="font-bold text-primary">R$ 300</span> à vista por indicação de novos licenciados +
+        royalties de equipa.
+      </>
+    ),
   },
-] as const;
+];
 
 export function IncomeSourcesSection() {
   return (
