@@ -12,7 +12,7 @@ export function BenefitsSection() {
         <SectionHeader
           eyebrow="Vantagens"
           title="Benefícios que fazem a diferença"
-          description="Tudo o que você precisa para proteger seu veículo sem burocracia."
+          description="Foi recusado por outra seguradora? Motorista de aplicativo, veículo antigo, CPF com restrições ou CEP de risco? A iGreen oferece um seguro simples, acessível e flexível para você proteger seu patrimônio sem burocracia."
           className="mb-10 sm:mb-14"
         />
 
