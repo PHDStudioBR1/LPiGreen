@@ -1,0 +1,70 @@
+.seguros-page {
+  --seguros-primary: #00c853;
+  --seguros-dark: #061b12;
+  --seguros-secondary: #0d3d2a;
+  --seguros-accent: #9fffce;
+  --seguros-bg: #020b07;
+  --seguros-text: #ffffff;
+  --seguros-muted: #b7c9c0;
+  background-color: var(--seguros-bg);
+  color: var(--seguros-text);
+}
+
+.seguros-glass {
+  background: rgba(6, 27, 18, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 200, 83, 0.15);
+}
+
+.seguros-glow {
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.2),
+    0 0 40px rgba(0, 200, 83, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.seguros-gradient-hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(0, 200, 83, 0.18), transparent),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(13, 61, 42, 0.6), transparent),
+    linear-gradient(160deg, #061b12 0%, #020b07 50%, #0d3d2a 100%);
+}
+
+.seguros-btn-primary {
+  background: linear-gradient(135deg, #00c853 0%, #00a844 100%);
+  color: #020b07;
+  font-weight: 800;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.seguros-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(0, 200, 83, 0.35);
+}
+
+.seguros-btn-outline {
+  border: 1px solid rgba(159, 255, 206, 0.35);
+  color: var(--seguros-text);
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.seguros-btn-outline:hover {
+  background: rgba(0, 200, 83, 0.08);
+  border-color: rgba(0, 200, 83, 0.5);
+}
+
+@keyframes seguros-pulse-soft {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(0, 200, 83, 0);
+  }
+}
+
+.seguros-whatsapp-pulse {
+  animation: seguros-pulse-soft 2.5s ease-in-out infinite;
+}

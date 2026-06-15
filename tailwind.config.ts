@@ -27,9 +27,19 @@ export default {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
+        'seguros-headline': ['var(--font-poppins)', 'Poppins', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
+        seguros: {
+          primary: '#00C853',
+          dark: '#061B12',
+          secondary: '#0D3D2A',
+          accent: '#9FFFCE',
+          bg: '#020B07',
+          text: '#FFFFFF',
+          muted: '#B7C9C0',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
