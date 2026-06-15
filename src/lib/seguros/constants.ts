@@ -30,3 +30,14 @@ export const SEGUROS_HERO_BADGES = [
   "Ativação em 10 minutos",
   "Regulamentado SUSEP",
 ] as const;
+
+export const SEGUROS_NAV_ITEMS = [
+  { id: "beneficios", label: "Benefícios" },
+  { id: "comparacao", label: "Comparativo" },
+  { id: "como-funciona", label: "Como Funciona" },
+  { id: "planos", label: "Planos" },
+  { id: "depoimentos", label: "Depoimentos" },
+  { id: "faq", label: "FAQ" },
+] as const;
+
+export const SEGUROS_HEADER_OFFSET = 80;

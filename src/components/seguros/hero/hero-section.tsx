@@ -14,7 +14,10 @@ type HeroSectionProps = {
 
 export function HeroSection({ onQuoteClick }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden lg:flex lg:min-h-[92vh] lg:items-center">
+    <section
+      id="inicio"
+      className="relative overflow-hidden pt-[72px] lg:flex lg:min-h-[92vh] lg:items-center"
+    >
       {/* Fundo desktop — imagem em tela cheia */}
       <Image
         src={HERO_BG}

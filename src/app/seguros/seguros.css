@@ -1,3 +1,17 @@
+html:has(.seguros-page) {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.seguros-page) {
+    scroll-behavior: auto;
+  }
+}
+
+.seguros-page [id] {
+  scroll-margin-top: 5.5rem;
+}
+
 .seguros-page {
   --seguros-primary: #00c853;
   --seguros-dark: #061b12;
@@ -90,4 +104,38 @@
     padding-top: 7rem;
     padding-bottom: 7rem;
   }
+}
+
+.seguros-header--transparent {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.seguros-header--scrolled {
+  background: rgba(2, 11, 7, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 200, 83, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.seguros-header__cta {
+  background: linear-gradient(135deg, #00c853 0%, #00a844 100%);
+  color: #020b07;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.seguros-header__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 200, 83, 0.35);
+}
+
+.seguros-header__drawer {
+  background: linear-gradient(180deg, #061b12 0%, #020b07 100%);
+}
+
+.seguros-header__trigger {
+  background: rgba(6, 27, 18, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }

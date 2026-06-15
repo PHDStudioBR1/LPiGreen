@@ -18,6 +18,7 @@ import { ScrollCta } from "@/components/seguros/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/seguros/floating/exit-intent-popup";
 import { SegurosFooter } from "@/components/seguros/footer/seguros-footer";
 import { LeadFormModal } from "@/components/modals/lead-form-modal";
+import { SegurosHeader } from "@/components/seguros/header/seguros-header";
 
 export function SegurosLandingPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -25,6 +26,7 @@ export function SegurosLandingPage() {
 
   return (
     <div className="seguros-page min-h-screen w-full min-w-0 font-body overflow-x-hidden">
+      <SegurosHeader onQuoteClick={openQuote} />
       <main className="pb-20 md:pb-0">
         <HeroSection onQuoteClick={openQuote} />
         <TrustBar />
