@@ -48,7 +48,7 @@ export type SegurosAssistanceItem = {
 };
 
 export type SegurosComparisonRow = {
-  label: string;
-  digital: boolean;
-  traditional: boolean;
+  characteristic: string;
+  igreen: string;
+  traditional: string;
 };

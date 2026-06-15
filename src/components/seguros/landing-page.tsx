@@ -31,7 +31,7 @@ export function SegurosLandingPage() {
         <HeroSection onQuoteClick={openQuote} />
         <TrustBar />
         <BenefitsSection />
-        <WhyChooseSection />
+        <WhyChooseSection onQuoteClick={openQuote} />
         <HowItWorksSection onQuoteClick={openQuote} />
         <PlansSection onQuoteClick={openQuote} />
         <TestimonialsSection />

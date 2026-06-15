@@ -139,3 +139,24 @@ html:has(.seguros-page) {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
+.seguros-text-gradient {
+  background: linear-gradient(135deg, #00c853 0%, #9fffce 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.seguros-comparison-column {
+  background: rgba(6, 27, 18, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 200, 83, 0.12);
+}
+
+.seguros-comparison-column--igreen {
+  border-color: rgba(0, 200, 83, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.15),
+    0 0 32px rgba(0, 200, 83, 0.12);
+}

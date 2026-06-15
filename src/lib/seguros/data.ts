@@ -77,14 +77,51 @@ export const SEGUROS_BENEFITS: SegurosBenefit[] = [
 ];
 
 export const SEGUROS_COMPARISON: SegurosComparisonRow[] = [
-  { label: "Sem análise de perfil", digital: true, traditional: false },
-  { label: "Sem consulta SPC/Serasa", digital: true, traditional: false },
-  { label: "Sem fidelidade", digital: true, traditional: false },
-  { label: "Contratação 100% online", digital: true, traditional: false },
-  { label: "Aprovação em minutos", digital: true, traditional: false },
-  { label: "Motorista de app aceito", digital: true, traditional: false },
-  { label: "Carro de leilão aceito", digital: true, traditional: false },
-  { label: "Burocracia extensa", digital: false, traditional: true },
+  {
+    characteristic: "Cotação online",
+    igreen: "100% Online em 3 min",
+    traditional: "Burocrático",
+  },
+  {
+    characteristic: "Análise de perfil do motorista",
+    igreen: "Sem análise de perfil",
+    traditional: "Análise obrigatória",
+  },
+  {
+    characteristic: "Fidelidade",
+    igreen: "Sem fidelidade",
+    traditional: "12 meses de fidelidade",
+  },
+  {
+    characteristic: "Aceita motorista de App (Uber/99)",
+    igreen: "Sim",
+    traditional: "Geralmente negado",
+  },
+  {
+    characteristic: "Aceita carro de leilão",
+    igreen: "Sim",
+    traditional: "Raramente",
+  },
+  {
+    characteristic: "Forma de pagamento",
+    igreen: "Mensal no boleto",
+    traditional: "Anual ou parcelado",
+  },
+  {
+    characteristic: "Multa por cancelamento",
+    igreen: "Sem multa",
+    traditional: "Multa proporcional",
+  },
+  {
+    characteristic: "Consulta SPC/Serasa",
+    igreen: "Sem consulta",
+    traditional: "Consulta obrigatória",
+  },
+  {
+    characteristic: "Tempo para ativar o seguro",
+    igreen: "Até 24 horas",
+    traditional: "Dias ou até semanas",
+  },
 ];
 
 export const SEGUROS_STEPS: SegurosStep[] = [
