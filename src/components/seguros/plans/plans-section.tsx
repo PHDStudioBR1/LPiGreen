@@ -12,13 +12,13 @@ type PlansSectionProps = {
 
 export function PlansSection({ onQuoteClick }: PlansSectionProps) {
   return (
-    <section id="planos" className="py-20 md:py-28 bg-seguros-dark/50">
+    <section id="planos" className="seguros-section bg-seguros-dark/50">
       <div className="container mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="Planos"
           title="Escolha o plano ideal"
           description="Três opções para cada perfil e orçamento. Sem surpresas."
-          className="mb-14"
+          className="mb-10 sm:mb-14"
         />
 
         <MotionStagger className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto items-stretch">
@@ -26,7 +26,7 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
             <motion.article
               key={plan.id}
               variants={fadeUp}
-              className={`relative flex flex-col rounded-3xl p-8 seguros-glass transition-all duration-300 ${
+              className={`relative flex flex-col rounded-3xl p-5 seguros-glass transition-all duration-300 sm:p-6 md:p-8 ${
                 plan.highlighted
                   ? "md:scale-105 md:-my-4 seguros-glow border-seguros-primary/40 z-10"
                   : "hover:border-seguros-primary/25"
@@ -38,13 +38,13 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
                 </span>
               )}
 
-              <h3 className="font-seguros-headline text-2xl font-extrabold text-seguros-text">
+              <h3 className="font-seguros-headline text-xl font-extrabold text-seguros-text sm:text-2xl">
                 {plan.name}
               </h3>
               <p className="text-seguros-muted text-sm mt-2 mb-6">{plan.description}</p>
 
               <div className="mb-6">
-                <span className="font-seguros-headline text-4xl font-extrabold text-seguros-primary">
+                <span className="font-seguros-headline text-3xl font-extrabold text-seguros-primary sm:text-4xl">
                   {plan.price}
                 </span>
                 <span className="text-seguros-muted">{plan.priceNote}</span>
@@ -62,7 +62,7 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
               <button
                 type="button"
                 onClick={onQuoteClick}
-                className={`w-full h-12 rounded-xl font-bold transition-all ${
+                className={`w-full h-11 sm:h-12 rounded-xl font-bold transition-all ${
                   plan.highlighted
                     ? "seguros-btn-primary"
                     : "seguros-btn-outline"

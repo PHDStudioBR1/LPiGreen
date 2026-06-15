@@ -33,7 +33,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.35 }}
-            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[70] max-w-md mx-auto seguros-glass rounded-3xl p-8 seguros-glow"
+            className="fixed left-4 right-4 top-1/2 z-[70] mx-auto max-w-md -translate-y-1/2 rounded-3xl p-5 seguros-glass seguros-glow sm:p-8"
           >
             <button
               type="button"
@@ -47,7 +47,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
             <p className="text-seguros-primary text-sm font-bold uppercase tracking-wider mb-2">
               Espere!
             </p>
-            <h3 className="font-seguros-headline text-2xl font-extrabold text-seguros-text mb-3">
+            <h3 className="mb-3 font-seguros-headline text-xl font-extrabold text-seguros-text sm:text-2xl">
               Sua cotação gratuita está a 2 minutos de distância
             </h3>
             <p className="text-seguros-muted mb-6 leading-relaxed">

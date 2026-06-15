@@ -14,7 +14,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
   return (
     <section
       id="motorista-app"
-      className="py-20 md:py-28 relative overflow-hidden"
+      className="seguros-section relative overflow-hidden"
       style={{
         background:
           "linear-gradient(135deg, #0D3D2A 0%, #061B12 50%, #020B07 100%)",
@@ -23,7 +23,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,200,83,0.12),transparent)]" />
 
       <div className="container relative mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           <MotionBlock variants={fadeLeft}>
             <SectionHeader
               align="left"
@@ -33,7 +33,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
               className="mb-8"
             />
 
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
+            <div className="mb-6 grid grid-cols-1 gap-3 sm:mb-8 sm:grid-cols-2 sm:gap-4">
               {SEGUROS_APP_DRIVER_FEATURES.map(({ icon: Icon, label }) => (
                 <div
                   key={label}
@@ -50,7 +50,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
             <button
               type="button"
               onClick={onQuoteClick}
-              className="seguros-btn-primary h-14 px-8 rounded-2xl text-lg font-extrabold"
+              className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
               Cotar para Motorista de App
             </button>
@@ -62,7 +62,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
             viewport={{ once: true }}
             variants={fadeRight}
             transition={{ duration: 0.6 }}
-            className="relative aspect-[4/3] rounded-3xl overflow-hidden seguros-glow"
+            className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl seguros-glow"
           >
             <Image
               src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop"

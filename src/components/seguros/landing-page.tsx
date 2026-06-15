@@ -25,7 +25,7 @@ export function SegurosLandingPage() {
 
   return (
     <div className="seguros-page min-h-screen w-full min-w-0 font-body overflow-x-hidden">
-      <main>
+      <main className="pb-20 md:pb-0">
         <HeroSection onQuoteClick={openQuote} />
         <TrustBar />
         <BenefitsSection />

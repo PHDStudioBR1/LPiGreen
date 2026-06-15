@@ -30,13 +30,13 @@ export function FaqSection() {
   const mounted = useMounted();
 
   return (
-    <section id="faq" className="py-20 md:py-28">
+    <section id="faq" className="seguros-section">
       <div className="container mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="FAQ"
           title="Perguntas frequentes"
           description="Tire suas dúvidas sobre o Seguro iGreen."
-          className="mb-14"
+          className="mb-10 sm:mb-14"
         />
 
         <MotionBlock className="max-w-3xl mx-auto">
@@ -50,7 +50,7 @@ export function FaqSection() {
                   value={item.id}
                   className="seguros-glass rounded-2xl px-4 md:px-6 border-none overflow-hidden data-[state=open]:border-seguros-primary/30"
                 >
-                  <AccordionTrigger className="text-left font-semibold text-seguros-text py-5 hover:no-underline hover:text-seguros-primary transition-colors">
+                  <AccordionTrigger className="py-4 text-left text-sm font-semibold text-seguros-text transition-colors hover:no-underline hover:text-seguros-primary sm:py-5 sm:text-base">
                     {item.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-seguros-muted pb-5 leading-relaxed">

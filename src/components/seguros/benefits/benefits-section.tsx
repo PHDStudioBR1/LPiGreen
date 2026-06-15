@@ -7,13 +7,13 @@ import { MotionStagger, fadeUp } from "@/components/seguros/ui/motion";
 
 export function BenefitsSection() {
   return (
-    <section id="beneficios" className="py-20 md:py-28">
+    <section id="beneficios" className="seguros-section">
       <div className="container mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="Vantagens"
           title="Benefícios que fazem a diferença"
           description="Tudo o que você precisa para proteger seu veículo sem burocracia."
-          className="mb-14"
+          className="mb-10 sm:mb-14"
         />
 
         <MotionStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
@@ -22,7 +22,7 @@ export function BenefitsSection() {
               key={benefit.id}
               variants={fadeUp}
               transition={{ duration: 0.5 }}
-              className="group seguros-glass rounded-3xl p-6 hover:border-seguros-primary/40 hover:-translate-y-1 transition-all duration-300"
+              className="group seguros-glass rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-seguros-primary/40 sm:p-6"
             >
               <div className="w-12 h-12 rounded-2xl bg-seguros-primary/15 flex items-center justify-center mb-4 group-hover:bg-seguros-primary/25 transition-colors">
                 <benefit.icon className="w-6 h-6 text-seguros-primary" />

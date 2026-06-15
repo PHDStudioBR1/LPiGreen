@@ -25,40 +25,40 @@ function AnimatedCounter({ target }: { target: number }) {
 
 export function FinalCtaSection({ onQuoteClick }: FinalCtaSectionProps) {
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden">
+    <section className="seguros-section relative overflow-hidden pb-28 md:pb-32">
       <div className="absolute inset-0 seguros-gradient-hero opacity-80" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,200,83,0.15),transparent)]" />
 
       <div className="container relative mx-auto px-4 sm:px-6">
-        <MotionBlock className="max-w-3xl mx-auto text-center space-y-8">
-          <h2 className="font-seguros-headline text-4xl sm:text-5xl md:text-6xl font-extrabold text-seguros-text leading-tight">
+        <MotionBlock className="mx-auto max-w-3xl space-y-6 text-center sm:space-y-8">
+          <h2 className="font-seguros-headline text-3xl font-extrabold leading-tight text-seguros-text sm:text-5xl md:text-6xl">
             Proteja seu veículo hoje mesmo.
           </h2>
-          <p className="text-lg sm:text-xl text-seguros-muted">
+          <p className="text-base text-seguros-muted sm:text-lg md:text-xl">
             Faça sua cotação gratuita em menos de 2 minutos.
           </p>
 
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full seguros-glass text-seguros-accent">
-            <Users className="w-5 h-5 text-seguros-primary" />
-            <span className="font-semibold text-seguros-text">
+          <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2.5 seguros-glass text-seguros-accent sm:px-5 sm:py-3">
+            <Users className="h-5 w-5 shrink-0 text-seguros-primary" />
+            <span className="text-sm font-semibold text-seguros-text sm:text-base">
               <AnimatedCounter target={SEGUROS_CLIENT_COUNT} /> clientes já protegidos
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center sm:gap-4">
             <a
               href={SEGUROS_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="seguros-btn-outline h-14 px-8 rounded-2xl text-lg font-bold inline-flex items-center justify-center gap-2"
+              className="seguros-btn-outline inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-bold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle className="h-5 w-5 shrink-0" />
               WhatsApp
             </a>
             <button
               type="button"
               onClick={onQuoteClick}
-              className="seguros-btn-primary h-14 px-8 rounded-2xl text-lg font-extrabold"
+              className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
               Fazer Cotação Gratuita
             </button>

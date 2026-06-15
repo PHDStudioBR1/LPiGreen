@@ -30,13 +30,13 @@ export function TestimonialsSection() {
   }, [emblaApi, onSelect]);
 
   return (
-    <section id="depoimentos" className="py-20 md:py-28">
+    <section id="depoimentos" className="seguros-section">
       <div className="container mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="Depoimentos"
           title="O que nossos clientes dizem"
           description="Histórias reais de quem encontrou proteção quando mais precisava."
-          className="mb-14"
+          className="mb-10 sm:mb-14"
         />
 
         <MotionBlock>
@@ -45,7 +45,7 @@ export function TestimonialsSection() {
               {SEGUROS_TESTIMONIALS.map((item) => (
                 <article
                   key={item.id}
-                  className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] seguros-glass rounded-3xl p-6 md:p-8"
+                  className="min-w-0 flex-[0_0_100%] seguros-glass rounded-3xl p-5 sm:flex-[0_0_calc(50%-12px)] sm:p-6 md:p-8 lg:flex-[0_0_calc(33.333%-16px)]"
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 ring-2 ring-seguros-primary/30">

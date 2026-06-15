@@ -9,21 +9,21 @@ type StickyMobileBarProps = {
 
 export function StickyMobileBar({ onQuoteClick }: StickyMobileBarProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden seguros-glass border-t border-seguros-primary/20 p-3 safe-area-pb">
-      <div className="flex gap-3">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-seguros-primary/20 p-3 seguros-glass seguros-safe-area-pb md:hidden">
+      <div className="flex gap-2 sm:gap-3">
         <a
           href={SEGUROS_WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 h-12 rounded-xl seguros-btn-outline inline-flex items-center justify-center gap-2 font-bold text-sm"
+          className="seguros-btn-outline inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl text-xs font-bold sm:h-12 sm:gap-2 sm:text-sm"
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="h-4 w-4 shrink-0" />
           WhatsApp
         </a>
         <button
           type="button"
           onClick={onQuoteClick}
-          className="flex-[1.4] h-12 rounded-xl seguros-btn-primary text-sm font-extrabold"
+          className="seguros-btn-primary h-11 flex-[1.4] rounded-xl text-xs font-extrabold sm:h-12 sm:text-sm"
         >
           Cotação Grátis
         </button>

@@ -68,3 +68,26 @@
 .seguros-whatsapp-pulse {
   animation: seguros-pulse-soft 2.5s ease-in-out infinite;
 }
+
+.seguros-safe-area-pb {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.seguros-section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .seguros-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .seguros-section {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+  }
+}
