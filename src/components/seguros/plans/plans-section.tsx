@@ -43,13 +43,6 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
               </h3>
               <p className="text-seguros-muted text-sm mt-2 mb-6">{plan.description}</p>
 
-              <div className="mb-6">
-                <span className="font-seguros-headline text-3xl font-extrabold text-seguros-primary sm:text-4xl">
-                  {plan.price}
-                </span>
-                <span className="text-seguros-muted">{plan.priceNote}</span>
-              </div>
-
               <ul className="space-y-3 mb-8 flex-grow">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm text-seguros-muted">

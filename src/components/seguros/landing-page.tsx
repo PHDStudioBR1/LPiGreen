@@ -17,7 +17,7 @@ import { StickyMobileBar } from "@/components/seguros/floating/sticky-mobile-bar
 import { ScrollCta } from "@/components/seguros/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/seguros/floating/exit-intent-popup";
 import { SegurosFooter } from "@/components/seguros/footer/seguros-footer";
-import { LeadFormModal } from "@/components/modals/lead-form-modal";
+import { SegurosQuoteModal } from "@/components/seguros/modals/seguros-quote-modal";
 import { SegurosHeader } from "@/components/seguros/header/seguros-header";
 
 export function SegurosLandingPage() {
@@ -48,7 +48,7 @@ export function SegurosLandingPage() {
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
 
-      <LeadFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      <SegurosQuoteModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
     </div>
   );
 }
