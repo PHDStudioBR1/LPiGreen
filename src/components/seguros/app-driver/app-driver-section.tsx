@@ -4,6 +4,7 @@ import Image from "next/image";
 import { SEGUROS_APP_DRIVER_FEATURES } from "@/lib/seguros/data";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionBlock, fadeLeft, fadeRight } from "@/components/seguros/ui/motion";
+import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 import { motion } from "framer-motion";
 
 type AppDriverSectionProps = {
@@ -49,7 +50,10 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
 
             <button
               type="button"
-              onClick={onQuoteClick}
+              onClick={() => {
+                trackSegurosQuoteClick("app_driver");
+                onQuoteClick();
+              }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
               Cotar para Motorista de App

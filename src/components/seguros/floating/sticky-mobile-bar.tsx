@@ -2,6 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
+import { trackSegurosQuoteClick, trackSegurosWhatsAppClick } from "@/lib/seguros/analytics";
 
 type StickyMobileBarProps = {
   onQuoteClick: () => void;
@@ -15,6 +16,7 @@ export function StickyMobileBar({ onQuoteClick }: StickyMobileBarProps) {
           href={SEGUROS_WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackSegurosWhatsAppClick("sticky_mobile")}
           className="seguros-btn-outline inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl text-xs font-bold sm:h-12 sm:gap-2 sm:text-sm"
         >
           <MessageCircle className="h-4 w-4 shrink-0" />
@@ -22,7 +24,10 @@ export function StickyMobileBar({ onQuoteClick }: StickyMobileBarProps) {
         </a>
         <button
           type="button"
-          onClick={onQuoteClick}
+          onClick={() => {
+            trackSegurosQuoteClick("sticky_mobile");
+            onQuoteClick();
+          }}
           className="seguros-btn-primary h-11 flex-[1.4] rounded-xl text-xs font-extrabold sm:h-12 sm:text-sm"
         >
           Cotação Grátis

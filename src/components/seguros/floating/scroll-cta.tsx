@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useScrollProgress } from "@/hooks/seguros/use-scroll-progress";
+import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 
 type ScrollCtaProps = {
   onQuoteClick: () => void;
@@ -25,7 +26,10 @@ export function ScrollCta({ onQuoteClick }: ScrollCtaProps) {
           </p>
           <button
             type="button"
-            onClick={onQuoteClick}
+            onClick={() => {
+              trackSegurosQuoteClick("scroll_cta");
+              onQuoteClick();
+            }}
             className="seguros-btn-primary h-10 px-6 rounded-full text-sm font-extrabold whitespace-nowrap"
           >
             Cotação Grátis

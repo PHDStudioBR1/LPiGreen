@@ -10,6 +10,7 @@ import { SEGUROS_FAQ } from "@/lib/seguros/data";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionBlock } from "@/components/seguros/ui/motion";
 import { useMounted } from "@/hooks/use-mounted";
+import { trackSegurosFaqExpand } from "@/lib/seguros/analytics";
 
 function FaqStaticFallback() {
   return (
@@ -43,7 +44,14 @@ export function FaqSection() {
           {!mounted ? (
             <FaqStaticFallback />
           ) : (
-            <Accordion type="single" collapsible className="space-y-3">
+            <Accordion
+              type="single"
+              collapsible
+              className="space-y-3"
+              onValueChange={(value) => {
+                if (value) trackSegurosFaqExpand(value);
+              }}
+            >
               {SEGUROS_FAQ.map((item) => (
                 <AccordionItem
                   key={item.id}

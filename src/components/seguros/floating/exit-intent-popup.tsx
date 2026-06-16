@@ -1,9 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useExitIntent } from "@/hooks/seguros/use-exit-intent";
 import { SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
+import {
+  trackSegurosExitIntent,
+  trackSegurosQuoteClick,
+  trackSegurosWhatsAppClick,
+} from "@/lib/seguros/analytics";
 
 type ExitIntentPopupProps = {
   onQuoteClick: () => void;
@@ -12,7 +18,18 @@ type ExitIntentPopupProps = {
 export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
   const { show, dismiss } = useExitIntent();
 
+  useEffect(() => {
+    if (show) trackSegurosExitIntent("show");
+  }, [show]);
+
+  const handleDismiss = () => {
+    trackSegurosExitIntent("dismiss");
+    dismiss();
+  };
+
   const handleQuote = () => {
+    trackSegurosExitIntent("quote");
+    trackSegurosQuoteClick("exit_intent");
     dismiss();
     onQuoteClick();
   };
@@ -26,7 +43,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
-            onClick={dismiss}
+            onClick={handleDismiss}
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -37,7 +54,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
           >
             <button
               type="button"
-              onClick={dismiss}
+              onClick={handleDismiss}
               className="absolute top-4 right-4 text-seguros-muted hover:text-seguros-text transition-colors"
               aria-label="Fechar"
             >
@@ -66,7 +83,11 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
                 href={SEGUROS_WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={dismiss}
+                onClick={() => {
+                  trackSegurosWhatsAppClick("exit_intent");
+                  trackSegurosExitIntent("whatsapp");
+                  handleDismiss();
+                }}
                 className="seguros-btn-outline h-12 rounded-xl font-bold inline-flex items-center justify-center"
               >
                 Falar no WhatsApp

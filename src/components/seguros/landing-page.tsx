@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { trackSegurosPageView } from "@/lib/seguros/analytics";
 import { HeroSection } from "@/components/seguros/hero/hero-section";
 import { TrustBar } from "@/components/seguros/trust-bar/trust-bar";
 import { BenefitsSection } from "@/components/seguros/benefits/benefits-section";
@@ -23,6 +24,10 @@ import { SegurosHeader } from "@/components/seguros/header/seguros-header";
 export function SegurosLandingPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const openQuote = () => setIsFormOpen(true);
+
+  useEffect(() => {
+    trackSegurosPageView();
+  }, []);
 
   return (
     <div className="seguros-page min-h-screen w-full min-w-0 font-body overflow-x-hidden">

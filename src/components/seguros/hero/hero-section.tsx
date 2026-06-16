@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Check, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { SEGUROS_HERO_BADGES, SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
+import { trackSegurosQuoteClick, trackSegurosWhatsAppClick } from "@/lib/seguros/analytics";
 import { fadeLeft } from "@/components/seguros/ui/motion";
 
 const HERO_BG = "/images/seguros/fundo_hero_pc.png";
@@ -74,7 +75,10 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <button
               type="button"
-              onClick={onQuoteClick}
+              onClick={() => {
+                trackSegurosQuoteClick("hero");
+                onQuoteClick();
+              }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-16 sm:w-auto sm:px-8 sm:text-lg"
             >
               Fazer Cotação Gratuita
@@ -83,6 +87,7 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
               href={SEGUROS_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackSegurosWhatsAppClick("hero")}
               className="seguros-btn-outline inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-bold sm:h-16 sm:w-auto sm:px-8 sm:text-lg"
             >
               <MessageCircle className="h-5 w-5 shrink-0" />

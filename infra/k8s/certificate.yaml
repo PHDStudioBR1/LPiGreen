@@ -4,6 +4,7 @@
 # Domínios ativos:
 #   - lpigreen.546digitalservices.com (prod)
 #   - centraldobeneficioenergia.com.br (prod)
+#   - representanteigreen.com.br (prod)
 #
 # NÃO usar cert-manager Certificate para estes domínios
 # pois conflita com o certResolver do Traefik (ambos usam HTTP-01 challenge).

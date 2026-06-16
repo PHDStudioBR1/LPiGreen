@@ -4,6 +4,7 @@ import { MessageCircle, Users } from "lucide-react";
 import { motion, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
 import { SEGUROS_CLIENT_COUNT, SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
+import { trackSegurosQuoteClick, trackSegurosWhatsAppClick } from "@/lib/seguros/analytics";
 import { MotionBlock } from "@/components/seguros/ui/motion";
 
 type FinalCtaSectionProps = {
@@ -50,6 +51,7 @@ export function FinalCtaSection({ onQuoteClick }: FinalCtaSectionProps) {
               href={SEGUROS_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackSegurosWhatsAppClick("final_cta")}
               className="seguros-btn-outline inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-bold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
               <MessageCircle className="h-5 w-5 shrink-0" />
@@ -57,7 +59,10 @@ export function FinalCtaSection({ onQuoteClick }: FinalCtaSectionProps) {
             </a>
             <button
               type="button"
-              onClick={onQuoteClick}
+              onClick={() => {
+                trackSegurosQuoteClick("final_cta");
+                onQuoteClick();
+              }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
             >
               Fazer Cotação Gratuita
