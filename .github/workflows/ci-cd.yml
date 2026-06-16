@@ -159,6 +159,13 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
           echo "Secret doc-ai-secret criado/atualizado (valores vêm do Environment production: DOC_AI_PROVIDER, OPENAI_API_KEY, etc.). Confira no passo 'Verificar variáveis Doc AI no Pod' se o pod recebeu as variáveis."
 
+      - name: Deploy Redis (cache de progresso da API)
+        run: |
+          kubectl apply -f infra/k8s/redis-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/redis-pvc.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/redis-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/redis -n ${{ env.K8S_NAMESPACE }} --timeout=180s || true
+
       - name: Deploy API (backend)
         run: |
           kubectl apply -f infra/k8s/api-secret.yaml -n ${{ env.K8S_NAMESPACE }}
@@ -166,7 +173,19 @@ jobs:
           kubectl set image deployment/lpigreen-api \
             api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+          if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
+            echo "❌ Rollout da API falhou. Diagnóstico:"
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
+            kubectl describe deployment lpigreen-api -n ${{ env.K8S_NAMESPACE }}
+            for POD in $(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o jsonpath='{.items[*].metadata.name}'); do
+              echo "=== describe pod/$POD ==="
+              kubectl describe pod "$POD" -n ${{ env.K8S_NAMESPACE }}
+              echo "=== logs pod/$POD ==="
+              kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --tail=80 || true
+              kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --previous --tail=80 2>/dev/null || true
+            done
+            exit 1
+          fi
 
       - name: Verificar variáveis Doc AI no Pod da API
         run: |
