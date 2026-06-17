@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { SEGUROS_PLANS } from "@/lib/seguros/data";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionStagger, fadeUp } from "@/components/seguros/ui/motion";
+import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 
 const PLANS_DISCLAIMERS = [
   {
@@ -75,7 +76,10 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
 
               <button
                 type="button"
-                onClick={onQuoteClick}
+                onClick={() => {
+                  trackSegurosQuoteClick(`plans_${plan.id}`);
+                  onQuoteClick();
+                }}
                 className={`w-full h-11 sm:h-12 rounded-xl font-bold transition-all ${
                   plan.highlighted
                     ? "seguros-btn-primary"

@@ -7,6 +7,7 @@ import {
   SEGUROS_HEADER_OFFSET,
   SEGUROS_NAV_ITEMS,
 } from "@/lib/seguros/constants";
+import { trackSegurosNavClick, trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 
 type SegurosHeaderProps = {
   onQuoteClick: () => void;
@@ -60,6 +61,7 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
   }, []);
 
   const scrollToSection = useCallback((sectionId: string) => {
+    trackSegurosNavClick(sectionId);
     const target = document.getElementById(sectionId);
     if (!target) return;
 
@@ -138,7 +140,10 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
             <div className="flex items-center justify-end gap-2 sm:gap-3">
               <button
                 type="button"
-                onClick={onQuoteClick}
+                onClick={() => {
+                  trackSegurosQuoteClick("header");
+                  onQuoteClick();
+                }}
                 className="seguros-header__cta hidden h-10 items-center justify-center rounded-full px-5 text-sm font-extrabold sm:inline-flex lg:h-11 lg:px-6"
               >
                 Cotar Grátis
@@ -213,6 +218,7 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
           type="button"
           onClick={() => {
             setIsMenuOpen(false);
+            trackSegurosQuoteClick("header_mobile");
             onQuoteClick();
           }}
           className="seguros-header__cta mt-8 h-12 w-full rounded-2xl text-base font-extrabold"

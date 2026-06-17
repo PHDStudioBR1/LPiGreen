@@ -18,6 +18,13 @@ import {
   type SegurosQuoteFieldErrors,
   type SegurosQuoteFormValues,
 } from "@/lib/seguros/quote-form";
+import {
+  trackSegurosFormStep,
+  trackSegurosFormSubmit,
+  trackSegurosModalClose,
+  trackSegurosModalOpen,
+  trackSegurosPlanSelect,
+} from "@/lib/seguros/analytics";
 import "@/app/seguros/seguros-quote-modal.css";
 
 export type SegurosQuoteModalProps = {
@@ -96,6 +103,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   }, []);
 
   const handleClose = useCallback(() => {
+    trackSegurosModalClose();
     resetForm();
     onClose();
   }, [onClose, resetForm]);
@@ -103,6 +111,10 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isOpen) trackSegurosModalOpen();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -145,6 +157,9 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     }
 
     setErrors({});
+    if (nextStep > step) {
+      trackSegurosFormStep(step);
+    }
     setStep(nextStep);
   };
 
@@ -158,6 +173,12 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     setIsSubmitting(true);
     setShowToast(true);
     setProgress(15);
+
+    trackSegurosFormSubmit({
+      plan: values.plan,
+      vehicle_type: values.vehicleType,
+      vehicle_use: values.vehicleUse,
+    });
 
     const whatsappUrl = buildSegurosWhatsAppUrl(values, SEGUROS_WHATSAPP_URL);
 
@@ -431,7 +452,10 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                               key={plan.id}
                               type="button"
                               className={`igf-plan-card${selected ? " selected" : ""}`}
-                              onClick={() => updateField("plan", plan.id)}
+                              onClick={() => {
+                                updateField("plan", plan.id);
+                                trackSegurosPlanSelect(plan.id);
+                              }}
                             >
                               {plan.recommended && (
                                 <div className="igf-plan-badge">⭐ Recomendado</div>

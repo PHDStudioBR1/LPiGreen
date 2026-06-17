@@ -5,6 +5,7 @@ import { SEGUROS_COMPARISON } from "@/lib/seguros/data";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionBlock } from "@/components/seguros/ui/motion";
 import { cn } from "@/lib/utils";
+import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 
 type WhyChooseSectionProps = {
   onQuoteClick?: () => void;
@@ -157,7 +158,10 @@ export function WhyChooseSection({ onQuoteClick }: WhyChooseSectionProps) {
             <div className="mt-10 hidden justify-center md:flex">
               <button
                 type="button"
-                onClick={onQuoteClick}
+                onClick={() => {
+                  trackSegurosQuoteClick("why_choose");
+                  onQuoteClick?.();
+                }}
                 className="seguros-btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-extrabold"
               >
                 Receber cotação grátis

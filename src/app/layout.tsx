@@ -1,7 +1,7 @@
 import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { GoogleAnalytics } from '@/components/google-analytics';
+import { GoogleTag } from '@/components/analytics/google-tag';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({
@@ -40,7 +40,7 @@ export default function RootLayout({
         className="font-body antialiased bg-background text-foreground overflow-x-hidden w-full min-w-0"
         suppressHydrationWarning
       >
-        <GoogleAnalytics />
+        <GoogleTag />
         {children}
         <Toaster />
       </body>
