@@ -39,7 +39,6 @@ export function trackSegurosPlanSelect(plan: string) {
 }
 
 export function trackSegurosFormSubmit(params: {
-  plan: string;
   vehicle_type: string;
   vehicle_use: string;
 }) {

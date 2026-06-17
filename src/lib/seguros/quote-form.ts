@@ -19,27 +19,6 @@ export const SEGUROS_GARAGE_OPTIONS = [
   { value: "Às vezes", label: "Às vezes (condomínio, trabalho)" },
 ] as const;
 
-export const SEGUROS_QUOTE_PLANS = [
-  {
-    id: "Infinite",
-    name: "Infinite",
-    description: "Proteção máxima com todas as coberturas",
-    recommended: false,
-  },
-  {
-    id: "Premium",
-    name: "Premium",
-    description: "Equilíbrio ideal entre preço e proteção",
-    recommended: true,
-  },
-  {
-    id: "Basic",
-    name: "Basic",
-    description: "Proteção essencial com menor custo",
-    recommended: false,
-  },
-] as const;
-
 export type SegurosQuoteFormValues = {
   vehicleType: string;
   plate: string;
@@ -51,7 +30,6 @@ export type SegurosQuoteFormValues = {
   email: string;
   phone: string;
   cep: string;
-  plan: string;
 };
 
 export const SEGUROS_QUOTE_SESSION_STORAGE_KEY = "seguros-quote-form-session";
@@ -91,7 +69,6 @@ export const SEGUROS_QUOTE_FORM_DEFAULTS: SegurosQuoteFormValues = {
   email: "",
   phone: "",
   cep: "",
-  plan: "",
 };
 
 export type SegurosQuoteFieldErrors = Partial<Record<keyof SegurosQuoteFormValues, string>>;
@@ -140,7 +117,7 @@ function isValidCnpj(digits: string): boolean {
 }
 
 export function validateQuoteStep(
-  step: 1 | 2 | 3,
+  step: 1 | 2,
   values: SegurosQuoteFormValues
 ): SegurosQuoteFieldErrors {
   const errors: SegurosQuoteFieldErrors = {};
@@ -178,10 +155,6 @@ export function validateQuoteStep(
     }
   }
 
-  if (step === 3 && !values.plan) {
-    errors.plan = "Selecione um plano para continuar.";
-  }
-
   return errors;
 }
 
@@ -205,8 +178,6 @@ export function buildSegurosWhatsAppUrl(
     `E-mail: ${values.email}`,
     `WhatsApp: ${values.phone}`,
     `CEP: ${values.cep}`,
-    "",
-    `*Plano escolhido:* ${values.plan}`,
   ].join("\n");
 
   const url = new URL(baseUrl);

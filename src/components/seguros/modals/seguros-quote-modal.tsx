@@ -13,7 +13,6 @@ import {
   persistQuoteSessionFields,
   SEGUROS_GARAGE_OPTIONS,
   SEGUROS_QUOTE_FORM_DEFAULTS,
-  SEGUROS_QUOTE_PLANS,
   SEGUROS_VEHICLE_TYPES,
   SEGUROS_VEHICLE_USES,
   validateQuoteStep,
@@ -25,7 +24,6 @@ import {
   trackSegurosFormSubmit,
   trackSegurosModalClose,
   trackSegurosModalOpen,
-  trackSegurosPlanSelect,
 } from "@/lib/seguros/analytics";
 import "@/app/seguros/seguros-quote-modal.css";
 
@@ -37,7 +35,6 @@ export type SegurosQuoteModalProps = {
 const STEPS = [
   { id: 1, label: "Veículo" },
   { id: 2, label: "Seus dados" },
-  { id: 3, label: "Plano" },
 ] as const;
 
 function ArrowRightIcon() {
@@ -88,7 +85,7 @@ function FormGroup({
 
 export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2>(1);
   const [values, setValues] = useState<SegurosQuoteFormValues>(SEGUROS_QUOTE_FORM_DEFAULTS);
   const [errors, setErrors] = useState<SegurosQuoteFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -163,7 +160,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     });
   };
 
-  const goStep = (nextStep: 1 | 2 | 3) => {
+  const goStep = (nextStep: 1 | 2) => {
     if (nextStep > step) {
       const stepErrors = validateQuoteStep(step, values);
       if (Object.keys(stepErrors).length > 0) {
@@ -180,7 +177,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   };
 
   const handleSubmit = async () => {
-    const stepErrors = validateQuoteStep(3, values);
+    const stepErrors = validateQuoteStep(2, values);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
       return;
@@ -190,8 +187,8 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     setShowToast(true);
     setProgress(15);
 
+    trackSegurosFormStep(2);
     trackSegurosFormSubmit({
-      plan: values.plan,
       vehicle_type: values.vehicleType,
       vehicle_use: values.vehicleUse,
     });
@@ -468,51 +465,6 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                         >
                           <ArrowLeftIcon />
                         </button>
-                        <button type="button" className="igf-btn igf-btn-green" onClick={() => goStep(3)}>
-                          <span className="igf-btn-text" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            Continuar
-                            <span className="igf-arrow">
-                              <ArrowRightIcon />
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {step === 3 && (
-                    <div id="igf-ws-3">
-                      <span className="igf-plans-label">
-                        Escolha seu plano <span className="igf-req">*</span>
-                      </span>
-
-                      <div className="igf-plan-cards">
-                        {SEGUROS_QUOTE_PLANS.map((plan) => {
-                          const selected = values.plan === plan.id;
-
-                          return (
-                            <button
-                              key={plan.id}
-                              type="button"
-                              className={`igf-plan-card${selected ? " selected" : ""}`}
-                              onClick={() => {
-                                updateField("plan", plan.id);
-                                trackSegurosPlanSelect(plan.id);
-                              }}
-                            >
-                              {plan.recommended && (
-                                <div className="igf-plan-badge">⭐ Recomendado</div>
-                              )}
-                              <span className="igf-plan-name">{plan.name}</span>
-                              <span className="igf-plan-desc">{plan.description}</span>
-                              <div className="igf-plan-check" />
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div id="igf-plan-error" className={errors.plan ? "show" : ""}>
-                        {errors.plan ?? "Selecione um plano para continuar."}
                       </div>
 
                       <div className="igf-btn-wrap">
@@ -550,11 +502,6 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                         </div>
                         <div className="igf-progress-label">Preparando redirecionamento...</div>
                       </div>
-
-                      <button type="button" className="igf-btn-back" onClick={() => goStep(2)}>
-                        <ArrowLeftIcon />
-                        Voltar
-                      </button>
                     </div>
                   )}
                 </div>
