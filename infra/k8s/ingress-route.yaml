@@ -55,6 +55,15 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
+    # /api/seguros -> frontend (Next.js), integração server-side com o PHD CRM
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/seguros`)
+      kind: Rule
+      services:
+        - name: web-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
     # Demais /api (/api/health, /api/aneel/distribuidoras, etc.) -> backend
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api`)
       kind: Rule
