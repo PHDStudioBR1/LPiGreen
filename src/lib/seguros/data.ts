@@ -7,6 +7,7 @@ import {
   FileCheck,
   Fuel,
   KeyRound,
+  MapPin,
   Phone,
   Shield,
   ShieldCheck,
@@ -160,47 +161,105 @@ export const SEGUROS_STEPS: SegurosStep[] = [
 export const SEGUROS_PLANS: SegurosPlan[] = [
   {
     id: "basic",
-    name: "Basic",
+    name: "BASIC",
     price: "R$ 89",
     priceNote: "/mês",
-    description: "Proteção essencial para quem busca economia.",
+    description: "Proteção essencial com o melhor custo-benefício.",
     features: [
-      "Cobertura contra roubo e furto",
-      "Assistência 24h básica",
-      "Guincho até 200 km",
-      "Sem consulta SPC",
+      {
+        icon: ShieldCheck,
+        label: "Cobertura",
+        description: "Roubo, Furto e Indenização de 100% da Tabela FIPE",
+      },
+      {
+        icon: Phone,
+        label: "Assistência 24h",
+        description:
+          "Guincho de até 250 km (total ida/volta), socorro mecânico, troca de pneus e chaveiro",
+      },
+      {
+        icon: UserCheck,
+        label: "Aprovação Facilitada",
+        description: "Sem consulta ao SPC/Serasa e sem burocracia",
+      },
+      {
+        icon: CreditCard,
+        label: "Modelo por Assinatura",
+        description: "Pagamento mensal recorrente, sem comprometer o limite do cartão",
+      },
     ],
   },
   {
     id: "premium",
-    name: "Premium",
+    name: "PREMIUM",
     price: "R$ 149",
     priceNote: "/mês",
-    description: "O plano mais escolhido pelos nossos clientes.",
+    description: "A proteção completa para o seu dia a dia.",
     features: [
-      "Cobertura completa",
-      "Assistência 24h premium",
-      "Guincho ilimitado",
-      "Carro reserva 7 dias",
-      "Motorista de app aceito",
-      "Sem fidelidade",
+      {
+        icon: Shield,
+        label: "Cobertura Abrangente",
+        description:
+          "Roubo, Furto, Colisão, Perda Total e Fenômenos da Natureza (enchente, granizo etc.)",
+      },
+      {
+        icon: Truck,
+        label: "Assistência 24h Expandida",
+        description:
+          "Guincho de até 500 km (total ida/volta) e auxílio para passageiros (hospedagem e transporte)",
+      },
+      {
+        icon: Car,
+        label: "Carro Reserva",
+        description: "7 dias inclusos em caso de sinistro",
+      },
+      {
+        icon: Smartphone,
+        label: "Aceitação Especial",
+        description: "Aceitamos motoristas de aplicativo, táxis e carros de locadora",
+      },
+      {
+        icon: CheckCircle2,
+        label: "Sem Fidelidade",
+        description: "Cancele quando quiser, sem multas ou taxas escondidas",
+      },
     ],
     highlighted: true,
     badge: "MAIS POPULAR",
   },
   {
     id: "infinite",
-    name: "Infinite",
+    name: "INFINITE",
     price: "R$ 219",
     priceNote: "/mês",
-    description: "Máxima proteção para quem não aceita limites.",
+    description: "Máxima segurança e tranquilidade total.",
     features: [
-      "Tudo do Premium",
-      "Cobertura internacional",
-      "Carro reserva 15 dias",
-      "Vidros e faróis inclusos",
-      "Carro de leilão aceito",
-      "Prioridade no atendimento",
+      {
+        icon: ShieldCheck,
+        label: "Tudo do Premium +",
+        description: "Proteção adicional para Vidros, Faróis, Lanternas e Retrovisores",
+      },
+      {
+        icon: Car,
+        label: "Carro Reserva Estendido",
+        description: "Opções de 15 ou 30 dias de veículo reserva",
+      },
+      {
+        icon: CarFront,
+        label: "Flexibilidade de Frota",
+        description:
+          "Aceitamos veículos de leilão (com depreciação de tabela) e modelos de alta performance",
+      },
+      {
+        icon: MapPin,
+        label: "Abrangência Nacional",
+        description: "Proteção garantida em todo o território brasileiro",
+      },
+      {
+        icon: Wrench,
+        label: "Peças de Qualidade",
+        description: "Reparos garantidos com peças M.A. (Mercado Alternativo/Compatíveis)",
+      },
     ],
   },
 ];

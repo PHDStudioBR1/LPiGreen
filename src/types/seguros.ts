@@ -14,13 +14,19 @@ export type SegurosStep = {
   icon: LucideIcon;
 };
 
+export type SegurosPlanFeature = {
+  icon: LucideIcon;
+  label: string;
+  description: string;
+};
+
 export type SegurosPlan = {
   id: string;
   name: string;
   price: string;
   priceNote: string;
   description: string;
-  features: string[];
+  features: SegurosPlanFeature[];
   highlighted?: boolean;
   badge?: string;
 };

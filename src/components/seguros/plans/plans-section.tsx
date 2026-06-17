@@ -1,10 +1,24 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { SEGUROS_PLANS } from "@/lib/seguros/data";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionStagger, fadeUp } from "@/components/seguros/ui/motion";
+
+const PLANS_DISCLAIMERS = [
+  {
+    title: "Variabilidade de preço",
+    text: "O valor final da mensalidade depende da análise do perfil de risco, incluindo fatores como CEP de pernoite, utilização de garagem e uso profissional do veículo.",
+  },
+  {
+    title: "Indenização",
+    text: "A indenização será calculada com base na Tabela FIPE vigente na data do sinistro.",
+  },
+  {
+    title: "Regulamentação",
+    text: "A iGreen é representante da BP Seguradora, conforme processo SUSEP nº 15414.659052/2024-88.",
+  },
+] as const;
 
 type PlansSectionProps = {
   onQuoteClick: () => void;
@@ -45,9 +59,16 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
 
               <ul className="space-y-3 mb-8 flex-grow">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-seguros-muted">
-                    <Check className="w-4 h-4 text-seguros-primary shrink-0 mt-0.5" />
-                    {feature}
+                  <li
+                    key={feature.label}
+                    className="flex items-start gap-2 text-sm text-seguros-muted"
+                  >
+                    <feature.icon className="w-4 h-4 text-seguros-primary shrink-0 mt-0.5" />
+                    <span>
+                      <span className="font-semibold text-seguros-text">{feature.label}</span>
+                      {feature.label.endsWith("+") ? " " : ": "}
+                      {feature.description}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -66,6 +87,19 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
             </motion.article>
           ))}
         </MotionStagger>
+
+        <div className="mt-10 sm:mt-14 max-w-4xl mx-auto space-y-4 border-t border-seguros-primary/10 pt-8 sm:pt-10">
+          {PLANS_DISCLAIMERS.map((item) => (
+            <div key={item.title}>
+              <p className="text-[11px] font-semibold text-seguros-muted sm:text-xs mb-1">
+                {item.title}
+              </p>
+              <p className="text-[11px] leading-relaxed text-seguros-muted/75 sm:text-xs">
+                {item.text}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
