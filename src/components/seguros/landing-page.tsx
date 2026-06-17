@@ -10,7 +10,6 @@ import { HowItWorksSection } from "@/components/seguros/how-it-works/how-it-work
 import { PlansSection } from "@/components/seguros/plans/plans-section";
 import { TestimonialsSection } from "@/components/seguros/testimonials/testimonials-section";
 import { AppDriverSection } from "@/components/seguros/app-driver/app-driver-section";
-import { AssistanceSection } from "@/components/seguros/assistance/assistance-section";
 import { FaqSection } from "@/components/seguros/faq/faq-section";
 import { FinalCtaSection } from "@/components/seguros/cta/final-cta-section";
 import { WhatsAppFloat } from "@/components/seguros/floating/whatsapp-float";
@@ -41,7 +40,6 @@ export function SegurosLandingPage() {
         <PlansSection onQuoteClick={openQuote} />
         <TestimonialsSection />
         <AppDriverSection onQuoteClick={openQuote} />
-        <AssistanceSection />
         <FaqSection />
         <FinalCtaSection onQuoteClick={openQuote} />
       </main>
