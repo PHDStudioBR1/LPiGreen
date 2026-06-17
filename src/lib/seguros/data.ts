@@ -394,8 +394,28 @@ export const SEGUROS_FAQ: SegurosFaqItem[] = [
 ];
 
 export const SEGUROS_APP_DRIVER_FEATURES = [
-  { icon: ShieldCheck, label: "Indenização completa" },
-  { icon: CreditCard, label: "Boleto mensal" },
-  { icon: Clock, label: "Assistência 24h" },
-  { icon: UserCheck, label: "Sem análise de perfil" },
+  {
+    icon: Clock,
+    label: "Indenização em até 30 dias*",
+    description:
+      "Para casos de roubo, furto ou perda total, após a entrega e aprovação de toda a documentação exigida.",
+  },
+  {
+    icon: FileCheck,
+    label: "Processo simplificado",
+    description:
+      "Sem burocracias excessivas e com análise focada nas informações do veículo e do perfil de utilização.",
+  },
+  {
+    icon: CreditCard,
+    label: "Pagamento mensal",
+    description:
+      "Assinatura recorrente via boleto ou PIX, facilitando o planejamento financeiro.",
+  },
+  {
+    icon: Wrench,
+    label: "Assistência 24 horas",
+    description:
+      "Guincho, chaveiro, troca de pneus e suporte sempre que você precisar.",
+  },
 ];
