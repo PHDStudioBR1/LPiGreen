@@ -339,21 +339,21 @@ export const SEGUROS_FAQ: SegurosFaqItem[] = [
   },
   {
     id: "2",
-    question: "Motoristas de aplicativo são aceitos?",
+    question: "Motoristas de Aplicativo são aceitos?",
     answer:
-      "Sim. Aceitamos motoristas de Uber, 99, iFood e demais apps de transporte e entrega sem análise de perfil adicional.",
+      "Sim! Aceitamos motoristas de aplicativos e táxis. Basta informar o uso profissional na cotação para que seu plano seja ajustado corretamente ao seu perfil de risco.",
   },
   {
     id: "3",
-    question: "Aceitam carro de leilão ou financiado?",
+    question: "Aceitam carros de Leilão ou financiado?",
     answer:
-      "Sim. Veículos adquiridos em leilão, financiados ou com restrição em seguradoras tradicionais podem ser segurados conosco.",
+      "Sim! Aceitamos veículos de leilão após aprovação em vistoria, com uma redução percentual na indenização da Tabela FIPE, conforme as regras da seguradora.",
   },
   {
     id: "4",
     question: "Quanto tempo leva para o seguro ficar ativo?",
     answer:
-      "Após o pagamento do primeiro boleto e envio das fotos do veículo, a ativação ocorre em até 10 minutos.",
+      "A proteção começa imediatamente após a confirmação do pagamento e a aceitação da proposta pela seguradora.",
   },
   {
     id: "5",
@@ -365,7 +365,7 @@ export const SEGUROS_FAQ: SegurosFaqItem[] = [
     id: "6",
     question: "Quais veículos podem ser segurados?",
     answer:
-      "Carros, motos e caminhões de passeio e comercial, incluindo veículos usados, de leilão e para uso em aplicativos.",
+      "Protegemos a grande maioria dos carros, motos e caminhões. Algumas marcas de luxo e veículos elétricos (exceto BYD) possuem restrições. Consulte a nossa lista de aceitação.",
   },
   {
     id: "7",
@@ -377,13 +377,13 @@ export const SEGUROS_FAQ: SegurosFaqItem[] = [
     id: "8",
     question: "O seguro é regulamentado?",
     answer:
-      "Sim. Operamos em parceria com seguradoras autorizadas pela SUSEP (Superintendência de Seguros Privados).",
+      "Sim. Operamos em parceria com a BP Seguradora, regulamentada pela SUSEP (Superintendência de Seguros Privados), com o código de registro: 15414.659052/2024-88",
   },
   {
     id: "9",
     question: "O que cobre o plano Basic?",
     answer:
-      "O plano Basic inclui cobertura contra roubo e furto, assistência 24h básica e guincho até 200 km, sem consulta SPC.",
+      "O plano Basic oferece proteção contra roubo, furto, perda total e danos a terceiros (RCF), além de assistência 24h com guincho de até 250 km (distância total).",
   },
   {
     id: "10",
