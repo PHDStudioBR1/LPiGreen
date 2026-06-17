@@ -62,6 +62,31 @@ spec:
               name: n8n-webhook-secret
               key: webhook-url
               optional: true
+        # Seguros → PHD CRM. Em DEV, mantenha PHDCRM_ENV=dev; para migrar, troque para prod e configure a senha de produção no Secret.
+        - name: PHDCRM_ENV
+          value: "dev"
+        - name: PHDCRM_TENANT_SLUG
+          value: "igreen"
+        - name: PHDCRM_DEV_BASE_URL
+          value: "https://phdcrmdev.546digitalservices.com"
+        - name: PHDCRM_DEV_EMAIL
+          value: "admin@igreen"
+        - name: PHDCRM_DEV_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: phdcrm-secret
+              key: dev-password
+              optional: true
+        - name: PHDCRM_PROD_BASE_URL
+          value: "https://phdcrm.546digitalservices.com"
+        - name: PHDCRM_PROD_EMAIL
+          value: "admin@igreen"
+        - name: PHDCRM_PROD_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: phdcrm-secret
+              key: prod-password
+              optional: true
         livenessProbe:
           httpGet:
             path: /

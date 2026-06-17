@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -36,6 +36,24 @@ const STEPS = [
   { id: 1, label: "Veículo" },
   { id: 2, label: "Seus dados" },
 ] as const;
+
+const SEGUROS_CRM_SESSION_STORAGE_KEY = "seguros-crm-lead-session";
+
+function createCrmSessionId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `seguros-${Date.now()}`;
+}
+
+function getOrCreateCrmSessionId(): string {
+  if (typeof window === "undefined") return createCrmSessionId();
+  const stored = sessionStorage.getItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
+  if (stored) return stored;
+  const next = createCrmSessionId();
+  sessionStorage.setItem(SEGUROS_CRM_SESSION_STORAGE_KEY, next);
+  return next;
+}
 
 function ArrowRightIcon() {
   return (
@@ -89,6 +107,9 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   const [values, setValues] = useState<SegurosQuoteFormValues>(SEGUROS_QUOTE_FORM_DEFAULTS);
   const [errors, setErrors] = useState<SegurosQuoteFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSyncingCrm, setIsSyncingCrm] = useState(false);
+  const [crmSessionId, setCrmSessionId] = useState("");
+  const [crmError, setCrmError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -97,6 +118,8 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     setValues(SEGUROS_QUOTE_FORM_DEFAULTS);
     setErrors({});
     setIsSubmitting(false);
+    setIsSyncingCrm(false);
+    setCrmError(null);
     setShowToast(false);
     setProgress(0);
   }, []);
@@ -117,6 +140,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    setCrmSessionId(getOrCreateCrmSessionId());
     const session = loadQuoteSessionFields();
     if (session) {
       setValues((current) => ({ ...current, ...session }));
@@ -158,13 +182,58 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
       delete next[field];
       return next;
     });
+    if (crmError) setCrmError(null);
   };
 
-  const goStep = (nextStep: 1 | 2) => {
+  const syncLeadToCrm = useCallback(
+    async (stepName: "vehicle" | "contact") => {
+      setIsSyncingCrm(true);
+      setCrmError(null);
+
+      try {
+        const sessionId = crmSessionId || getOrCreateCrmSessionId();
+        if (!crmSessionId) setCrmSessionId(sessionId);
+
+        const response = await fetch("/api/seguros/crm-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            step: stepName,
+            session_id: sessionId,
+            values,
+          }),
+        });
+
+        const body = await response.json().catch(() => null);
+        if (!response.ok || body?.success === false) {
+          throw new Error(body?.error || `CRM HTTP ${response.status}`);
+        }
+
+        return body?.data;
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message
+            ? error.message
+            : "Não foi possível registrar seus dados no CRM.";
+        setCrmError(message);
+        throw error;
+      } finally {
+        setIsSyncingCrm(false);
+      }
+    },
+    [crmSessionId, values]
+  );
+
+  const goStep = async (nextStep: 1 | 2) => {
     if (nextStep > step) {
       const stepErrors = validateQuoteStep(step, values);
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors);
+        return;
+      }
+      try {
+        await syncLeadToCrm("vehicle");
+      } catch {
         return;
       }
     }
@@ -184,8 +253,14 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     }
 
     setIsSubmitting(true);
-    setShowToast(true);
-    setProgress(15);
+    setCrmError(null);
+
+    try {
+      await syncLeadToCrm("contact");
+    } catch {
+      setIsSubmitting(false);
+      return;
+    }
 
     trackSegurosFormStep(2);
     trackSegurosFormSubmit({
@@ -193,16 +268,21 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
       vehicle_use: values.vehicleUse,
     });
 
-    const whatsappUrl = buildSegurosWhatsAppUrl(values, SEGUROS_WHATSAPP_URL);
+    setShowToast(true);
+    setProgress(15);
 
     await new Promise((resolve) => setTimeout(resolve, 400));
     setProgress(55);
     await new Promise((resolve) => setTimeout(resolve, 500));
     setProgress(100);
 
+    const whatsappUrl = buildSegurosWhatsAppUrl(values, SEGUROS_WHATSAPP_URL);
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
     await new Promise((resolve) => setTimeout(resolve, 900));
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
+    }
     handleClose();
   };
 
@@ -228,7 +308,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event: MouseEvent<HTMLDivElement>) => event.stopPropagation()}
           >
             <button
               type="button"
@@ -274,6 +354,12 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                 </div>
 
                 <div className="igf-body">
+                  {crmError && (
+                    <div className="igf-crm-error" role="alert">
+                      {crmError}
+                    </div>
+                  )}
+
                   {step === 1 && (
                     <div id="igf-ws-1">
                       <FormGroup id="w-grp-tipo" label="Tipo do veículo" error={errors.vehicleType}>
@@ -375,13 +461,19 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                       </FormGroup>
 
                       <div className="igf-btn-row">
-                        <button type="button" className="igf-btn igf-btn-green" onClick={() => goStep(2)}>
+                        <button
+                          type="button"
+                          className={`igf-btn igf-btn-green${isSyncingCrm ? " loading" : ""}`}
+                          onClick={() => void goStep(2)}
+                          disabled={isSyncingCrm}
+                        >
                           <span className="igf-btn-text" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            Continuar
+                            {isSyncingCrm ? "Registrando..." : "Continuar"}
                             <span className="igf-arrow">
                               <ArrowRightIcon />
                             </span>
                           </span>
+                          <span className="igf-spinner" />
                         </button>
                       </div>
                     </div>
@@ -472,7 +564,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                           type="button"
                           className={`igf-btn igf-btn-wpp${isSubmitting ? " loading" : ""}`}
                           onClick={handleSubmit}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isSyncingCrm}
                         >
                           <span className="igf-btn-text" style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <WhatsAppIcon />
