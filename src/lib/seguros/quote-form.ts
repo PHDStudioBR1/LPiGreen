@@ -54,6 +54,32 @@ export type SegurosQuoteFormValues = {
   plan: string;
 };
 
+export const SEGUROS_QUOTE_SESSION_STORAGE_KEY = "seguros-quote-form-session";
+
+export type SegurosQuoteSessionFields = Pick<SegurosQuoteFormValues, "name" | "phone">;
+
+export function loadQuoteSessionFields(): SegurosQuoteSessionFields | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(SEGUROS_QUOTE_SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SegurosQuoteSessionFields>;
+    if (typeof parsed.name !== "string" || typeof parsed.phone !== "string") return null;
+    return { name: parsed.name, phone: parsed.phone };
+  } catch {
+    return null;
+  }
+}
+
+export function persistQuoteSessionFields(fields: SegurosQuoteSessionFields): void {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(SEGUROS_QUOTE_SESSION_STORAGE_KEY, JSON.stringify(fields));
+  } catch {
+    // ignore
+  }
+}
+
 export const SEGUROS_QUOTE_FORM_DEFAULTS: SegurosQuoteFormValues = {
   vehicleType: "",
   plate: "",
@@ -120,6 +146,10 @@ export function validateQuoteStep(
   const errors: SegurosQuoteFieldErrors = {};
 
   if (step === 1) {
+    if (!values.name.trim()) errors.name = "Por favor, informe seu nome.";
+    if (values.phone.replace(/\D/g, "").length < 10) {
+      errors.phone = "Informe um telefone válido.";
+    }
     if (!values.vehicleType) errors.vehicleType = "Selecione o tipo de veículo.";
     if (values.plate.replace(/\W/g, "").length < 7) errors.plate = "Informe a placa.";
     if (!values.model.trim()) errors.model = "Informe marca e modelo.";

@@ -8,7 +8,9 @@ import { maskCep, maskCpfCnpj, maskPhone } from "@/lib/masks";
 import { SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
 import {
   buildSegurosWhatsAppUrl,
+  loadQuoteSessionFields,
   maskPlate,
+  persistQuoteSessionFields,
   SEGUROS_GARAGE_OPTIONS,
   SEGUROS_QUOTE_FORM_DEFAULTS,
   SEGUROS_QUOTE_PLANS,
@@ -118,6 +120,14 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    const session = loadQuoteSessionFields();
+    if (session) {
+      setValues((current) => ({ ...current, ...session }));
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -138,7 +148,13 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     field: K,
     value: SegurosQuoteFormValues[K]
   ) => {
-    setValues((current) => ({ ...current, [field]: value }));
+    setValues((current) => {
+      const next = { ...current, [field]: value };
+      if (field === "name" || field === "phone") {
+        persistQuoteSessionFields({ name: next.name, phone: next.phone });
+      }
+      return next;
+    });
     setErrors((current) => {
       if (!current[field]) return current;
       const next = { ...current };
@@ -336,6 +352,31 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                         </select>
                       </FormGroup>
 
+                      <FormGroup id="w-grp-nome-veiculo" label="Nome completo" error={errors.name}>
+                        <input
+                          id="w-grp-nome-veiculo-field"
+                          type="text"
+                          className={`igf-input${errors.name ? " error" : ""}`}
+                          placeholder="Seu nome completo"
+                          autoComplete="name"
+                          value={values.name}
+                          onChange={(event) => updateField("name", event.target.value)}
+                        />
+                      </FormGroup>
+
+                      <FormGroup id="w-grp-tel-veiculo" label="WhatsApp" error={errors.phone}>
+                        <input
+                          id="w-grp-tel-veiculo-field"
+                          type="tel"
+                          className={`igf-input${errors.phone ? " error" : ""}`}
+                          placeholder="(00) 00000-0000"
+                          maxLength={15}
+                          inputMode="numeric"
+                          value={values.phone}
+                          onChange={(event) => updateField("phone", maskPhone(event.target.value))}
+                        />
+                      </FormGroup>
+
                       <div className="igf-btn-row">
                         <button type="button" className="igf-btn igf-btn-green" onClick={() => goStep(2)}>
                           <span className="igf-btn-text" style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -355,11 +396,12 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                         <input
                           id="w-grp-nome-field"
                           type="text"
-                          className={`igf-input${errors.name ? " error" : ""}`}
+                          className={`igf-input igf-input-locked${errors.name ? " error" : ""}`}
                           placeholder="Seu nome completo"
                           autoComplete="name"
                           value={values.name}
-                          onChange={(event) => updateField("name", event.target.value)}
+                          readOnly
+                          aria-readonly="true"
                         />
                       </FormGroup>
 
@@ -393,12 +435,13 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                           <input
                             id="w-grp-tel-field"
                             type="tel"
-                            className={`igf-input${errors.phone ? " error" : ""}`}
+                            className={`igf-input igf-input-locked${errors.phone ? " error" : ""}`}
                             placeholder="(00) 00000-0000"
                             maxLength={15}
                             inputMode="numeric"
                             value={values.phone}
-                            onChange={(event) => updateField("phone", maskPhone(event.target.value))}
+                            readOnly
+                            aria-readonly="true"
                           />
                         </FormGroup>
 

@@ -294,6 +294,20 @@
   box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.08);
 }
 
+#igform-wrap .igf-input.igf-input-locked {
+  background: #eef5f0;
+  color: #5a7a6a;
+  cursor: not-allowed;
+  border-color: #dde8e2;
+  box-shadow: none;
+}
+
+#igform-wrap .igf-input.igf-input-locked:focus {
+  border-color: #dde8e2;
+  background: #eef5f0;
+  box-shadow: none;
+}
+
 #igform-wrap .igf-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300A040' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
