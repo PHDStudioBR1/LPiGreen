@@ -4,11 +4,9 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useExitIntent } from "@/hooks/seguros/use-exit-intent";
-import { SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
 import {
   trackSegurosExitIntent,
   trackSegurosQuoteClick,
-  trackSegurosWhatsAppClick,
 } from "@/lib/seguros/analytics";
 
 type ExitIntentPopupProps = {
@@ -71,28 +69,13 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
               Sem consulta SPC, sem fidelidade e aprovação em minutos. Não perca essa oportunidade.
             </p>
 
-            <div className="flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={handleQuote}
-                className="seguros-btn-primary h-12 rounded-xl font-extrabold"
-              >
-                Fazer Cotação Gratuita
-              </button>
-              <a
-                href={SEGUROS_WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  trackSegurosWhatsAppClick("exit_intent");
-                  trackSegurosExitIntent("whatsapp");
-                  handleDismiss();
-                }}
-                className="seguros-btn-outline h-12 rounded-xl font-bold inline-flex items-center justify-center"
-              >
-                Falar no WhatsApp
-              </a>
-            </div>
+            <button
+              type="button"
+              onClick={handleQuote}
+              className="seguros-btn-primary h-12 w-full rounded-xl font-extrabold"
+            >
+              Fazer Cotação Gratuita
+            </button>
           </motion.div>
         </>
       )}

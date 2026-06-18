@@ -10,9 +10,8 @@ import { HowItWorksSection } from "@/components/seguros/how-it-works/how-it-work
 import { PlansSection } from "@/components/seguros/plans/plans-section";
 import { TestimonialsSection } from "@/components/seguros/testimonials/testimonials-section";
 import { AppDriverSection } from "@/components/seguros/app-driver/app-driver-section";
+import { IgreenClubSection } from "@/components/seguros/igreen-club/igreen-club-section";
 import { FaqSection } from "@/components/seguros/faq/faq-section";
-import { FinalCtaSection } from "@/components/seguros/cta/final-cta-section";
-import { WhatsAppFloat } from "@/components/seguros/floating/whatsapp-float";
 import { StickyMobileBar } from "@/components/seguros/floating/sticky-mobile-bar";
 import { ScrollCta } from "@/components/seguros/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/seguros/floating/exit-intent-popup";
@@ -39,14 +38,13 @@ export function SegurosLandingPage() {
         <HowItWorksSection onQuoteClick={openQuote} />
         <PlansSection onQuoteClick={openQuote} />
         <TestimonialsSection />
+        <IgreenClubSection onQuoteClick={openQuote} />
         <AppDriverSection onQuoteClick={openQuote} />
         <FaqSection />
-        <FinalCtaSection onQuoteClick={openQuote} />
       </main>
 
       <SegurosFooter />
 
-      <WhatsAppFloat />
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />

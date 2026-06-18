@@ -99,16 +99,14 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className="group flex min-w-0 items-center gap-2.5 text-left"
+                className="group flex min-w-0 items-center text-left"
                 aria-label="Voltar ao início"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-seguros-primary text-xs font-extrabold text-seguros-bg transition-transform duration-200 group-hover:scale-105 sm:h-10 sm:w-10 sm:text-sm">
-                  iG
-                </span>
-                <span className="min-w-0 font-seguros-headline text-base font-extrabold leading-tight text-seguros-text sm:text-lg">
-                  <span className="block truncate">Seguro</span>
-                  <span className="block truncate text-seguros-primary">iGreen</span>
-                </span>
+                <img
+                  src="/images/seguros/logo-seguros-B8WMVJ8W.svg"
+                  alt="Seguro iGreen"
+                  className="h-8 w-auto transition-transform duration-200 group-hover:scale-105 sm:h-9"
+                />
               </button>
             </div>
 
