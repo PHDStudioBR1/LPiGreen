@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
-import { Poppins, Source_Sans_3 } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import {
   getBreadcrumbSchema,
   getFaqSchema,
   getInsuranceAgencySchema,
 } from "@/lib/seguros/seo";
 import { SEGURO_AUTO_SITE_URL } from "@/lib/seguro-auto/constants";
-import "../seguros/seguros.css";
 import "./seguro-auto.css";
 
-const sourceSans = Source_Sans_3({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-source-sans",
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
   display: "swap",
 });
 
-const poppins = Poppins({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["600", "700", "800", "900"],
-  variable: "--font-poppins",
+  weight: ["600", "700", "800"],
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
@@ -81,7 +80,7 @@ export default function SeguroAutoLayout({
   ];
 
   return (
-    <div className={`${sourceSans.variable} ${poppins.variable}`}>
+    <div className={`${inter.variable} ${plusJakarta.variable}`}>
       {schemas.map((schema, i) => (
         <script
           key={i}
