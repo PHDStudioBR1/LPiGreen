@@ -7,7 +7,7 @@ import { SEGUROS_HERO_BADGES } from "@/lib/seguros/constants";
 import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 import { fadeLeft } from "@/components/seguros/ui/motion";
 
-const HERO_BG = "/images/seguros/fundo_hero_pc.png";
+const HERO_BG = "/images/seguros/fundo_gl_seguros.png";
 
 type HeroSectionProps = {
   onQuoteClick: () => void;
@@ -19,23 +19,20 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
       id="inicio"
       className="relative overflow-hidden pt-[72px] lg:flex lg:min-h-[92vh] lg:items-center"
     >
-      {/* Fundo desktop — imagem em tela cheia */}
+      {/* Fundo — imagem em tela cheia */}
       <Image
         src={HERO_BG}
         alt=""
         fill
         priority
         sizes="100vw"
-        className="pointer-events-none hidden object-cover object-center lg:block"
+        className="pointer-events-none object-cover object-center"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-seguros-bg/50 via-transparent to-transparent lg:block"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-seguros-bg/60 via-seguros-bg/20 to-transparent lg:from-seguros-bg/50 lg:via-transparent"
         aria-hidden
       />
-
-      {/* Fundo mobile — gradiente sólido, sem sobrepor o conteúdo */}
-      <div className="pointer-events-none absolute inset-0 seguros-gradient-hero lg:hidden" aria-hidden />
 
       <div className="container relative z-10 mx-auto px-4 py-12 sm:px-6 sm:py-16 lg:py-24">
         <motion.div

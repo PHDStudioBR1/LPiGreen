@@ -28,9 +28,20 @@ export default {
         body: ['Inter', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
         'seguros-headline': ['var(--font-poppins)', 'Poppins', 'sans-serif'],
+        'sa-body': ['var(--font-source-sans)', 'Source Sans 3', 'sans-serif'],
+        'sa-headline': ['var(--font-source-sans)', 'Source Sans 3', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
+        sa: {
+          primary: '#0046C0',
+          'primary-hover': '#0039A0',
+          bg: '#FFFFFF',
+          surface: '#F5F5F5',
+          text: '#1A1A1A',
+          muted: '#666666',
+          border: '#E5E5E5',
+        },
         seguros: {
           primary: '#00C853',
           dark: '#061B12',
