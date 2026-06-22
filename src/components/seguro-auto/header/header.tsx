@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosNavClick, trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 import {
   SEGURO_AUTO_HEADER_OFFSET,
   SEGURO_AUTO_NAV_ITEMS,
@@ -37,7 +37,9 @@ export function Header({ onQuoteClick }: HeaderProps) {
 
   const scrollToSection = useCallback((href: string) => {
     if (!href.startsWith("#")) return;
-    const target = document.getElementById(href.slice(1));
+    const sectionId = href.slice(1);
+    trackSegurosNavClick(sectionId);
+    const target = document.getElementById(sectionId);
     if (!target) return;
     const top =
       target.getBoundingClientRect().top + window.scrollY - SEGURO_AUTO_HEADER_OFFSET;
@@ -45,8 +47,8 @@ export function Header({ onQuoteClick }: HeaderProps) {
     setIsMenuOpen(false);
   }, []);
 
-  const handleQuote = () => {
-    trackSegurosQuoteClick("header");
+  const handleQuote = (location: "header" | "header_mobile" = "header") => {
+    trackSegurosQuoteClick(location);
     onQuoteClick?.();
   };
 
@@ -104,7 +106,7 @@ export function Header({ onQuoteClick }: HeaderProps) {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <Button
-              onClick={handleQuote}
+              onClick={() => handleQuote("header")}
               className="hidden h-11 px-6 text-sm sm:inline-flex"
             >
               Cotar agora
@@ -172,7 +174,7 @@ export function Header({ onQuoteClick }: HeaderProps) {
                 fullWidth
                 onClick={() => {
                   setIsMenuOpen(false);
-                  handleQuote();
+                  handleQuote("header_mobile");
                 }}
                 className="mt-8 h-12"
               >

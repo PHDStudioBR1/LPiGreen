@@ -1,5 +1,6 @@
 export const SEGURO_AUTO_SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://igreen.com.br";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "https://centraldobeneficioenergia.com.br";
 
 export const SEGURO_AUTO_HEADER_OFFSET = 108;
 

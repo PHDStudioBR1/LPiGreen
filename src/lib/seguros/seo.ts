@@ -1,15 +1,28 @@
 import { SEGUROS_FAQ } from "@/lib/seguros/data";
 import { SEGUROS_SITE_URL } from "@/lib/seguros/constants";
 
-export function getInsuranceAgencySchema() {
+type SegurosPageSeo = {
+  siteUrl?: string;
+  pagePath?: string;
+  pageName?: string;
+};
+
+function resolveSiteUrl(siteUrl?: string) {
+  return siteUrl ?? SEGUROS_SITE_URL;
+}
+
+export function getInsuranceAgencySchema(options?: SegurosPageSeo) {
+  const siteUrl = resolveSiteUrl(options?.siteUrl);
+  const pagePath = options?.pagePath ?? "/seguros";
+
   return {
     "@context": "https://schema.org",
     "@type": "InsuranceAgency",
     name: "Seguro iGreen",
     description:
       "Seguro para carro, moto e caminhão sem consulta SPC/Serasa, sem análise de perfil e sem fidelidade.",
-    url: `${SEGUROS_SITE_URL}/seguros`,
-    logo: `${SEGUROS_SITE_URL}/favicon.svg`,
+    url: `${siteUrl}${pagePath}`,
+    logo: `${siteUrl}/favicon.svg`,
     areaServed: {
       "@type": "Country",
       name: "Brasil",
@@ -35,7 +48,11 @@ export function getFaqSchema() {
   };
 }
 
-export function getBreadcrumbSchema() {
+export function getBreadcrumbSchema(options?: SegurosPageSeo) {
+  const siteUrl = resolveSiteUrl(options?.siteUrl);
+  const pagePath = options?.pagePath ?? "/seguros";
+  const pageName = options?.pageName ?? "Seguro iGreen";
+
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -44,13 +61,13 @@ export function getBreadcrumbSchema() {
         "@type": "ListItem",
         position: 1,
         name: "Início",
-        item: SEGUROS_SITE_URL,
+        item: siteUrl,
       },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Seguro iGreen",
-        item: `${SEGUROS_SITE_URL}/seguros`,
+        name: pageName,
+        item: `${siteUrl}${pagePath}`,
       },
     ],
   };

@@ -74,9 +74,16 @@ export default function SeguroAutoLayout({
   children: React.ReactNode;
 }>) {
   const schemas = [
-    getInsuranceAgencySchema(),
+    getInsuranceAgencySchema({
+      siteUrl: SEGURO_AUTO_SITE_URL,
+      pagePath: "/seguro-auto",
+    }),
     getFaqSchema(),
-    getBreadcrumbSchema(),
+    getBreadcrumbSchema({
+      siteUrl: SEGURO_AUTO_SITE_URL,
+      pagePath: "/seguro-auto",
+      pageName: "Seguro Auto iGreen",
+    }),
   ];
 
   return (
