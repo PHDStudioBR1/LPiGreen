@@ -40,6 +40,20 @@ type CrmLead = {
   tags?: Array<string | { name?: string }>;
 };
 
+type CrmUser = {
+  id: number;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+};
+
+type RandomServiceRepresentative = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+};
+
 type CrmResponse<T = unknown> = {
   success?: boolean;
   data?: T;
@@ -319,6 +333,39 @@ async function mergeTags(config: CrmConfig, lead: CrmLead, step: SegurosCrmStep)
   return existingTagNames(result.data || { id: lead.id, tags: merged });
 }
 
+async function fetchNextRepresentative(
+  leadName: string,
+  leadPhone: string
+): Promise<RandomServiceRepresentative | null> {
+  const res = await fetch("http://random-service-api/next", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome_lead: leadName, telefone: leadPhone, segmento: "seguros" }),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`random-service HTTP ${res.status}`);
+  const body = (await res.json()) as { representative?: RandomServiceRepresentative };
+  if (!body.representative) throw new Error("random-service: representative ausente na resposta");
+  return body.representative;
+}
+
+async function findCrmUserIdByEmail(config: CrmConfig, email: string): Promise<number | null> {
+  const encoded = encodeURIComponent(email.toLowerCase().trim());
+  const body = await crmRequest<CrmUser[]>(config, `/api/crm/v1/users?search=${encoded}&limit=20`, {
+    method: "GET",
+  });
+  const users = Array.isArray(body.data) ? body.data : [];
+  const match = users.find((u) => u.email?.toLowerCase() === email.toLowerCase().trim());
+  return match?.id ?? null;
+}
+
+async function assignResponsavel(config: CrmConfig, leadId: number, responsavelId: number): Promise<void> {
+  await crmRequest(config, `/api/crm/v1/leads/${leadId}`, {
+    method: "PUT",
+    body: JSON.stringify({ responsavel_id: responsavelId }),
+  });
+}
+
 async function createActivity(config: CrmConfig, leadId: number, payload: SegurosCrmPayload) {
   const auth = await login(config);
   const title =
@@ -374,6 +421,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let responsavelAssigned: { userId: number; representativeName: string } | null = null;
+    if (payload.step === "contact") {
+      const leadName = cleanString(payload.values?.name, 180);
+      const leadPhone = onlyDigits(payload.values?.phone);
+      try {
+        const representative = await fetchNextRepresentative(leadName, leadPhone);
+        if (representative?.email) {
+          const userId = await findCrmUserIdByEmail(config, representative.email);
+          if (userId != null) {
+            await assignResponsavel(config, lead.id, userId);
+            responsavelAssigned = { userId, representativeName: representative.name };
+          } else {
+            console.warn(
+              `Seguros CRM responsavel: usuário CRM não encontrado para email ${representative.email}`
+            );
+          }
+        } else {
+          console.warn("Seguros CRM responsavel: representante sem email, atribuição ignorada");
+        }
+      } catch (responsavelError) {
+        console.error(
+          "Seguros CRM responsavel:",
+          responsavelError instanceof Error ? responsavelError.message : responsavelError
+        );
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -381,6 +455,7 @@ export async function POST(request: NextRequest) {
         lead_id: lead.id,
         tags,
         activity_created: activityCreated,
+        responsavel_assigned: responsavelAssigned,
       },
     });
   } catch (error) {
