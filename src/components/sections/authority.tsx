@@ -1,9 +1,7 @@
 "use client"
 
 import React from 'react';
-import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
 
 const NEWS_ITEMS = [
   {
@@ -24,7 +22,13 @@ const NEWS_ITEMS = [
   },
 ];
 
-export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
+export function AuthoritySection({
+  onCTAClick,
+  onNewsClick,
+}: {
+  onCTAClick?: () => void;
+  onNewsClick?: () => void;
+}) {
   return (
     <section className="py-20 bg-white dark:bg-neutral-950 border-y border-border dark:border-neutral-800">
       <div className="container mx-auto px-6">
@@ -43,8 +47,13 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
 
         <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
           {NEWS_ITEMS.map((item) => (
-            <Link key={item.outlet} href="/formulario">
-              <Card className="group overflow-hidden rounded-2xl border border-border dark:border-neutral-800 shadow-lg hover:shadow-xl transition-shadow h-full bg-white dark:bg-neutral-900">
+            <button
+              key={item.outlet}
+              type="button"
+              onClick={onNewsClick}
+              className="group w-full text-left"
+            >
+              <Card className="overflow-hidden rounded-2xl border border-border dark:border-neutral-800 shadow-lg hover:shadow-xl transition-shadow h-full bg-white dark:bg-neutral-900">
                 <CardContent className="flex h-full flex-col justify-between p-6 space-y-4">
                   <div className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
                     {item.outlet}
@@ -55,7 +64,7 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
                   <div className="flex items-center gap-2 text-sm font-bold text-primary mt-2"></div>
                 </CardContent>
               </Card>
-            </Link>
+            </button>
           ))}
         </div>
 
@@ -64,12 +73,13 @@ export function AuthoritySection({ onCTAClick }: { onCTAClick?: () => void }) {
         </p>
         {onCTAClick && (
           <div className="mt-6 text-center">
-            <Link
-              href="/formulario"
+            <button
+              type="button"
+              onClick={onCTAClick}
               className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
             >
               Quero economizar na conta de luz
-            </Link>
+            </button>
           </div>
         )}
       </div>

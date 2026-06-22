@@ -27,9 +27,30 @@ export default {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
+        'seguros-headline': ['var(--font-poppins)', 'Poppins', 'sans-serif'],
+        'sa-body': ['var(--font-inter)', 'Inter', 'sans-serif'],
+        'sa-headline': ['var(--font-plus-jakarta)', 'Plus Jakarta Sans', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
+        sa: {
+          primary: '#0046C0',
+          'primary-hover': '#0039A0',
+          bg: '#FFFFFF',
+          surface: '#F7F8FA',
+          text: '#1A1A1A',
+          muted: '#6B7280',
+          border: '#E8EAED',
+        },
+        seguros: {
+          primary: '#00C853',
+          dark: '#061B12',
+          secondary: '#0D3D2A',
+          accent: '#9FFFCE',
+          bg: '#020B07',
+          text: '#FFFFFF',
+          muted: '#B7C9C0',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

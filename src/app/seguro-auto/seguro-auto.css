@@ -1,0 +1,33 @@
+html:has(.seguro-auto-page) {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.seguro-auto-page) {
+    scroll-behavior: auto;
+  }
+
+  .seguro-auto-page *,
+  .seguro-auto-page *::before,
+  .seguro-auto-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.seguro-auto-page [id] {
+  scroll-margin-top: 7rem;
+}
+
+.seguro-auto-page {
+  --sa-primary: #0046c0;
+  --sa-primary-hover: #0039a0;
+  --sa-bg: #ffffff;
+  --sa-surface: #f7f8fa;
+  --sa-text: #1a1a1a;
+  --sa-muted: #6b7280;
+  --sa-border: #e8eaed;
+  background-color: var(--sa-bg);
+  color: var(--sa-text);
+}

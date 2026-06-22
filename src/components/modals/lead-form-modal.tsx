@@ -356,7 +356,15 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
           },
         });
 
-        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(`ANEEL distribuidoras: HTTP ${res.status}`);
+        }
+
+        const json = await res.json().catch(() => null);
+        if (!json) {
+          throw new Error("ANEEL distribuidoras: resposta vazia ou inválida");
+        }
+
         const records: AneelDistribuidora[] = json?.result?.records ?? [];
 
         // Deduplica por nome e remove registros "Não Informado"

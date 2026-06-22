@@ -1,6 +1,7 @@
 import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { GoogleTag } from '@/components/analytics/google-tag';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({
@@ -14,7 +15,11 @@ export const metadata: Metadata = {
   description:
     'Descubra como economizar até 50% na sua conta de luz usando energia limpa por assinatura. Sem obras e sem investimento. Garantido pela Lei 14.300/2022.',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
   },
 };
 
@@ -30,8 +35,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
-      <body className="font-body antialiased bg-background text-foreground overflow-x-hidden w-full min-w-0">
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+      <body
+        className="font-body antialiased bg-background text-foreground overflow-x-hidden w-full min-w-0"
+        suppressHydrationWarning
+      >
+        <GoogleTag />
         {children}
         <Toaster />
       </body>

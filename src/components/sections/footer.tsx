@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export function Footer({ onCTAClick }: { onCTAClick?: () => void }) {
   return (
@@ -19,12 +19,12 @@ export function Footer({ onCTAClick }: { onCTAClick?: () => void }) {
           </p>
           {onCTAClick && (
             <div className="pt-4">
-              <Link
-                href="/formulario"
+              <Button
+                onClick={onCTAClick}
                 className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
               >
                 Faça parte da transição energética
-              </Link>
+              </Button>
             </div>
           )}
         </div>
