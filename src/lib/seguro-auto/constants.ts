@@ -14,9 +14,8 @@ export const SEGURO_AUTO_UTILITY_LINKS = [
 ] as const;
 
 export const SEGURO_AUTO_NAV_ITEMS = [
-  { label: "Benefícios", href: "#beneficios" },
+  { label: "Vantagens", href: "#vantagens" },
   { label: "Comparativo", href: "#comparacao" },
-  { label: "Como Funciona", href: "#como-funciona" },
   { label: "Planos", href: "#planos" },
   { label: "Depoimentos", href: "#depoimentos" },
   { label: "FAQ", href: "#faq" },

@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import { trackSegurosPageView } from "@/lib/seguros/analytics";
 import { Header } from "@/components/seguro-auto/header/header";
 import { HeroSection } from "@/components/seguro-auto/hero/hero-section";
-import { TrustBar } from "@/components/seguro-auto/sections/trust-bar";
 import { PlansShowcase } from "@/components/seguro-auto/sections/plans-showcase";
-import { ProductsGrid } from "@/components/seguro-auto/sections/products-grid";
 import { BenefitsSection } from "@/components/seguro-auto/sections/benefits-section";
 import { ComparisonSection } from "@/components/seguro-auto/sections/comparison-section";
-import { HowItWorksSection } from "@/components/seguro-auto/sections/how-it-works-section";
 import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { ClubSection } from "@/components/seguro-auto/sections/club-section";
 import { AppSection } from "@/components/seguro-auto/sections/app-section";
@@ -35,12 +32,9 @@ export function SeguroAutoLandingPage() {
 
       <main className="pb-20 md:pb-0">
         <HeroSection onQuoteClick={openQuote} />
-        <TrustBar />
-        <PlansShowcase />
-        <ProductsGrid onQuoteClick={openQuote} />
         <BenefitsSection />
+        <PlansShowcase />
         <ComparisonSection onQuoteClick={openQuote} />
-        <HowItWorksSection onQuoteClick={openQuote} />
         <TestimonialsSection />
         <ClubSection onQuoteClick={openQuote} />
         <AppSection onQuoteClick={openQuote} />

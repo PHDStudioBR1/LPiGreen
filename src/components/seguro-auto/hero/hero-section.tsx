@@ -34,19 +34,9 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
               Conte com um seguro digital com pagamento mensal, sem consulta ao SPC, sem fidelidade e com assistência 24h —
               contratação 100% online em minutos.
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-10">
               <Button onClick={handleQuote} className="h-12 px-8 text-base">
                 Fazer cotação
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  const el = document.getElementById("planos");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="h-12 px-8 text-base"
-              >
-                Ver planos
               </Button>
             </div>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-sa-muted">

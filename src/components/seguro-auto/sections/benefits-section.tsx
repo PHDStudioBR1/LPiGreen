@@ -8,11 +8,11 @@ import { MotionBlock, MotionStagger, MotionItem } from "@/components/seguro-auto
 
 export function BenefitsSection() {
   return (
-    <section id="beneficios" className="bg-sa-surface/60 py-20 md:py-28">
+    <section id="vantagens" className="bg-sa-surface/60 py-20 md:py-28">
       <Container>
         <MotionBlock>
           <SectionHeading
-            eyebrow="Benefícios"
+            eyebrow="Vantagens"
             title="Vantagens e serviços exclusivos"
             description="Tudo o que você precisa para rodar com tranquilidade, em um único seguro digital."
           />
