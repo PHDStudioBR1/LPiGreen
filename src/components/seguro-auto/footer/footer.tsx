@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/seguro-auto/ui/container";
 
 export function Footer() {
@@ -11,22 +12,20 @@ export function Footer() {
             className="h-8 w-auto opacity-80"
           />
           <p className="max-w-2xl text-sm leading-relaxed text-sa-muted">
-            Produtos oferecidos por parceiros autorizados pela SUSEP. Consulte condições e
-            coberturas antes da contratação.
+            Produtos oferecidos por licenciado independente Igreen, representante da BP Seguradora
+            S.A. regulamentado pela SUSEP 15414.659052/2024-88. Consulte condições e coberturas
+            antes da contratação.
           </p>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-sa-muted">
-            <a href="#" className="transition-colors hover:text-sa-primary">
+            <Link href="/seguro-auto/politicadeprivacidade" className="transition-colors hover:text-sa-primary">
               Política de privacidade
-            </a>
-            <a href="#" className="transition-colors hover:text-sa-primary">
+            </Link>
+            <Link href="/seguro-auto/termosdeuso" className="transition-colors hover:text-sa-primary">
               Termos de uso
-            </a>
-            <a href="#" className="transition-colors hover:text-sa-primary">
-              Regulamentação SUSEP
-            </a>
+            </Link>
           </div>
           <p className="text-xs text-sa-muted/70">
-            © {new Date().getFullYear()} iGreen Energy LTDA. Todos os direitos reservados.
+            © 2026 representanteigreen Todos os direitos reservados.
           </p>
         </div>
       </Container>
