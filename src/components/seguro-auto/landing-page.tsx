@@ -10,7 +10,6 @@ import { ProductsGrid } from "@/components/seguro-auto/sections/products-grid";
 import { BenefitsSection } from "@/components/seguro-auto/sections/benefits-section";
 import { ComparisonSection } from "@/components/seguro-auto/sections/comparison-section";
 import { HowItWorksSection } from "@/components/seguro-auto/sections/how-it-works-section";
-import { PlansSection } from "@/components/seguro-auto/sections/plans-section";
 import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { ClubSection } from "@/components/seguro-auto/sections/club-section";
 import { AppSection } from "@/components/seguro-auto/sections/app-section";
@@ -42,7 +41,6 @@ export function SeguroAutoLandingPage() {
         <BenefitsSection />
         <ComparisonSection onQuoteClick={openQuote} />
         <HowItWorksSection onQuoteClick={openQuote} />
-        <PlansSection onQuoteClick={openQuote} />
         <TestimonialsSection />
         <ClubSection onQuoteClick={openQuote} />
         <AppSection onQuoteClick={openQuote} />
