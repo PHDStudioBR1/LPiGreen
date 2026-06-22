@@ -1,21 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "seguros-exit-intent-dismissed";
 
+function hasSeenExitIntent(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markExitIntentSeen(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
+
 export function useExitIntent() {
   const [show, setShow] = useState(false);
+  const seenRef = useRef(false);
 
   useEffect(() => {
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
-    } catch {
-      // ignore
+    if (hasSeenExitIntent()) {
+      seenRef.current = true;
+      return;
     }
 
     const onMouseLeave = (e: MouseEvent) => {
-      if (e.clientY > 0) return;
+      if (seenRef.current || e.clientY > 0) return;
+      seenRef.current = true;
+      markExitIntentSeen();
       setShow(true);
     };
 
@@ -23,14 +41,11 @@ export function useExitIntent() {
     return () => document.removeEventListener("mouseleave", onMouseLeave);
   }, []);
 
-  const dismiss = () => {
+  const dismiss = useCallback(() => {
+    seenRef.current = true;
+    markExitIntentSeen();
     setShow(false);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      // ignore
-    }
-  };
+  }, []);
 
   return { show, dismiss, setShow };
 }
