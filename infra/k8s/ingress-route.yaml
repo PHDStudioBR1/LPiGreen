@@ -3,7 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: lpigreen-http
-  namespace: phdstudio
+  namespace: lpigreen
 spec:
   entryPoints:
     - web
@@ -16,14 +16,14 @@ spec:
           port: 80
       middlewares:
         - name: redirect-https
-          namespace: phdstudio
+          namespace: lpigreen
 ---
 # IngressRoute HTTPS (rotas principais com TLS)
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: lpigreen-https
-  namespace: phdstudio
+  namespace: lpigreen
 spec:
   entryPoints:
     - websecure
@@ -36,7 +36,7 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
     # CRM Admin: login, logout, me, export -> frontend (Next.js)
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/admin`)
       kind: Rule
@@ -45,7 +45,7 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
     # /api/representantes -> frontend (Next.js), usado pelo CRM na edição de lead
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/representantes`)
       kind: Rule
@@ -54,7 +54,7 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
     # /api/seguros -> frontend (Next.js), integração server-side com o PHD CRM
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/seguros`)
       kind: Rule
@@ -63,7 +63,7 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
     # Demais /api (/api/health, /api/aneel/distribuidoras, etc.) -> backend
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api`)
       kind: Rule
@@ -72,7 +72,7 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
     # Frontend (web)
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/`)
       kind: Rule
@@ -81,9 +81,9 @@ spec:
           port: 80
       middlewares:
         - name: security-headers
-          namespace: phdstudio
+          namespace: lpigreen
         - name: compress
-          namespace: phdstudio
+          namespace: lpigreen
   tls:
     certResolver: le
     domains:

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lpigreen-web
-  namespace: phdstudio
+  namespace: lpigreen
   labels:
     app: lpigreen-web
 spec:
@@ -33,7 +33,9 @@ spec:
         - name: HOSTNAME
           value: "0.0.0.0"
         - name: LEAD_API_URL
-          value: "http://api-service"
+          value: "http://api-service.phdstudio.svc.cluster.local"
+        - name: RANDOM_SERVICE_URL
+          value: "http://random-service-api.phdstudio.svc.cluster.local"
         - name: LEAD_API_KEY
           valueFrom:
             secretKeyRef:
@@ -113,7 +115,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-service
-  namespace: phdstudio
+  namespace: lpigreen
   labels:
     app: lpigreen-web
 spec:

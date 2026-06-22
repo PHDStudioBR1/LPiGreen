@@ -337,7 +337,8 @@ async function fetchNextRepresentative(
   leadName: string,
   leadPhone: string
 ): Promise<RandomServiceRepresentative | null> {
-  const res = await fetch("http://random-service-api/next", {
+  const randomServiceUrl = process.env.RANDOM_SERVICE_URL ?? "http://random-service-api";
+  const res = await fetch(`${randomServiceUrl}/next`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nome_lead: leadName, telefone: leadPhone, segmento: "seguros" }),

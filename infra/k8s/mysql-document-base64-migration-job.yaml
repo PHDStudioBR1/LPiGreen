@@ -5,7 +5,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: mysql-document-base64-migration
-  namespace: phdstudio
+  namespace: lpigreen
 spec:
   ttlSecondsAfterFinished: 300
   template:
