@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
 import {
@@ -109,16 +109,6 @@ export function Header({ onQuoteClick }: HeaderProps) {
             >
               Cotar agora
             </Button>
-
-            <button
-              type="button"
-              className="hidden items-center gap-2.5 text-sm font-medium text-sa-text transition-colors hover:text-sa-primary lg:inline-flex"
-            >
-              Área do cliente
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-sa-border bg-white">
-                <User className="h-4 w-4" aria-hidden />
-              </span>
-            </button>
 
             <button
               type="button"
