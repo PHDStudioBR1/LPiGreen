@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lpigreen-web
-  namespace: phdstudio
+  namespace: phdcrm-dev
   labels:
     app: lpigreen-web
 spec:
@@ -20,7 +20,7 @@ spec:
         - name: lpigreen-registry
       containers:
       - name: web
-        image: donavanalencar/lpigreen-web:latest
+        image: donavanalencar/lpigreen-web:develop
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -33,7 +33,7 @@ spec:
         - name: HOSTNAME
           value: "0.0.0.0"
         - name: LEAD_API_URL
-          value: "http://api-service"
+          value: "http://api-dev-service"
         - name: LEAD_API_KEY
           valueFrom:
             secretKeyRef:
@@ -64,7 +64,7 @@ spec:
               optional: true
         # Seguros → PHD CRM. Em DEV, mantenha PHDCRM_ENV=dev; para migrar, troque para prod e configure a senha de produção no Secret.
         - name: PHDCRM_ENV
-          value: "prod"
+          value: "dev"
         - name: PHDCRM_TENANT_SLUG
           value: "igreen"
         - name: PHDCRM_DEV_BASE_URL
@@ -113,7 +113,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-service
-  namespace: phdstudio
+  namespace: phdcrm-dev
   labels:
     app: lpigreen-web
 spec:

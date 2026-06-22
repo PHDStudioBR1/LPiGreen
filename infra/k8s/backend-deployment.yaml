@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lpigreen-api
-  namespace: phdstudio
+  namespace: phdcrm-dev
   labels:
     app: lpigreen-api
 spec:
@@ -19,7 +19,7 @@ spec:
         - name: lpigreen-registry
       containers:
         - name: api
-          image: donavanalencar/lpigreen-api:latest
+          image: donavanalencar/lpigreen-api:develop
           imagePullPolicy: Always
           ports:
             - containerPort: 3001
@@ -131,8 +131,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-service
-  namespace: phdstudio
+  name: api-dev-service
+  namespace: phdcrm-dev
   labels:
     app: lpigreen-api
 spec:
