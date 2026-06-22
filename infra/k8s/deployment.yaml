@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lpigreen-web
-  namespace: lpigreen
+  namespace: phdstudio
   labels:
     app: lpigreen-web
 spec:
@@ -64,7 +64,7 @@ spec:
               optional: true
         # Seguros → PHD CRM. Em DEV, mantenha PHDCRM_ENV=dev; para migrar, troque para prod e configure a senha de produção no Secret.
         - name: PHDCRM_ENV
-          value: "dev"
+          value: "prod"
         - name: PHDCRM_TENANT_SLUG
           value: "igreen"
         - name: PHDCRM_DEV_BASE_URL
@@ -113,7 +113,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-service
-  namespace: lpigreen
+  namespace: phdstudio
   labels:
     app: lpigreen-web
 spec:
