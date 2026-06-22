@@ -13,7 +13,7 @@ type AppSectionProps = {
 
 export function AppSection({ onQuoteClick }: AppSectionProps) {
   return (
-    <section className="bg-sa-surface/60 py-20 md:py-28">
+    <section id="motorista-app" className="bg-sa-surface/60 py-20 md:py-28">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <MotionBlock
@@ -24,9 +24,9 @@ export function AppSection({ onQuoteClick }: AppSectionProps) {
           >
             <SectionHeading
               align="left"
-              eyebrow="+ praticidade"
-              title="Baixe o app com todo o cuidado iGreen"
-              description="O aplicativo que tem tudo que você precisa: assistência 24 horas, gestão da apólice, sinistros e muito mais."
+              eyebrow="Para Motoristas de App"
+              title="Motorista de Uber, 99 ou iFood? Aqui você é bem-vindo."
+              description="A iGreen oferece proteção também para motoristas de aplicativo. Diferente de muitos seguros tradicionais, o processo é simples e descomplicado: basta informar corretamente o uso profissional do veículo no momento da cotação para garantir sua cobertura."
               className="mb-8 md:mb-10"
             />
             <ul className="space-y-5">
@@ -47,16 +47,34 @@ export function AppSection({ onQuoteClick }: AppSectionProps) {
                 );
               })}
             </ul>
+
+            <div className="mt-8 space-y-3">
+              <h3 className="font-sa-headline text-lg font-bold text-sa-text">
+                Cotação para motoristas de app
+              </h3>
+              <p className="text-sm leading-relaxed text-sa-muted">
+                <strong className="font-semibold text-sa-text">Importante:</strong> Ao solicitar sua
+                cotação, informe que utiliza o veículo para aplicativo. O uso profissional é
+                considerado no cálculo da mensalidade e a informação correta é essencial para
+                garantir a validade da sua cobertura em caso de sinistro.
+              </p>
+            </div>
+
             <div className="mt-10">
               <Button
                 onClick={() => {
-                  trackSegurosQuoteClick("app");
+                  trackSegurosQuoteClick("app_driver");
                   onQuoteClick?.();
                 }}
               >
-                Cotar pelo app
+                Cotar para Motorista de App
               </Button>
             </div>
+
+            <p className="mt-4 text-xs leading-relaxed text-sa-muted">
+              * O prazo de até 30 dias para indenização começa a contar após a entrega completa e
+              aprovação dos documentos exigidos pela seguradora.
+            </p>
           </MotionBlock>
 
           <MotionBlock
@@ -69,8 +87,8 @@ export function AppSection({ onQuoteClick }: AppSectionProps) {
           >
             <img
               src="/images/seguros/Seguro-iGreen-apps.webp"
-              alt="Aplicativo Seguro iGreen"
-              className="max-h-[480px] w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.12)]"
+              alt="Seguro iGreen para motoristas de aplicativo"
+              className="max-h-[520px] w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.12)]"
             />
           </MotionBlock>
         </div>

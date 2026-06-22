@@ -18,6 +18,8 @@ export const SEGURO_AUTO_NAV_ITEMS = [
   { label: "Comparativo", href: "#comparacao" },
   { label: "Planos", href: "#planos" },
   { label: "Depoimentos", href: "#depoimentos" },
+  { label: "Clube de Benefícios", href: "#igreen-club" },
+  { label: "Motoristas de App", href: "#motorista-app" },
   { label: "FAQ", href: "#faq" },
 ] as const;
 
