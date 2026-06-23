@@ -66,7 +66,7 @@ spec:
               optional: true
         # Seguros → PHD CRM. Em DEV, mantenha PHDCRM_ENV=dev; para migrar, troque para prod e configure a senha de produção no Secret.
         - name: PHDCRM_ENV
-          value: "prod"
+          value: "dev"
         - name: PHDCRM_TENANT_SLUG
           value: "igreen"
         - name: PHDCRM_DEV_BASE_URL
