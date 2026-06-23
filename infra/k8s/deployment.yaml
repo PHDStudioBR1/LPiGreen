@@ -33,9 +33,9 @@ spec:
         - name: HOSTNAME
           value: "0.0.0.0"
         - name: LEAD_API_URL
-          value: "http://api-service.phdstudio.svc.cluster.local"
+          value: "http://api-dev-service.phdcrm-dev.svc.cluster.local"
         - name: RANDOM_SERVICE_URL
-          value: "http://random-service-api.phdstudio.svc.cluster.local"
+          value: "http://random-service-api.phdcrm-dev.svc.cluster.local"
         - name: LEAD_API_KEY
           valueFrom:
             secretKeyRef:
