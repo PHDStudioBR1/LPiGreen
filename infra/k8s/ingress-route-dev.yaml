@@ -1,14 +1,14 @@
-# IngressRoute HTTP (redireciona para HTTPS, exceto ACME challenge)
+# IngressRoute HTTP DEV (redireciona para HTTPS, exceto ACME challenge)
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: lpigreen-http
+  name: lpigreen-dev-http
   namespace: lpigreen
 spec:
   entryPoints:
     - web
   routes:
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
       kind: Rule
       services:
         - name: web-service
@@ -17,17 +17,17 @@ spec:
         - name: redirect-https
           namespace: lpigreen
 ---
-# IngressRoute HTTPS (rotas principais com TLS)
+# IngressRoute HTTPS DEV (rotas principais com TLS)
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: lpigreen-https
+  name: lpigreen-dev-https
   namespace: lpigreen
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/leads`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
         - name: web-service
@@ -35,7 +35,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/admin`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/admin`)
       kind: Rule
       services:
         - name: web-service
@@ -43,7 +43,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/representantes`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
       kind: Rule
       services:
         - name: web-service
@@ -51,7 +51,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/seguros`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/seguros`)
       kind: Rule
       services:
         - name: web-service
@@ -59,7 +59,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api`)
       kind: Rule
       services:
         - name: api-service
@@ -67,7 +67,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
       kind: Rule
       services:
         - name: web-service
@@ -80,6 +80,4 @@ spec:
   tls:
     certResolver: le
     domains:
-      - main: lpigreen.546digitalservices.com
-      - main: centraldobeneficioenergia.com.br
-      - main: representanteigreen.com.br
+      - main: lpigreendev.546digitalservices.com
