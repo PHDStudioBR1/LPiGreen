@@ -12,6 +12,7 @@ on:
 
 env:
   DOCKER_REGISTRY: donavanalencar
+  K8S_NAMESPACE: lpigreen
 
 jobs:
   validate:
@@ -116,15 +117,13 @@ jobs:
           cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.ref == 'refs/heads/main' && 'latest' || 'develop' }}
           cache-to: type=inline
 
-  # ─── PRODUÇÃO (main → phdstudio) ───────────────────────────────────────────
+  # ─── PRODUÇÃO (main) ──────────────────────────────────────────────────────
   deploy-prod:
-    name: Deploy - Produção (phdstudio)
+    name: Deploy - Produção
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
-    env:
-      K8S_NAMESPACE: phdstudio
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -194,13 +193,9 @@ jobs:
             api=${{ needs.build.outputs.api_image }} \
             -n ${{ env.K8S_NAMESPACE }}
           if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
-            echo "❌ Rollout da API falhou. Diagnóstico:"
             kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
-            kubectl describe deployment lpigreen-api -n ${{ env.K8S_NAMESPACE }}
             for POD in $(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o jsonpath='{.items[*].metadata.name}'); do
-              echo "=== logs pod/$POD ==="
               kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --tail=80 || true
-              kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --previous --tail=80 2>/dev/null || true
             done
             exit 1
           fi
@@ -213,9 +208,7 @@ jobs:
               --from-literal=admin-password="${{ secrets.ADMIN_PASSWORD }}" \
               --from-literal=admin-jwt-secret="${{ secrets.ADMIN_JWT_SECRET }}" \
               --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
-            echo "✅ admin-secret atualizado."
           else
-            echo "⚠️ ADMIN_USER, ADMIN_PASSWORD ou ADMIN_JWT_SECRET não configurados. Aplicando exemplo."
             kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
           fi
 
@@ -243,15 +236,13 @@ jobs:
           echo "=== IngressRoutes ==="
           kubectl get ingressroute -n ${{ env.K8S_NAMESPACE }}
 
-  # ─── DESENVOLVIMENTO (develop → phdcrm-dev) ────────────────────────────────
+  # ─── DESENVOLVIMENTO (develop) ─────────────────────────────────────────────
   deploy-dev:
-    name: Deploy - Desenvolvimento (phdcrm-dev)
+    name: Deploy - Desenvolvimento
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment: development
-    env:
-      K8S_NAMESPACE: phdcrm-dev
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -299,8 +290,7 @@ jobs:
       - name: Migrações do banco de dados
         run: |
           for JOB in infra/k8s/mysql-*-migration-job.yaml; do
-            echo "Aplicando migração: $JOB"
-            JOB_NAME=$(grep "name:" "$JOB" | head -1 | awk '{print $2}')
+            JOB_NAME=$(grep "^  name:" "$JOB" | head -1 | awk '{print $2}')
             kubectl delete job "$JOB_NAME" -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
             kubectl apply -f "$JOB" -n ${{ env.K8S_NAMESPACE }}
             kubectl wait --for=condition=complete job/"$JOB_NAME" -n ${{ env.K8S_NAMESPACE }} --timeout=120s || true
@@ -332,11 +322,8 @@ jobs:
             api=${{ needs.build.outputs.api_image }} \
             -n ${{ env.K8S_NAMESPACE }}
           if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
-            echo "❌ Rollout da API falhou. Diagnóstico:"
             kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
-            kubectl describe deployment lpigreen-api -n ${{ env.K8S_NAMESPACE }}
             for POD in $(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o jsonpath='{.items[*].metadata.name}'); do
-              echo "=== logs pod/$POD ==="
               kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --tail=80 || true
             done
             exit 1
@@ -344,15 +331,16 @@ jobs:
 
       - name: Secret CRM Admin
         run: |
-          if [ -n "${{ secrets.ADMIN_USER_DEV || secrets.ADMIN_USER }}" ] && [ -n "${{ secrets.ADMIN_PASSWORD_DEV || secrets.ADMIN_PASSWORD }}" ] && [ -n "${{ secrets.ADMIN_JWT_SECRET_DEV || secrets.ADMIN_JWT_SECRET }}" ]; then
+          ADMIN_USER="${{ secrets.ADMIN_USER_DEV || secrets.ADMIN_USER }}"
+          ADMIN_PASS="${{ secrets.ADMIN_PASSWORD_DEV || secrets.ADMIN_PASSWORD }}"
+          ADMIN_JWT="${{ secrets.ADMIN_JWT_SECRET_DEV || secrets.ADMIN_JWT_SECRET }}"
+          if [ -n "$ADMIN_USER" ] && [ -n "$ADMIN_PASS" ] && [ -n "$ADMIN_JWT" ]; then
             kubectl create secret generic admin-secret -n ${{ env.K8S_NAMESPACE }} \
-              --from-literal=admin-user="${{ secrets.ADMIN_USER_DEV || secrets.ADMIN_USER }}" \
-              --from-literal=admin-password="${{ secrets.ADMIN_PASSWORD_DEV || secrets.ADMIN_PASSWORD }}" \
-              --from-literal=admin-jwt-secret="${{ secrets.ADMIN_JWT_SECRET_DEV || secrets.ADMIN_JWT_SECRET }}" \
+              --from-literal=admin-user="$ADMIN_USER" \
+              --from-literal=admin-password="$ADMIN_PASS" \
+              --from-literal=admin-jwt-secret="$ADMIN_JWT" \
               --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
-            echo "✅ admin-secret (dev) atualizado."
           else
-            echo "⚠️ Credenciais admin não configuradas. Aplicando exemplo."
             kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
           fi
 

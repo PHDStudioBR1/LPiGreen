@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: mysql-lead-form-logs-migration
-  namespace: phdcrm-dev
+  namespace: lpigreen
 spec:
   ttlSecondsAfterFinished: 300
   template:

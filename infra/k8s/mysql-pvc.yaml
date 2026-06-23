@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pvc
-  namespace: phdcrm-dev
+  namespace: lpigreen
 spec:
   accessModes:
     - ReadWriteOnce
