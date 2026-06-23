@@ -45,9 +45,11 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl text-zinc-300 max-w-xl leading-relaxed">
-            Torne-se o "iFood da Energia". Ganhe comissões todos os meses conectando fazendas solares a
-            consumidores, sem que seu cliente precise investir 1 centavo. Junte-se à plataforma com mais de
-            500 mil clientes.
+            Torne-se o <strong className="text-white">iFood da Energia</strong>. Conecte clientes a fazendas solares
+            usando apenas o seu telemóvel e receba{" "}
+            <strong className="text-white">comissões todos os meses</strong>.{" "}
+            <strong className="text-white">Zero stock. Zero obras.</strong>{" "}
+            <strong className="text-white">Sem que o seu cliente invista 1 cêntimo.</strong>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">

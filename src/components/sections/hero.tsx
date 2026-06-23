@@ -47,18 +47,11 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
             Economia na conta de luz <span className="text-primary italic">sem investimento, sem burocracia e sem fidelidade</span>
           </h1>
 
-          <div className="space-y-4 text-base sm:text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed min-w-0">
-            <p>
-              Energia limpa injetada na rede da sua distribuidora (Cemig, CPFL, Equatorial e outras) — tudo amparado pela{' '}
-              <span className="text-white font-bold underline decoration-primary">Lei nº 14.300/2022</span>.
-            </p>
-            <p>
-              Você continua recebendo a mesma energia, da mesma distribuidora, mas paga menos. Acesso ao benefício do <span className="font-bold">Cashback Indicou, Ganhou</span> — podendo zerar a própria conta de luz.
-            </p>
-            <p className="text-base md:text-lg text-gray-100">
-              Faça parte da maior transição energética do Brasil. Verifique agora se você está apto.
-            </p>
-          </div>
+          <p className="text-lg sm:text-xl text-gray-200 max-w-xl leading-relaxed min-w-0">
+            A sua distribuidora (Cemig, CPFL, etc) continua a entregar a energia, mas a iGreen injeta energia limpa na
+            rede e repassa-lhe o desconto.{' '}
+            <strong className="text-white">Até 15% mais barato todos os meses, garantido por lei.</strong>
+          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full">
             <Button
@@ -74,15 +67,15 @@ export function HeroSection({ onCTAClick }: { onCTAClick: () => void }) {
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4 text-gray-300">
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5" />
-              <span>Zero Investimento</span>
+              <span>Zero Obras</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5" />
-              <span>Sem Fidelidade</span>
+              <span>Zero Taxa de Adesão</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="text-primary w-5 h-5" />
-              <span>Cancelamento Grátis</span>
+              <span>Cancele quando quiser</span>
             </div>
           </div>
         </div>

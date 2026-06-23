@@ -145,8 +145,7 @@ CREATE TABLE IF NOT EXISTS config_api (
   UNIQUE KEY uq_key (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Exemplo de registros iniciais em config (opcional)
--- INSERT INTO config (namespace, `key`, value) VALUES
--- ('app', 'api_base_url', 'https://api.seudominio.com'),
--- ('ingress', 'rate_limit_per_minute', '60')
--- ON DUPLICATE KEY UPDATE value = VALUES(value);
+-- Feature flags
+INSERT INTO config (namespace, `key`, value) VALUES
+('doc_ai', 'enabled', 'true')
+ON DUPLICATE KEY UPDATE value = VALUES(value);

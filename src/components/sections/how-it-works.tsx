@@ -1,81 +1,60 @@
 "use client"
 
 import React from 'react';
+import { Sun, Zap, TrendingDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+
+const STEPS = [
+  {
+    icon: Sun,
+    title: '1. Nós geramos',
+    description:
+      'A iGreen produz energia 100% limpa em fazendas solares e injeta na rede pública.',
+  },
+  {
+    icon: Zap,
+    title: '2. A Distribuidora entrega',
+    description:
+      'A Cemig/CPFL continua a levar a energia até sua casa. Nada muda na sua instalação.',
+  },
+  {
+    icon: TrendingDown,
+    title: '3. Você lucra',
+    description:
+      'Os créditos da nossa energia são vinculados ao seu CPF/CNPJ e a sua conta chega mais barata.',
+  },
+] as const;
 
 export function HowItWorksSection() {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground">
-            Veja o exemplo abaixo para entender:
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16 space-y-4">
+          <h2 className="text-3xl md:text-5xl font-headline font-black text-foreground leading-tight">
+            É como mudar de operadora de telemóvel (só que mais fácil).
           </h2>
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+            Você já não escolhe qual plano de internet usar? Agora pode escolher pagar menos na sua energia. Sem trocar
+            nenhum fio.
+          </p>
         </div>
 
-        <Card className="max-w-4xl mx-auto mb-12 rounded-[2.5rem] border-none shadow-2xl bg-white dark:bg-neutral-800">
-          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
-            <p>
-              Você conhece operadora de celular, certo? Claro, Vivo, TIM, Oi...
-            </p>
-            <p>
-              Todas elas <span className="font-bold">não produzem a internet</span>. A internet não é "fabricada" por elas. Elas usam a infraestrutura de antenas e cabos (que muitas vezes nem são delas) para entregar o sinal até você.
-            </p>
-            <p>
-              Mas cada operadora tem parcerias, acordos e formas diferentes de te cobrar pelo mesmo serviço.
-            </p>
-            <p>
-              É por isso que:
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>A Claro pode te oferecer 50GB por R$ 100</li>
-              <li>A Vivo pode te oferecer 50GB por R$ 120</li>
-            </ul>
-            <p>
-              É a mesma internet. A mesma rede. O mesmo sinal.{' '}
-              <span className="font-bold">A diferença está em quem está intermediando e qual é o modelo de negócio.</span>
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="max-w-4xl mx-auto rounded-[2.5rem] border border-primary/20 shadow-xl bg-primary/5">
-          <CardContent className="p-8 md:p-12 space-y-4 text-lg text-muted-foreground leading-relaxed">
-            <h3 className="text-2xl font-bold text-primary">
-              Agora transfere isso para a energia elétrica
-            </h3>
-            <p>
-              A energia que chega na sua casa <span className="font-bold">não é "produzida" pela distribuidora</span>. A distribuidora (Cemig, CPFL, Equatorial, Enel, Light...) é só o "entregador" da energia.
-            </p>
-            <p>
-              Essas empresas pegam energia de fontes (hidrelétricas), ou seja, onde o consumo é muito maior, e consequentemente o lucro deles também será muito maior ao repassar para a sua casa.
-            </p>
-            <h3 className="text-2xl font-bold text-primary mt-6">
-              Entra a iGreen Energy
-            </h3>
-            <p>
-              E aí que nós entramos.
-            </p>
-            <p>
-              A iGreen tem <span className="font-bold">usinas de energia limpa</span>; a energia é produzida e <span className="font-bold">injetada na rede da distribuidora</span> (Cemig, CPFL, Equatorial e outras) — a mesma rede que já existe.
-            </p>
-            <p>
-              E a gente faz um <span className="font-bold">acordo com a distribuidora</span> para vincular créditos de energia à sua conta.
-            </p>
-            <p className="font-medium">
-              Resultado?
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Você continua recebendo energia da mesma distribuidora</li>
-              <li>Pela mesma fiação</li>
-              <li>Com a mesma qualidade</li>
-              <li>Mas paga menos, porque agora está usando energia limpa</li>
-            </ul>
-            <p>
-              Nada vai mudar na qualidade da sua energia, pelo contrário, será uma energia{' '}
-              <span className="font-bold">mais limpa, sustentável e barata</span>!
-            </p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {STEPS.map(({ icon: Icon, title, description }) => (
+            <Card
+              key={title}
+              className="rounded-2xl border border-border/70 bg-card shadow-sm transition-shadow hover:shadow-md"
+            >
+              <CardContent className="p-6 sm:p-8 flex flex-col gap-4">
+                <Icon className="w-14 h-14 sm:w-16 sm:h-16 text-primary shrink-0" strokeWidth={1.25} aria-hidden />
+                <div className="space-y-2 text-left">
+                  <h3 className="text-xl font-bold text-foreground tracking-tight">{title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{description}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -350,14 +350,46 @@ async function fetchNextRepresentative(
   return body.representative;
 }
 
-async function findCrmUserIdByEmail(config: CrmConfig, email: string): Promise<number | null> {
-  const encoded = encodeURIComponent(email.toLowerCase().trim());
+async function searchCrmUsers(config: CrmConfig, search: string): Promise<CrmUser[]> {
+  const encoded = encodeURIComponent(search.trim());
   const body = await crmRequest<CrmUser[]>(config, `/api/crm/v1/users?search=${encoded}&limit=20`, {
     method: "GET",
   });
-  const users = Array.isArray(body.data) ? body.data : [];
-  const match = users.find((u) => u.email?.toLowerCase() === email.toLowerCase().trim());
-  return match?.id ?? null;
+  return Array.isArray(body.data) ? body.data : [];
+}
+
+async function findCrmUserIdByRepresentative(
+  config: CrmConfig,
+  representative: RandomServiceRepresentative
+): Promise<number | null> {
+  // Tenta por email primeiro (mais confiável)
+  if (representative.email) {
+    const email = representative.email.toLowerCase().trim();
+    const users = await searchCrmUsers(config, email);
+    const match = users.find((u) => u.email?.toLowerCase() === email);
+    if (match) {
+      console.log(`Seguros CRM responsavel: usuário CRM encontrado por email (id=${match.id})`);
+      return match.id;
+    }
+    console.warn(`Seguros CRM responsavel: email ${representative.email} não encontrou usuário CRM`);
+  }
+
+  // Fallback: busca por nome
+  if (representative.name) {
+    const nameLower = representative.name.trim().toLowerCase();
+    const users = await searchCrmUsers(config, representative.name.trim());
+    const match = users.find((u) => {
+      const full = `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim().toLowerCase();
+      return full === nameLower || full.startsWith(nameLower) || nameLower.startsWith(full);
+    });
+    if (match) {
+      console.log(`Seguros CRM responsavel: usuário CRM encontrado por nome "${representative.name}" (id=${match.id})`);
+      return match.id;
+    }
+    console.warn(`Seguros CRM responsavel: nome "${representative.name}" não encontrou usuário CRM`);
+  }
+
+  return null;
 }
 
 async function assignResponsavel(config: CrmConfig, leadId: number, responsavelId: number): Promise<void> {
@@ -428,18 +460,16 @@ export async function POST(request: NextRequest) {
       const leadPhone = onlyDigits(payload.values?.phone);
       try {
         const representative = await fetchNextRepresentative(leadName, leadPhone);
-        if (representative?.email) {
-          const userId = await findCrmUserIdByEmail(config, representative.email);
+        if (representative) {
+          const userId = await findCrmUserIdByRepresentative(config, representative);
           if (userId != null) {
             await assignResponsavel(config, lead.id, userId);
             responsavelAssigned = { userId, representativeName: representative.name };
           } else {
             console.warn(
-              `Seguros CRM responsavel: usuário CRM não encontrado para email ${representative.email}`
+              `Seguros CRM responsavel: representante "${representative.name}" não mapeado para usuário CRM`
             );
           }
-        } else {
-          console.warn("Seguros CRM responsavel: representante sem email, atribuição ignorada");
         }
       } catch (responsavelError) {
         console.error(
