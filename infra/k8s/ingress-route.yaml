@@ -8,7 +8,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
       kind: Rule
       services:
         - name: web-service
@@ -27,7 +27,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/api/leads`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
         - name: web-service
@@ -35,7 +35,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/api/admin`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/admin`)
       kind: Rule
       services:
         - name: web-service
@@ -43,7 +43,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
       kind: Rule
       services:
         - name: web-service
@@ -51,7 +51,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/api/seguros`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/seguros`)
       kind: Rule
       services:
         - name: web-service
@@ -60,7 +60,7 @@ spec:
         - name: security-headers
           namespace: lpigreen
     # Demais /api -> backend local do LPiGreen (api-service no namespace lpigreen)
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/api`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api`)
       kind: Rule
       services:
         - name: api-service
@@ -68,7 +68,7 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
-    - match: Host(`lpigreen-dev.546digitalservices.com`) && PathPrefix(`/`)
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
       kind: Rule
       services:
         - name: web-service
@@ -81,4 +81,4 @@ spec:
   tls:
     certResolver: le
     domains:
-      - main: lpigreen-dev.546digitalservices.com
+      - main: lpigreendev.546digitalservices.com
