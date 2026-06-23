@@ -8,7 +8,6 @@ import { BenefitsSection } from "@/components/seguros/benefits/benefits-section"
 import { WhyChooseSection } from "@/components/seguros/why-choose/why-choose-section";
 import { HowItWorksSection } from "@/components/seguros/how-it-works/how-it-works-section";
 import { PlansSection } from "@/components/seguros/plans/plans-section";
-import { TestimonialsSection } from "@/components/seguros/testimonials/testimonials-section";
 import { AppDriverSection } from "@/components/seguros/app-driver/app-driver-section";
 import { IgreenClubSection } from "@/components/seguros/igreen-club/igreen-club-section";
 import { FaqSection } from "@/components/seguros/faq/faq-section";
@@ -37,7 +36,6 @@ export function SegurosLandingPage() {
         <WhyChooseSection onQuoteClick={openQuote} />
         <HowItWorksSection onQuoteClick={openQuote} />
         <PlansSection onQuoteClick={openQuote} />
-        <TestimonialsSection />
         <IgreenClubSection onQuoteClick={openQuote} />
         <AppDriverSection onQuoteClick={openQuote} />
         <FaqSection />

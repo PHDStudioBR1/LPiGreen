@@ -7,7 +7,6 @@ import { HeroSection } from "@/components/seguro-auto/hero/hero-section";
 import { PlansShowcase } from "@/components/seguro-auto/sections/plans-showcase";
 import { BenefitsSection } from "@/components/seguro-auto/sections/benefits-section";
 import { ComparisonSection } from "@/components/seguro-auto/sections/comparison-section";
-import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { ClubSection } from "@/components/seguro-auto/sections/club-section";
 import { AppSection } from "@/components/seguro-auto/sections/app-section";
 import { FaqSection } from "@/components/seguro-auto/sections/faq-section";
@@ -35,7 +34,6 @@ export function SeguroAutoLandingPage() {
         <BenefitsSection />
         <PlansShowcase />
         <ComparisonSection onQuoteClick={openQuote} />
-        <TestimonialsSection />
         <ClubSection onQuoteClick={openQuote} />
         <AppSection onQuoteClick={openQuote} />
         <FaqSection />
