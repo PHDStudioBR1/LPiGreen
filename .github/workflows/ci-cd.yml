@@ -82,17 +82,13 @@ jobs:
         id: tags
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest
-          ${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}" >> $GITHUB_OUTPUT
-            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest
-          ${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "api_image=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:develop
-          ${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
-            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:develop
-          ${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:develop,${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:develop,${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "api_image=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
