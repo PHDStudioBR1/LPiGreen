@@ -97,7 +97,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ steps.tags.outputs.web_tags }}
-          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.ref == 'refs/heads/main' && 'latest' || 'develop' }}
           cache-to: type=inline
 
       - name: Build e Push imagem (backend API)
@@ -107,7 +106,6 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: ${{ steps.tags.outputs.api_tags }}
-          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.ref == 'refs/heads/main' && 'latest' || 'develop' }}
           cache-to: type=inline
 
   # ─── PRODUÇÃO (main) ──────────────────────────────────────────────────────
@@ -117,9 +115,6 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
-    env:
-      WEB_IMAGE: ${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}
-      API_IMAGE: ${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -186,7 +181,7 @@ jobs:
           kubectl apply -f infra/k8s/api-secret.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/backend-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl set image deployment/lpigreen-api \
-            api=${{ env.API_IMAGE }} \
+            api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
             kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
@@ -212,7 +207,7 @@ jobs:
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl set image deployment/lpigreen-web \
-            web=${{ env.WEB_IMAGE }} \
+            web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
 
@@ -239,9 +234,6 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment: development
-    env:
-      WEB_IMAGE: ${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}
-      API_IMAGE: ${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -318,7 +310,7 @@ jobs:
           kubectl apply -f infra/k8s/api-secret.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/backend-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl set image deployment/lpigreen-api \
-            api=${{ env.API_IMAGE }} \
+            api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
             kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
@@ -347,7 +339,7 @@ jobs:
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl set image deployment/lpigreen-web \
-            web=${{ env.WEB_IMAGE }} \
+            web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
 
