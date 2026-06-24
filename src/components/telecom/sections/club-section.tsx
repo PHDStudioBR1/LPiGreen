@@ -81,23 +81,28 @@ export function ClubSection({ onQuoteClick }: ClubSectionProps) {
             </MotionStagger>
           </div>
 
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-            <div className="hidden lg:block" aria-hidden />
-            <div>
-              <MotionBlock delay={0.2}>
-                <ClubHighlightBlock />
-              </MotionBlock>
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <MotionBlock delay={0.2}>
+              <ClubHighlightBlock />
+            </MotionBlock>
 
-              <MotionBlock delay={0.25} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button variant="accent" onClick={handleQuote} className="sm:flex-1">
-                  QUERO APROVEITAR O IGREEN CLUB
-                </Button>
-                <Button variant="outline" onClick={scrollToPlans} className="sm:flex-1">
-                  VER PLANOS DISPONÍVEIS
-                </Button>
-              </MotionBlock>
-            </div>
+            <MotionBlock delay={0.25} className="flex justify-center">
+              <img
+                src="/images/igreen club.webp"
+                alt="iGreen Club — aplicativo completo"
+                className="max-h-[380px] w-auto object-contain drop-shadow-[0_24px_60px_rgba(0,230,118,0.18)] sm:max-h-[460px]"
+              />
+            </MotionBlock>
           </div>
+
+          <MotionBlock delay={0.3} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+            <Button variant="accent" onClick={handleQuote} className="sm:max-w-xs sm:flex-1">
+              QUERO APROVEITAR O IGREEN CLUB
+            </Button>
+            <Button variant="outline" onClick={scrollToPlans} className="sm:max-w-xs sm:flex-1">
+              VER PLANOS DISPONÍVEIS
+            </Button>
+          </MotionBlock>
         </div>
       </Container>
     </section>
