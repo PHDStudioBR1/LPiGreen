@@ -20,21 +20,21 @@ type ClubFloatingBadgesProps = {
 
 export function ClubFloatingBadges({ children }: ClubFloatingBadgesProps) {
   return (
-    <div className="relative mx-auto w-full max-w-[400px] px-4 sm:max-w-[440px] sm:px-8 lg:max-w-none lg:px-12">
+    <div className="relative mx-auto w-full max-w-[440px] px-4 sm:max-w-[480px] sm:px-8 lg:max-w-none lg:px-12">
       {children}
 
       {TELECOM_CLUB_FLOATING_BADGES.map((badge, index) => (
         <motion.div
           key={badge.id}
-          className={`pointer-events-none absolute z-20 max-w-[140px] sm:max-w-[180px] ${POSITION_CLASSES[badge.position]}`}
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+          className={`pointer-events-none absolute z-20 max-w-[150px] sm:max-w-[195px] ${POSITION_CLASSES[badge.position]}`}
+          initial={{ opacity: 0, scale: 0.85 }}
+          whileInView={{ opacity: 1, scale: 1, y: [0, -14, 0] }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{
             opacity: { duration: 0.5, delay: 0.3 + index * 0.1 },
             scale: { duration: 0.5, delay: 0.3 + index * 0.1 },
             y: {
-              duration: 4 + index * 0.3,
+              duration: 3.2 + index * 0.25,
               repeat: Infinity,
               ease: "easeInOut",
               delay: FLOAT_DELAYS[index],

@@ -48,50 +48,55 @@ export function ClubSection({ onQuoteClick }: ClubSectionProps) {
       />
 
       <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <MotionBlock delay={0.1} className="order-1">
-            <ClubFloatingBadges>
-              <ClubPhoneMockup />
-            </ClubFloatingBadges>
-          </MotionBlock>
+        <MotionBlock>
+          <SectionHeading
+            align="center"
+            eyebrow="EXCLUSIVO PARA CLIENTES IGREEN"
+            title={
+              <>
+                iGreen Club:
+                <br />
+                Muito mais que um aplicativo.
+              </>
+            }
+            description="O iGreen Club é a central completa do cliente iGreen Telecom. Um aplicativo que reúne benefícios exclusivos, cashback, descontos em milhares de lojas e controle total da sua linha em um só lugar."
+            className="mb-12 md:mb-16"
+          />
+        </MotionBlock>
 
-          <div className="order-2">
-            <MotionBlock>
-              <SectionHeading
-                align="left"
-                eyebrow="EXCLUSIVO PARA CLIENTES IGREEN"
-                title={
-                  <>
-                    iGreen Club:
-                    <br />
-                    Muito mais que um aplicativo.
-                  </>
-                }
-                description="O iGreen Club é a central completa do cliente iGreen Telecom. Um aplicativo que reúne benefícios exclusivos, cashback, descontos em milhares de lojas e controle total da sua linha em um só lugar."
-                className="mb-8 md:mb-10"
-              />
+        <div className="flex flex-col gap-12 lg:gap-10">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <MotionBlock delay={0.1} className="order-1 lg:-mt-6">
+              <ClubFloatingBadges>
+                <ClubPhoneMockup />
+              </ClubFloatingBadges>
             </MotionBlock>
 
-            <MotionStagger className="grid gap-4 sm:grid-cols-2">
+            <MotionStagger className="order-2 grid gap-4 sm:grid-cols-2">
               {TELECOM_CLUB_GRID_BENEFITS.map((benefit) => (
                 <MotionItem key={benefit.id}>
                   <ClubBenefitCard benefit={benefit} />
                 </MotionItem>
               ))}
             </MotionStagger>
+          </div>
 
-            <MotionBlock delay={0.2} className="mt-6">
-              <ClubHighlightBlock />
-            </MotionBlock>
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="hidden lg:block" aria-hidden />
+            <div>
+              <MotionBlock delay={0.2}>
+                <ClubHighlightBlock />
+              </MotionBlock>
 
-            <MotionBlock delay={0.25} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button variant="accent" onClick={handleQuote} className="sm:flex-1">
-                QUERO APROVEITAR O IGREEN CLUB
-              </Button>
-              <Button variant="outline" onClick={scrollToPlans} className="sm:flex-1">
-                VER PLANOS DISPONÍVEIS
-              </Button>
-            </MotionBlock>
+              <MotionBlock delay={0.25} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button variant="accent" onClick={handleQuote} className="sm:flex-1">
+                  QUERO APROVEITAR O IGREEN CLUB
+                </Button>
+                <Button variant="outline" onClick={scrollToPlans} className="sm:flex-1">
+                  VER PLANOS DISPONÍVEIS
+                </Button>
+              </MotionBlock>
+            </div>
           </div>
         </div>
       </Container>

@@ -14,15 +14,15 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function ClubPhoneMockup() {
   return (
-    <div className="relative mx-auto w-full max-w-[320px] sm:max-w-[360px]">
+    <div className="relative mx-auto w-full max-w-[340px] sm:max-w-[400px]">
       <motion.div
         className="relative z-10"
         initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 1, y: [0, -10, 0] }}
+        whileInView={{ opacity: 1, y: [0, -16, 0] }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{
           opacity: { duration: 0.7, ease },
-          y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+          y: { duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
         }}
       >
         <div
@@ -106,9 +106,9 @@ export function ClubPhoneMockup() {
         </div>
 
         <motion.div
-          className="pointer-events-none absolute -inset-6 -z-10 rounded-[3rem] bg-[#00e676]/10 blur-2xl"
-          animate={{ opacity: [0.35, 0.65, 0.35], scale: [0.96, 1.04, 0.96] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem] bg-[#00e676]/12 blur-3xl"
+          animate={{ opacity: [0.3, 0.8, 0.3], scale: [0.92, 1.1, 0.92] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
         />
       </motion.div>
     </div>
