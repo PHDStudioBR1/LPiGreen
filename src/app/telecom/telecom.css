@@ -1,0 +1,52 @@
+html:has(.telecom-page) {
+  scroll-behavior: smooth;
+}
+
+.telecom-page {
+  --telecom-primary: #6c3aed;
+  --telecom-primary-hover: #5b21b6;
+  --telecom-secondary: #1e1b4b;
+  --telecom-accent: #06b6d4;
+  --telecom-surface: #f8fafc;
+  --telecom-text: #0f172a;
+  --telecom-muted: #64748b;
+  --telecom-border: #e2e8f0;
+}
+
+.telecom-page [id] {
+  scroll-margin-top: 140px;
+}
+
+@media (max-width: 1023px) {
+  .telecom-page [id] {
+    scroll-margin-top: 100px;
+  }
+}
+
+.telecom-gradient-hero {
+  background: linear-gradient(135deg, #f8fafc 0%, #ede9fe 50%, #ecfeff 100%);
+}
+
+.telecom-gradient-cta {
+  background: linear-gradient(135deg, #6c3aed 0%, #4f46e5 50%, #06b6d4 100%);
+}
+
+.telecom-glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(108, 58, 237, 0.08);
+}
+
+.telecom-glow {
+  box-shadow: 0 4px 24px rgba(108, 58, 237, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .telecom-page *,
+  .telecom-page *::before,
+  .telecom-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
