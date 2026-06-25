@@ -66,8 +66,7 @@ export function CtaBanner({ onQuoteClick }: CtaBannerProps) {
               transition={{ delay: 0.2 }}
               className="relative mx-auto mt-4 max-w-xl text-base text-white/80 sm:text-lg"
             >
-              Contrate agora e receba eSIM instantâneo, cashback no primeiro mês e acesso ao clube
-              de benefícios.
+              Contrate agora e receba cashback no primeiro mês e acesso ao clube de benefícios.
             </motion.p>
 
             <motion.div

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { trackTelecomNavClick, trackTelecomQuoteClick } from "@/lib/telecom/analytics";
-import { TELECOM_HEADER_OFFSET, TELECOM_NAV_ITEMS } from "@/lib/telecom/constants";
+import { TELECOM_HEADER_OFFSET, TELECOM_LOGO_SRC, TELECOM_NAV_ITEMS } from "@/lib/telecom/constants";
 import { Container } from "@/components/telecom/ui/container";
 import { Button } from "@/components/telecom/ui/button";
 
@@ -80,9 +80,11 @@ export function Header({ onQuoteClick }: HeaderProps) {
             className="shrink-0"
             aria-label="Voltar ao início"
           >
-            <span className="font-tc-headline text-xl font-bold tracking-tight text-white">
-              Telecom<span className="text-[#00e676]">.</span>iGreen
-            </span>
+            <img
+              src={TELECOM_LOGO_SRC}
+              alt="Telecom iGreen"
+              className="h-8 w-auto sm:h-9"
+            />
           </button>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegação principal">

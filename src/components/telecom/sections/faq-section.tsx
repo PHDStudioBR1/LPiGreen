@@ -20,7 +20,7 @@ export function FaqSection() {
           <SectionHeading
             eyebrow="FAQ"
             title="Perguntas frequentes"
-            description="Tire suas dúvidas sobre planos, eSIM, portabilidade e funcionamento da operadora."
+            description="Tire suas dúvidas sobre planos, portabilidade e funcionamento da operadora."
           />
         </MotionBlock>
 

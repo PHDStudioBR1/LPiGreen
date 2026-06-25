@@ -82,27 +82,27 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
               Internet que acumula, conecta e te dá benefícios todos os dias.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-8 grid gap-3 sm:grid-cols-2">
-              <article className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-[#00e676]/25">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#00e676]/15">
-                  <BarChart3 className="h-4 w-4 text-[#00e676]" />
+            <motion.div variants={fadeUp} className="mt-8 grid gap-4 sm:grid-cols-2">
+              <article className="rounded-2xl border border-[#00e676]/30 bg-[#00e676]/[0.08] p-5 shadow-[0_0_32px_rgba(0,230,118,0.12)] backdrop-blur-sm transition-all hover:border-[#00e676]/50 hover:bg-[#00e676]/[0.12] hover:shadow-[0_0_40px_rgba(0,230,118,0.2)]">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[#00e676]/20">
+                  <BarChart3 className="h-5 w-5 text-[#00e676]" />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#00e676]">
-                  Internet acumulativa
+                <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#00e676] sm:text-sm">
+                  Internet Acumulativa
                 </p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/55">
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
                   Sua internet não expira. Acumule, ganhe bônus e tenha muito mais liberdade.
                 </p>
               </article>
 
-              <article className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:border-[#a78bfa]/25">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#a78bfa]/15">
-                  <Gift className="h-4 w-4 text-[#a78bfa]" />
+              <article className="rounded-2xl border border-[#00e676]/30 bg-[#00e676]/[0.08] p-5 shadow-[0_0_32px_rgba(0,230,118,0.12)] backdrop-blur-sm transition-all hover:border-[#00e676]/50 hover:bg-[#00e676]/[0.12] hover:shadow-[0_0_40px_rgba(0,230,118,0.2)]">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[#00e676]/20">
+                  <Gift className="h-5 w-5 text-[#00e676]" />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#a78bfa]">
+                <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#00e676] sm:text-sm">
                   iGreen Club
                 </p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/55">
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
                   Descontos exclusivos em mais de 30.000 parceiros perto de você.
                 </p>
               </article>

@@ -22,12 +22,13 @@ export const TELECOM_WHATSAPP_URL =
 
 export const TELECOM_HEADER_OFFSET = 140;
 
+export const TELECOM_LOGO_SRC = "/images/logo_igreen_telecom_branco.png";
+
 export const TELECOM_CLIENT_COUNT = 28450;
 
 export const TELECOM_TRUST_ITEMS = [
   { id: "anatel", label: "Regulamentado ANATEL" },
   { id: "5g", label: "Rede 5G nacional" },
-  { id: "esim", label: "eSIM instantâneo" },
   { id: "24h", label: "Suporte digital 24h" },
 ] as const;
 
@@ -36,6 +37,7 @@ export const TELECOM_NAV_ITEMS = [
   { label: "Planos", href: "#planos" },
   { label: "Comparativo", href: "#comparativo" },
   { label: "Como funciona", href: "#como-funciona" },
+  { label: "iGreen Club", href: "#clube" },
   { label: "FAQ", href: "#faq" },
 ] as const;
 

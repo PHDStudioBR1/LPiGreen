@@ -20,7 +20,7 @@ export function getOrganizationSchema(options?: TelecomPageSeo) {
     "@type": "Organization",
     name: "Telecom iGreen",
     description:
-      "Operadora digital com planos de telefonia móvel 4G/5G, eSIM instantâneo, portabilidade gratuita e cashback mensal.",
+      "Operadora digital com planos de telefonia móvel 4G/5G, portabilidade gratuita e cashback mensal.",
     url: `${siteUrl}${pagePath}`,
     logo: `${siteUrl}/favicon.svg`,
     areaServed: {
@@ -45,7 +45,7 @@ export function getTelecomServiceSchema(options?: TelecomPageSeo) {
     "@type": "Service",
     name: "Planos de Telefonia Móvel iGreen",
     description:
-      "Planos de celular 4G/5G sem fidelidade, com eSIM, portabilidade gratuita e cashback.",
+      "Planos de celular 4G/5G sem fidelidade, com portabilidade gratuita e cashback.",
     provider: {
       "@type": "Organization",
       name: "Telecom iGreen",

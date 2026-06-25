@@ -221,7 +221,6 @@ export const TELECOM_PLANS: TelecomPlan[] = [
 export const TELECOM_COMPARISON: TelecomComparisonRow[] = [
   { characteristic: "Contratação 100% online", igreen: "Sim, em minutos", traditional: "Loja física ou call center" },
   { characteristic: "Fidelidade", igreen: "Sem fidelidade", traditional: "12 a 24 meses" },
-  { characteristic: "eSIM instantâneo", igreen: "Ativação imediata", traditional: "Apenas chip físico" },
   { characteristic: "Cashback", igreen: "Até 10% mensal", traditional: "Não oferece" },
   { characteristic: "Portabilidade", igreen: "Grátis e assistida", traditional: "Taxa ou burocracia" },
   { characteristic: "App de gestão", igreen: "Completo e intuitivo", traditional: "Limitado ou inexistente" },
@@ -245,8 +244,8 @@ export const TELECOM_STEPS: TelecomStep[] = [
   {
     id: "activate",
     step: 3,
-    title: "Ative com eSIM",
-    description: "Receba o QR Code no app e ative imediatamente. Chip físico opcional.",
+    title: "Ative sua linha",
+    description: "Ativação imediata por eSIM ou receba seu chip e ative o plano em poucos minutos. Processo 100% online.",
   },
   {
     id: "enjoy",
@@ -261,7 +260,7 @@ export const TELECOM_TESTIMONIALS: TelecomTestimonial[] = [
     id: "1",
     name: "Camila R.",
     role: "Empreendedora — São Paulo",
-    quote: "Migrei em 10 minutos com eSIM. A fatura caiu 40% e o app é muito mais claro que da operadora anterior.",
+    quote: "Migrei em 10 minutos. A fatura caiu 40% e o app é muito mais claro que da operadora anterior.",
     rating: 5,
   },
   {
@@ -297,103 +296,123 @@ export const TELECOM_TESTIMONIALS: TelecomTestimonial[] = [
 export const TELECOM_FAQ: TelecomFaqItem[] = [
   {
     id: "faq-1",
-    question: "O que é a Telecom iGreen?",
-    answer: "Somos uma operadora digital (MVNO) que oferece planos de telefonia móvel com internet 4G/5G, contratação 100% online, eSIM instantâneo e benefícios exclusivos como cashback e clube de vantagens.",
+    question: "O que é a iGreen Telecom?",
+    answer:
+      "A iGreen Telecom é a operadora móvel do grupo iGreen Energy, atuando no modelo MVNO (Operadora Móvel Virtual). Ela utiliza a infraestrutura das principais operadoras do país para oferecer cobertura nacional com planos acessíveis e benefícios exclusivos.",
   },
   {
     id: "faq-2",
-    question: "Preciso trocar meu número para contratar?",
-    answer: "Não. Você pode manter seu número atual com portabilidade gratuita e assistida. Também é possível contratar uma nova linha com número novo.",
+    question: "Quais são os planos disponíveis?",
+    answer:
+      "A iGreen Telecom oferece cinco opções de planos: Start, Mega, Giga, Ultra e Infinity, com franquias de internet que variam de 6GB a 50GB, considerando os bônus para clientes que realizam portabilidade.",
   },
   {
     id: "faq-3",
-    question: "Como funciona o eSIM?",
-    answer: "Após a contratação, você recebe um QR Code no app. Escaneie nas configurações do celular e seu plano é ativado em minutos, sem precisar de chip físico.",
+    question: "Os planos possuem fidelidade ou multa por cancelamento?",
+    answer:
+      "Não. Todos os planos são 100% sem fidelidade. Você pode cancelar, alterar ou migrar de plano quando desejar, sem burocracia e sem cobrança de multa.",
   },
   {
     id: "faq-4",
-    question: "Meu celular é compatível com eSIM?",
-    answer: "A maioria dos smartphones lançados a partir de 2019 suporta eSIM, incluindo iPhones (XR em diante), Samsung Galaxy S20+, Google Pixel e outros. Consulte as especificações do seu aparelho.",
+    question: "Qual a diferença entre contratar um número novo ou fazer portabilidade?",
+    answer:
+      "Ao realizar a portabilidade do seu número atual para a iGreen Telecom, você recebe 5GB extras todos os meses e ainda paga uma mensalidade reduzida em comparação à contratação de uma linha nova.",
   },
   {
     id: "faq-5",
-    question: "Existe fidelidade nos planos?",
-    answer: "Não. Todos os planos são sem fidelidade. Você pode cancelar a qualquer momento sem multa ou taxa de rescisão.",
+    question: "Como funciona o acúmulo de internet?",
+    answer:
+      "A internet não utilizada durante o mês é acumulada para o ciclo seguinte, desde que o pagamento esteja em dia. O acúmulo pode chegar a até duas vezes a franquia principal do plano contratado.",
   },
   {
     id: "faq-6",
-    question: "Como funciona a portabilidade?",
-    answer: "Informe seu número atual no cadastro. Nossa equipe inicia o processo automaticamente e você recebe atualizações por SMS e app. O prazo médio é de 1 a 3 dias úteis.",
+    question: "O que é o iGreen Club?",
+    answer:
+      "O iGreen Club é um clube de vantagens incluso nos planos da operadora, oferecendo descontos exclusivos em mais de 30 mil lojas, serviços, restaurantes, farmácias, viagens e grandes marcas parceiras.",
   },
   {
     id: "faq-7",
-    question: "Quanto tempo demora para ativar?",
-    answer: "Com eSIM, a ativação é instantânea após confirmação do pagamento. Para chip físico, a entrega ocorre em até 48 horas úteis nas principais capitais.",
+    question: "O WhatsApp é realmente ilimitado?",
+    answer:
+      "Sim. O envio e recebimento de mensagens de texto, fotos e áudios pelo WhatsApp não consomem a franquia de internet do seu plano.",
   },
   {
     id: "faq-8",
-    question: "Quais formas de pagamento são aceitas?",
-    answer: "Aceitamos cartão de crédito, débito automático, PIX recorrente e boleto bancário. O débito automático garante desconto adicional de 5%.",
+    question: "Ligações e chamadas de vídeo pelo WhatsApp consomem internet?",
+    answer:
+      "Sim. Chamadas de voz e vídeo realizadas pelo WhatsApp utilizam a franquia de dados normalmente e são descontadas do pacote contratado.",
   },
   {
     id: "faq-9",
-    question: "O que é o cashback?",
-    answer: "Todo mês você recebe de volta uma porcentagem do valor pago, creditada na sua carteira digital no app. Pode usar em descontos na fatura ou resgatar em parceiros.",
+    question: "O aplicativo Waze é gratuito?",
+    answer:
+      "Sim. O uso do Waze sem desconto da franquia está disponível para os clientes dos planos Giga, Ultra e Infinity.",
   },
   {
     id: "faq-10",
-    question: "Como funciona o clube de benefícios?",
-    answer: "Assinantes têm acesso a descontos exclusivos em streaming, delivery, farmácias, academias e centenas de parceiros. Os benefícios variam conforme o plano contratado.",
+    question: "Como funciona o cashback por indicação?",
+    answer:
+      "Ao indicar um novo cliente que ative uma linha na iGreen Telecom, você recebe R$ 3,50 de cashback todos os meses, enquanto a linha indicada permanecer ativa e com os pagamentos em dia.",
   },
   {
     id: "faq-11",
-    question: "A cobertura funciona em todo o Brasil?",
-    answer: "Sim. Utilizamos a infraestrutura das principais redes nacionais, garantindo cobertura 4G/5G em todo o território brasileiro. Consulte o mapa de cobertura no app.",
+    question: "O que acontece quando minha franquia de internet acaba?",
+    answer:
+      "Sua internet não é interrompida. Você continua navegando com velocidade reduzida de 32 Kbps até a renovação do plano ou início do próximo ciclo.",
   },
   {
     id: "faq-12",
-    question: "Posso usar internet no exterior?",
-    answer: "Planos Plus e superiores incluem roaming na América Latina. Para outros destinos, pacotes de roaming internacional podem ser contratados pelo app.",
+    question: "A iGreen Telecom oferece eSIM?",
+    answer:
+      "Sim. Clientes com aparelhos compatíveis podem ativar a linha por eSIM (chip virtual), dispensando o uso do chip físico e permitindo uma ativação mais rápida.",
   },
   {
     id: "faq-13",
-    question: "O que acontece se eu esgotar meus dados?",
-    answer: "Você recebe alertas ao atingir 80% e 100% do pacote. Pode contratar pacotes adicionais pelo app ou aguardar a renovação no ciclo seguinte.",
+    question: "Como recebo o chip físico caso meu aparelho não seja compatível com eSIM?",
+    answer:
+      "Se o seu dispositivo não aceitar eSIM, a iGreen Telecom envia o chip físico diretamente para o endereço informado durante o cadastro.",
   },
   {
     id: "faq-14",
-    question: "Posso compartilhar internet (hotspot)?",
-    answer: "Sim. Todos os planos permitem compartilhamento de internet via hotspot/Wi-Fi sem custo adicional, respeitando o limite de dados do plano.",
+    question: "Quais são as formas de pagamento disponíveis?",
+    answer:
+      "As mensalidades podem ser pagas via Cartão de Crédito, com cobrança recorrente, ou por PIX.",
   },
   {
     id: "faq-15",
-    question: "Como entro em contato com o suporte?",
-    answer: "Pelo app, WhatsApp ou chat no site — 24 horas por dia, 7 dias por semana. Tempo médio de resposta: menos de 5 minutos.",
+    question: "O que é o Plano Família?",
+    answer:
+      "O Plano Família permite cadastrar várias linhas vinculadas ao mesmo CPF ou CNPJ. A partir da segunda linha, cada número adicional recebe R$ 10,00 de desconto mensal.",
   },
   {
     id: "faq-16",
-    question: "Posso ter mais de uma linha na mesma conta?",
-    answer: "Sim. Gerencie até 5 linhas familiares na mesma conta com desconto progressivo a partir da segunda linha.",
+    question: "Como acompanhar meu consumo de internet e minhas faturas?",
+    answer:
+      "Toda a gestão da sua linha pode ser feita pelo aplicativo iGreen Club, onde você acompanha consumo de dados, saldo acumulado, pagamentos e demais informações da conta.",
   },
   {
     id: "faq-17",
-    question: "A operadora é regulamentada?",
-    answer: "Sim. Operamos como MVNO devidamente autorizada pela ANATEL, em conformidade com todas as regulamentações do setor de telecomunicações.",
+    question: "Quanto tempo leva para a linha ser ativada?",
+    answer:
+      "Após a confirmação do pagamento inicial, a ativação da linha acontece em poucos minutos.",
   },
   {
     id: "faq-18",
-    question: "Meus dados pessoais estão seguros?",
-    answer: "Sim. Seguimos rigorosamente a LGPD, com criptografia de ponta a ponta e políticas transparentes de privacidade. Seus dados nunca são vendidos a terceiros.",
+    question: "Quanto tempo demora a portabilidade?",
+    answer:
+      "O processo de portabilidade é concluído em até 3 dias úteis após a solicitação e validação dos dados.",
   },
   {
     id: "faq-19",
-    question: "Posso mudar de plano depois?",
-    answer: "Sim. Upgrade ou downgrade a qualquer momento pelo app, com efeito imediato ou no próximo ciclo de faturamento, conforme sua preferência.",
+    question: "A iGreen Telecom possui suporte 24 horas?",
+    answer:
+      "Sim. O atendimento é 100% digital e funciona 24 horas por dia, 7 dias por semana, através do WhatsApp no número 0800 183 0080 (Opção 4).",
   },
   {
     id: "faq-20",
-    question: "Como cancelo meu plano?",
-    answer: "Pelo app ou WhatsApp, sem burocracia e sem multa. O cancelamento é processado em até 24 horas e você mantém o serviço até o fim do ciclo pago.",
+    question: "O que acontece se eu atrasar o pagamento da mensalidade?",
+    answer:
+      "Em caso de atraso, os dados acumulados podem ser perdidos e o benefício de acúmulo de internet poderá ficar suspenso até a regularização do pagamento.",
   },
 ];
 

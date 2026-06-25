@@ -64,7 +64,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
               Seu plano ideal está a 2 minutos de distância
             </h3>
             <p className="mb-6 leading-relaxed text-telecom-muted">
-              Sem fidelidade, eSIM instantâneo e cashback no primeiro mês. Não perca essa oportunidade.
+              Sem fidelidade e cashback no primeiro mês. Não perca essa oportunidade.
             </p>
 
             <Button fullWidth onClick={handleQuote} className="h-12">

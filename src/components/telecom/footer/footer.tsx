@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TELECOM_LOGO_SRC } from "@/lib/telecom/constants";
 import { Container } from "@/components/telecom/ui/container";
 
 export function Footer() {
@@ -6,9 +7,11 @@ export function Footer() {
     <footer className="relative border-t border-white/10 py-12 pb-28 md:pb-12">
       <Container>
         <div className="flex flex-col items-center gap-6 text-center">
-          <span className="font-tc-headline text-xl font-bold tracking-tight text-white">
-            Telecom<span className="text-[#00e676]">.</span>iGreen
-          </span>
+          <img
+            src={TELECOM_LOGO_SRC}
+            alt="Telecom iGreen"
+            className="h-9 w-auto"
+          />
           <p className="max-w-2xl text-sm leading-relaxed text-white/50">
             Serviços de telefonia móvel oferecidos por MVNO devidamente autorizada pela ANATEL.
             Consulte cobertura, condições e regulamentos antes da contratação.

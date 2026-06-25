@@ -25,7 +25,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 const title = "Telecom iGreen | Planos de celular 5G sem fidelidade";
 const description =
-  "Operadora digital com planos 4G/5G, eSIM instantâneo, portabilidade gratuita, cashback mensal e clube de benefícios. Contrate 100% online em minutos.";
+  "Operadora digital com planos 4G/5G, portabilidade gratuita, cashback mensal e clube de benefícios. Contrate 100% online em minutos.";
 
 export const metadata: Metadata = {
   title,
@@ -34,7 +34,6 @@ export const metadata: Metadata = {
     "telecom iGreen",
     "operadora digital",
     "plano de celular",
-    "eSIM",
     "portabilidade",
     "MVNO",
     "5G",
