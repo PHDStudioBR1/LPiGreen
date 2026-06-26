@@ -5,16 +5,13 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { maskCep, maskCpfCnpj, maskPhone } from "@/lib/masks";
-import { SEGUROS_WHATSAPP_URL } from "@/lib/seguros/constants";
 import {
-  buildSegurosWhatsAppUrl,
   loadQuoteSessionFields,
   maskPlate,
   persistQuoteSessionFields,
-  SEGUROS_GARAGE_OPTIONS,
   SEGUROS_QUOTE_FORM_DEFAULTS,
   SEGUROS_VEHICLE_TYPES,
-  SEGUROS_VEHICLE_USES,
+  SEGUROS_YES_NO_OPTIONS,
   validateQuoteStep,
   type SegurosQuoteFieldErrors,
   type SegurosQuoteFormValues,
@@ -35,7 +32,10 @@ export type SegurosQuoteModalProps = {
 const STEPS = [
   { id: 1, label: "Veículo" },
   { id: 2, label: "Seus dados" },
+  { id: 3, label: "Concluído" },
 ] as const;
+
+type QuoteStep = (typeof STEPS)[number]["id"];
 
 const SEGUROS_CRM_SESSION_STORAGE_KEY = "seguros-crm-lead-session";
 
@@ -103,15 +103,13 @@ function FormGroup({
 
 export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<QuoteStep>(1);
   const [values, setValues] = useState<SegurosQuoteFormValues>(SEGUROS_QUOTE_FORM_DEFAULTS);
   const [errors, setErrors] = useState<SegurosQuoteFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSyncingCrm, setIsSyncingCrm] = useState(false);
   const [crmSessionId, setCrmSessionId] = useState("");
   const [crmError, setCrmError] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -120,8 +118,6 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     setIsSubmitting(false);
     setIsSyncingCrm(false);
     setCrmError(null);
-    setShowToast(false);
-    setProgress(0);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -226,7 +222,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
 
   const goStep = async (nextStep: 1 | 2) => {
     if (nextStep > step) {
-      const stepErrors = validateQuoteStep(step, values);
+      const stepErrors = validateQuoteStep(step as 1 | 2, values);
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors);
         return;
@@ -268,22 +264,13 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
       vehicle_use: values.vehicleUse,
     });
 
-    setShowToast(true);
-    setProgress(15);
-
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setProgress(55);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setProgress(100);
-
-    const whatsappUrl = buildSegurosWhatsAppUrl(values, SEGUROS_WHATSAPP_URL);
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-
-    await new Promise((resolve) => setTimeout(resolve, 900));
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
     }
-    handleClose();
+
+    setStep(3);
+    trackSegurosFormStep(3);
+    setIsSubmitting(false);
   };
 
   if (!mounted) return null;
@@ -328,12 +315,20 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                   </div>
 
                   <h2 className="igf-title" id="seguros-quote-modal-title">
-                    Receba sua cotação personalizada em{" "}
-                    <em>minutos no WhatsApp</em>
+                    {step === 3 ? (
+                      <>Solicitação enviada com <em>sucesso!</em></>
+                    ) : (
+                      <>
+                        Receba sua cotação personalizada em{" "}
+                        <em>minutos no WhatsApp</em>
+                      </>
+                    )}
                   </h2>
-                  <p className="igf-sub">
-                    Preencha os dados abaixo · Sem consulta no SPC/Serasa · Sem compromisso
-                  </p>
+                  {step !== 3 && (
+                    <p className="igf-sub">
+                      Preencha os dados abaixo · Sem consulta no SPC/Serasa · Sem compromisso
+                    </p>
+                  )}
 
                   <div className="igf-steps" id="igf-steps-header">
                     {STEPS.map(({ id, label }) => {
@@ -403,23 +398,31 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                         </FormGroup>
                       </div>
 
-                      <FormGroup id="w-grp-uso" label="Uso do veículo" error={errors.vehicleUse}>
+                      <FormGroup
+                        id="w-grp-uso"
+                        label="Você utiliza esse veículo para Aplicativo ou Táxi?"
+                        error={errors.vehicleUse}
+                      >
                         <select
                           id="w-grp-uso-field"
                           className={`igf-select${errors.vehicleUse ? " error" : ""}`}
                           value={values.vehicleUse}
                           onChange={(event) => updateField("vehicleUse", event.target.value)}
                         >
-                          <option value="">Como você usa seu veículo?</option>
-                          {SEGUROS_VEHICLE_USES.map((use) => (
-                            <option key={use} value={use}>
-                              {use}
+                          <option value="">Selecione...</option>
+                          {SEGUROS_YES_NO_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
                             </option>
                           ))}
                         </select>
                       </FormGroup>
 
-                      <FormGroup id="w-grp-garagem" label="Possui garagem?" error={errors.garage}>
+                      <FormGroup
+                        id="w-grp-garagem"
+                        label="Você possui garagem própria para pernoite do veículo?"
+                        error={errors.garage}
+                      >
                         <select
                           id="w-grp-garagem-field"
                           className={`igf-select${errors.garage ? " error" : ""}`}
@@ -427,7 +430,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                           onChange={(event) => updateField("garage", event.target.value)}
                         >
                           <option value="">Selecione...</option>
-                          {SEGUROS_GARAGE_OPTIONS.map((option) => (
+                          {SEGUROS_YES_NO_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
@@ -573,40 +576,61 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
                           <span className="igf-spinner" />
                         </button>
                       </div>
+                    </div>
+                  )}
 
-                      <div className={`igf-toast${showToast ? " show" : ""}`} id="igf-toast">
-                        <div className="igf-toast-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                            <path d="M20 6L9 17l-5-5" />
-                          </svg>
-                        </div>
-                        <div className="igf-toast-content">
-                          <div className="igf-toast-title">Solicitação enviada! 🎉</div>
-                          <div className="igf-toast-msg">
-                            Seus dados foram recebidos. Aguarde, você será direcionado ao WhatsApp em instantes.
-                          </div>
-                        </div>
+                  {step === 3 && (
+                    <div id="igf-ws-3" className="igf-success">
+                      <div className="igf-success-icon" aria-hidden>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
                       </div>
 
-                      <div className={`igf-progress-wrap${showToast ? " show" : ""}`} id="igf-progress-wrap">
-                        <div className="igf-progress-track">
-                          <div className="igf-progress-bar" style={{ width: `${progress}%` }} />
-                        </div>
-                        <div className="igf-progress-label">Preparando redirecionamento...</div>
+                      <p className="igf-success-intro">
+                        Recebemos suas informações e sua solicitação já está sendo processada.
+                      </p>
+                      <p className="igf-success-intro">
+                        Nos próximos minutos, você receberá uma mensagem de um de nossos especialistas
+                        diretamente no WhatsApp para dar continuidade à sua cotação.
+                      </p>
+
+                      <h3 className="igf-success-heading">O que acontece agora?</h3>
+                      <ul className="igf-success-list">
+                        <li>Analisaremos suas informações.</li>
+                        <li>Entraremos em contato pelo WhatsApp cadastrado.</li>
+                        <li>Entenderemos melhor suas necessidades.</li>
+                        <li>Apresentaremos as melhores opções de seguro para você.</li>
+                      </ul>
+
+                      <p className="igf-success-whatsapp">
+                        📱 Fique atento às suas mensagens no WhatsApp.
+                      </p>
+
+                      <p className="igf-success-thanks">
+                        Obrigado pela confiança! Em breve nossa equipe falará com você.
+                      </p>
+
+                      <div className="igf-btn-wrap">
+                        <button type="button" className="igf-btn igf-btn-green" onClick={handleClose}>
+                          Fechar
+                        </button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="igf-footer">
-                  <div className="igf-footer-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0110 0v4" />
-                    </svg>
-                    Seus dados estão protegidos pela LGPD. Não enviamos spam.
+                {step !== 3 && (
+                  <div className="igf-footer">
+                    <div className="igf-footer-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                      </svg>
+                      Seus dados estão protegidos pela LGPD. Não enviamos spam.
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </motion.div>

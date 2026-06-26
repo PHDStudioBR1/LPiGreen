@@ -296,8 +296,8 @@ function buildActivityDescription(payload: SegurosCrmPayload): string {
     `Tipo: ${cleanString(values.vehicleType) || "-"}`,
     `Placa: ${cleanString(values.plate) || "-"}`,
     `Modelo: ${cleanString(values.model) || "-"}`,
-    `Uso: ${cleanString(values.vehicleUse) || "-"}`,
-    `Garagem: ${cleanString(values.garage) || "-"}`,
+    `Aplicativo ou Táxi: ${cleanString(values.vehicleUse) || "-"}`,
+    `Garagem própria para pernoite: ${cleanString(values.garage) || "-"}`,
   ];
 
   if (payload.step === "contact") {
