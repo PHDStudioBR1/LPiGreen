@@ -1,8 +1,6 @@
 export const SEGUROS_VEHICLE_TYPES = [
   "Carro",
   "Moto",
-  "Caminhão",
-  "Van / Utilitário",
 ] as const;
 
 export const SEGUROS_VEHICLE_USES = [

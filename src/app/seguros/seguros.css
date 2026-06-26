@@ -38,6 +38,45 @@ html:has(.seguros-page) {
     0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
+.seguros-plan-featured {
+  position: relative;
+  overflow: visible;
+  border-color: rgba(0, 200, 83, 0.55) !important;
+  background: rgba(6, 27, 18, 0.82);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.5),
+    0 0 24px rgba(0, 200, 83, 0.45),
+    0 0 56px rgba(0, 200, 83, 0.3),
+    0 0 96px rgba(0, 200, 83, 0.18),
+    inset 0 0 48px rgba(0, 200, 83, 0.08),
+    0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+.seguros-plan-featured::before {
+  content: "";
+  position: absolute;
+  inset: -32px -20px;
+  border-radius: 2.75rem;
+  background: radial-gradient(
+    ellipse 90% 80% at 50% 45%,
+    rgba(0, 200, 83, 0.42) 0%,
+    rgba(0, 200, 83, 0.18) 35%,
+    rgba(0, 200, 83, 0.06) 55%,
+    transparent 72%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+.seguros-plan-featured::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 36px rgba(0, 200, 83, 0.1);
+  pointer-events: none;
+}
+
 .seguros-gradient-hero {
   background:
     radial-gradient(ellipse 80% 60% at 70% 20%, rgba(0, 200, 83, 0.18), transparent),

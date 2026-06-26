@@ -43,12 +43,12 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
               variants={fadeUp}
               className={`relative flex flex-col rounded-3xl p-5 seguros-glass transition-all duration-300 sm:p-6 md:p-8 ${
                 plan.highlighted
-                  ? "md:scale-105 md:-my-4 seguros-glow border-seguros-primary/40 z-10"
+                  ? "md:scale-[1.07] md:-my-6 seguros-plan-featured z-10"
                   : "hover:border-seguros-primary/25"
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-seguros-primary text-seguros-bg text-xs font-extrabold tracking-wider">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-seguros-primary text-seguros-bg text-xs font-extrabold tracking-wider shadow-[0_0_24px_rgba(0,200,83,0.7),0_0_48px_rgba(0,200,83,0.35)] ring-2 ring-seguros-accent/40">
                   {plan.badge}
                 </span>
               )}
