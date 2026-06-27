@@ -3,15 +3,15 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
-import { maskCep, maskCpfCnpj, maskPhone } from "@/lib/masks";
+import { Check, X } from "lucide-react";
+import { maskCpfCnpj, maskPhone } from "@/lib/masks";
 import {
-  buildTelecomWhatsAppUrl,
-  loadTelecomQuoteSessionFields,
-  persistTelecomQuoteSessionFields,
-  TELECOM_DATA_OPTIONS,
-  TELECOM_PLAN_TYPES,
-  TELECOM_PORTABILITY_OPTIONS,
+  formatTelecomPrice,
+  getTelecomPlansForActivation,
+  TELECOM_ACTIVATION_OPTIONS,
+  TELECOM_CHIP_OPTIONS,
+  TELECOM_DDD_OPTIONS,
+  TELECOM_OPERATORS,
   TELECOM_QUOTE_FORM_DEFAULTS,
   validateTelecomQuoteStep,
   type TelecomQuoteFieldErrors,
@@ -22,6 +22,7 @@ import {
   trackTelecomFormSubmit,
   trackTelecomModalClose,
   trackTelecomModalOpen,
+  trackTelecomPlanSelect,
 } from "@/lib/telecom/analytics";
 import "@/app/telecom/telecom-quote-modal.css";
 
@@ -31,9 +32,13 @@ export type TelecomQuoteModalProps = {
 };
 
 const STEPS = [
-  { id: 1, label: "Plano" },
-  { id: 2, label: "Seus dados" },
+  { id: 1, label: "Tipo" },
+  { id: 2, label: "Dados" },
+  { id: 3, label: "Plano" },
+  { id: 4, label: "Concluído" },
 ] as const;
+
+type QuoteStep = (typeof STEPS)[number]["id"];
 
 const TELECOM_CRM_SESSION_STORAGE_KEY = "telecom-crm-lead-session";
 
@@ -57,17 +62,19 @@ function FormGroup({
   id,
   label,
   error,
+  required = true,
   children,
 }: {
   id: string;
   label: string;
   error?: string;
+  required?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className={`tqf-group${error ? " has-error" : ""}`} id={id}>
       <label htmlFor={`${id}-field`}>
-        {label} <span className="req">*</span>
+        {label} {required && <span className="req">*</span>}
       </label>
       {children}
       {error && <div className="tqf-error">{error}</div>}
@@ -77,10 +84,11 @@ function FormGroup({
 
 export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<QuoteStep>(1);
   const [values, setValues] = useState<TelecomQuoteFormValues>(TELECOM_QUOTE_FORM_DEFAULTS);
   const [errors, setErrors] = useState<TelecomQuoteFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSyncingCrm, setIsSyncingCrm] = useState(false);
   const [crmError, setCrmError] = useState<string | null>(null);
   const [crmSessionId, setCrmSessionId] = useState("");
 
@@ -89,8 +97,15 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     setValues(TELECOM_QUOTE_FORM_DEFAULTS);
     setErrors({});
     setIsSubmitting(false);
+    setIsSyncingCrm(false);
     setCrmError(null);
   }, []);
+
+  const handleClose = useCallback(() => {
+    trackTelecomModalClose();
+    resetForm();
+    onClose();
+  }, [onClose, resetForm]);
 
   useEffect(() => {
     setMounted(true);
@@ -100,10 +115,6 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     if (isOpen) {
       trackTelecomModalOpen();
       setCrmSessionId(getOrCreateCrmSessionId());
-      const saved = loadTelecomQuoteSessionFields();
-      if (saved.name || saved.phone) {
-        setValues((prev) => ({ ...prev, ...saved }));
-      }
     } else {
       resetForm();
     }
@@ -120,14 +131,26 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  });
+  }, [isOpen, handleClose]);
 
-  const handleClose = () => {
-    trackTelecomModalClose();
-    onClose();
+  const updateField = <K extends keyof TelecomQuoteFormValues>(
+    field: K,
+    value: TelecomQuoteFormValues[K]
+  ) => {
+    setValues((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
   };
 
-  const syncCrm = async (crmStep: "plan" | "contact") => {
+  const syncCrm = async (
+    crmStep: "activation" | "details" | "contact",
+    payloadValues: TelecomQuoteFormValues = values
+  ) => {
+    setIsSyncingCrm(true);
     try {
       const res = await fetch("/api/telecom/crm-lead", {
         method: "POST",
@@ -135,16 +158,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
         body: JSON.stringify({
           step: crmStep,
           session_id: crmSessionId,
-          values: {
-            planType: values.planType,
-            dataGb: values.dataGb,
-            portability: values.portability,
-            name: values.name,
-            cpfCnpj: values.cpfCnpj,
-            email: values.email,
-            phone: values.phone,
-            cep: values.cep,
-          },
+          values: payloadValues,
         }),
       });
       if (!res.ok) {
@@ -154,41 +168,65 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
       setCrmError(null);
     } catch (err) {
       setCrmError(err instanceof Error ? err.message : "Erro ao sincronizar lead");
+    } finally {
+      setIsSyncingCrm(false);
     }
   };
 
-  const handleNext = async () => {
-    const stepErrors = validateTelecomQuoteStep(1, values);
-    if (Object.keys(stepErrors).length > 0) {
-      setErrors(stepErrors);
-      return;
-    }
+  const selectActivationType = async (activationType: "portabilidade" | "linha_nova") => {
+    const nextValues = {
+      ...values,
+      activationType,
+      portNumber: "",
+      currentOperator: "",
+      ddd: "",
+      selectedPlan: "",
+    };
+    setValues(nextValues);
     setErrors({});
     trackTelecomFormStep(1);
-    await syncCrm("plan");
+    await syncCrm("activation", nextValues);
     setStep(2);
   };
 
-  const handleSubmit = async () => {
+  const goToStep3 = async () => {
     const stepErrors = validateTelecomQuoteStep(2, values);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
       return;
     }
     setErrors({});
-    setIsSubmitting(true);
     trackTelecomFormStep(2);
+    await syncCrm("details");
+    setStep(3);
+  };
+
+  const handleSubmit = async () => {
+    const stepErrors = validateTelecomQuoteStep(3, values);
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      return;
+    }
+    setErrors({});
+    setIsSubmitting(true);
+    trackTelecomFormStep(3);
     trackTelecomFormSubmit({
-      plan_type: values.planType,
-      portability: values.portability,
+      plan_type: values.selectedPlan,
+      portability: values.activationType === "portabilidade" ? "yes" : "no",
     });
-    persistTelecomQuoteSessionFields({ name: values.name, phone: values.phone });
+    trackTelecomPlanSelect(values.selectedPlan);
     await syncCrm("contact");
-    const whatsappUrl = buildTelecomWhatsAppUrl(values);
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     sessionStorage.removeItem(TELECOM_CRM_SESSION_STORAGE_KEY);
     setIsSubmitting(false);
-    handleClose();
+    setStep(4);
+  };
+
+  const plans = getTelecomPlansForActivation(values.activationType);
+  const subtitleByStep: Record<QuoteStep, string> = {
+    1: "Como deseja ativar sua linha?",
+    2: "Informe seus dados para continuar",
+    3: "Escolha o seu plano",
+    4: "Solicitação enviada com sucesso!",
   };
 
   if (!mounted) return null;
@@ -206,7 +244,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
           }}
         >
           <motion.div
-            className="telecom-quote-modal-shell"
+            className={`telecom-quote-modal-shell${step === 3 ? " telecom-quote-modal-shell-wide" : ""}`}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -222,133 +260,195 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
             </button>
 
             <div className="telecom-quote-modal-card">
-              <h2>Contratar Telecom iGreen</h2>
-              <p className="subtitle">
-                {step === 1
-                  ? "Escolha o plano ideal para você"
-                  : "Informe seus dados para finalizar"}
-              </p>
+              <h2>{step === 4 ? "Solicitação enviada com sucesso!" : "Ativar Telecom iGreen"}</h2>
+              <p className="subtitle">{subtitleByStep[step]}</p>
 
-              <div className="tqf-steps">
-                {STEPS.map((s) => (
-                  <div key={s.id} className={`tqf-step${step >= s.id ? " active" : ""}`} />
-                ))}
-              </div>
+              {step !== 4 && (
+                <div className="tqf-steps">
+                  {STEPS.slice(0, 3).map((s) => (
+                    <div key={s.id} className={`tqf-step${step >= s.id ? " active" : ""}`} />
+                  ))}
+                </div>
+              )}
 
-              {step === 1 ? (
+              {step === 1 && (
                 <>
-                  <FormGroup id="planType" label="Tipo de plano" error={errors.planType}>
-                    <select
-                      id="planType-field"
-                      value={values.planType}
-                      onChange={(e) => setValues((v) => ({ ...v, planType: e.target.value }))}
-                    >
-                      <option value="">Selecione</option>
-                      {TELECOM_PLAN_TYPES.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </FormGroup>
-
-                  <FormGroup id="dataGb" label="Quantidade de dados" error={errors.dataGb}>
-                    <select
-                      id="dataGb-field"
-                      value={values.dataGb}
-                      onChange={(e) => setValues((v) => ({ ...v, dataGb: e.target.value }))}
-                    >
-                      <option value="">Selecione</option>
-                      {TELECOM_DATA_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </FormGroup>
-
-                  <FormGroup id="portability" label="Portabilidade" error={errors.portability}>
-                    <select
-                      id="portability-field"
-                      value={values.portability}
-                      onChange={(e) => setValues((v) => ({ ...v, portability: e.target.value }))}
-                    >
-                      <option value="">Selecione</option>
-                      {TELECOM_PORTABILITY_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </FormGroup>
-
-                  <div className="tqf-actions">
-                    <button type="button" className="tqf-btn-primary" onClick={handleNext}>
-                      Continuar
-                    </button>
+                  <div className="tqf-type-buttons">
+                    {TELECOM_ACTIVATION_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className="tqf-type-btn"
+                        onClick={() => void selectActivationType(option.value)}
+                        disabled={isSyncingCrm}
+                      >
+                        <span className="tqf-type-btn-label">{option.label}</span>
+                        <span className="tqf-type-btn-desc">{option.description}</span>
+                      </button>
+                    ))}
                   </div>
+                  {errors.activationType && (
+                    <div className="tqf-error tqf-error-block">{errors.activationType}</div>
+                  )}
                 </>
-              ) : (
+              )}
+
+              {step === 2 && (
                 <>
-                  <FormGroup id="name" label="Nome completo" error={errors.name}>
-                    <input
-                      id="name-field"
-                      type="text"
-                      value={values.name}
-                      onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
-                      placeholder="Seu nome"
-                    />
-                  </FormGroup>
-
-                  <FormGroup id="phone" label="WhatsApp" error={errors.phone}>
-                    <input
-                      id="phone-field"
-                      type="tel"
-                      value={values.phone}
-                      onChange={(e) =>
-                        setValues((v) => ({ ...v, phone: maskPhone(e.target.value) }))
-                      }
-                      placeholder="(00) 00000-0000"
-                    />
-                  </FormGroup>
-
-                  <FormGroup id="cpfCnpj" label="CPF/CNPJ" error={errors.cpfCnpj}>
+                  <FormGroup id="cpfCnpj" label="CPF ou CNPJ" error={errors.cpfCnpj}>
                     <input
                       id="cpfCnpj-field"
                       type="text"
                       value={values.cpfCnpj}
-                      onChange={(e) =>
-                        setValues((v) => ({ ...v, cpfCnpj: maskCpfCnpj(e.target.value) }))
-                      }
+                      onChange={(e) => updateField("cpfCnpj", maskCpfCnpj(e.target.value))}
                       placeholder="000.000.000-00"
                     />
                   </FormGroup>
 
-                  <FormGroup id="cep" label="CEP" error={errors.cep}>
-                    <input
-                      id="cep-field"
-                      type="text"
-                      value={values.cep}
-                      onChange={(e) => setValues((v) => ({ ...v, cep: maskCep(e.target.value) }))}
-                      placeholder="00000-000"
-                    />
+                  <FormGroup id="chipType" label="Tipo do chip" error={errors.chipType}>
+                    <select
+                      id="chipType-field"
+                      value={values.chipType}
+                      onChange={(e) =>
+                        updateField("chipType", e.target.value as TelecomQuoteFormValues["chipType"])
+                      }
+                    >
+                      <option value="">Selecione</option>
+                      {TELECOM_CHIP_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </FormGroup>
 
-                  <FormGroup id="email" label="E-mail (opcional)" error={errors.email}>
-                    <input
-                      id="email-field"
-                      type="email"
-                      value={values.email}
-                      onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
-                      placeholder="seu@email.com"
-                    />
-                  </FormGroup>
+                  {values.activationType === "portabilidade" && (
+                    <>
+                      <FormGroup
+                        id="portNumber"
+                        label="Número a ser portado com DDD"
+                        error={errors.portNumber}
+                      >
+                        <input
+                          id="portNumber-field"
+                          type="tel"
+                          value={values.portNumber}
+                          onChange={(e) =>
+                            updateField("portNumber", maskPhone(e.target.value))
+                          }
+                          placeholder="(00) 00000-0000"
+                        />
+                      </FormGroup>
+
+                      <FormGroup
+                        id="currentOperator"
+                        label="Operadora Atual"
+                        error={errors.currentOperator}
+                      >
+                        <select
+                          id="currentOperator-field"
+                          value={values.currentOperator}
+                          onChange={(e) => updateField("currentOperator", e.target.value)}
+                        >
+                          <option value="">Selecione</option>
+                          {TELECOM_OPERATORS.map((operator) => (
+                            <option key={operator} value={operator}>
+                              {operator}
+                            </option>
+                          ))}
+                        </select>
+                      </FormGroup>
+                    </>
+                  )}
+
+                  {values.activationType === "linha_nova" && (
+                    <FormGroup id="ddd" label="DDD" error={errors.ddd}>
+                      <select
+                        id="ddd-field"
+                        value={values.ddd}
+                        onChange={(e) => updateField("ddd", e.target.value)}
+                      >
+                        <option value="">Selecione</option>
+                        {TELECOM_DDD_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </FormGroup>
+                  )}
 
                   <div className="tqf-actions">
                     <button
                       type="button"
                       className="tqf-btn-secondary"
                       onClick={() => setStep(1)}
+                      disabled={isSyncingCrm}
+                    >
+                      Voltar
+                    </button>
+                    <button
+                      type="button"
+                      className="tqf-btn-primary"
+                      onClick={() => void goToStep3()}
+                      disabled={isSyncingCrm}
+                    >
+                      {isSyncingCrm ? "Registrando..." : "Continuar"}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <div className={`tqf-plans-scroll${errors.selectedPlan ? " has-error" : ""}`}>
+                    {plans.map((plan) => {
+                      const isSelected = values.selectedPlan === plan.id;
+                      return (
+                        <button
+                          key={plan.id}
+                          type="button"
+                          className={`tqf-plan-card${isSelected ? " selected" : ""}`}
+                          onClick={() => updateField("selectedPlan", plan.id)}
+                        >
+                          {isSelected && (
+                            <span className="tqf-plan-selected-badge" aria-hidden>
+                              <Check className="h-3.5 w-3.5" />
+                            </span>
+                          )}
+                          <span className="tqf-plan-name">Plano {plan.name}</span>
+                          <span className="tqf-plan-data">{plan.dataMain}</span>
+                          {plan.dataBonus && (
+                            <span className="tqf-plan-bonus">{plan.dataBonus}</span>
+                          )}
+                          {plan.dataDetail && (
+                            <span className="tqf-plan-detail">{plan.dataDetail}</span>
+                          )}
+                          <ul className="tqf-plan-features">
+                            {plan.features.map((feature) => (
+                              <li key={feature}>{feature}</li>
+                            ))}
+                          </ul>
+                          <span className="tqf-plan-price">
+                            {formatTelecomPrice(plan.price)}
+                            <small>/mês</small>
+                          </span>
+                          {plan.priceNote && (
+                            <span className="tqf-plan-note">{plan.priceNote}</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.selectedPlan && (
+                    <div className="tqf-error tqf-error-block">{errors.selectedPlan}</div>
+                  )}
+
+                  <div className="tqf-actions">
+                    <button
+                      type="button"
+                      className="tqf-btn-secondary"
+                      onClick={() => setStep(2)}
                       disabled={isSubmitting}
                     >
                       Voltar
@@ -356,16 +456,57 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
                     <button
                       type="button"
                       className="tqf-btn-primary"
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
+                      onClick={() => void handleSubmit()}
+                      disabled={isSubmitting || isSyncingCrm}
                     >
-                      {isSubmitting ? "Enviando..." : "Finalizar no WhatsApp"}
+                      {isSubmitting ? "Enviando..." : "Finalizar solicitação"}
                     </button>
                   </div>
                 </>
               )}
 
-              {crmError && <div className="tqf-crm-error">{crmError}</div>}
+              {step === 4 && (
+                <div className="tqf-success">
+                  <div className="tqf-success-icon" aria-hidden>
+                    <Check className="h-7 w-7" />
+                  </div>
+
+                  <p className="tqf-success-intro">
+                    Recebemos seus dados e sua solicitação já está em andamento.
+                  </p>
+                  <p className="tqf-success-intro">
+                    Nos próximos instantes, um de nossos especialistas entrará em contato pelo
+                    WhatsApp para finalizar sua contratação.
+                  </p>
+
+                  <h3 className="tqf-success-heading">Próximos passos:</h3>
+                  <ul className="tqf-success-list">
+                    <li>Conferência das informações enviadas.</li>
+                    <li>Atendimento personalizado via WhatsApp.</li>
+                    <li>
+                      Orientação sobre a portabilidade ou ativação de um novo número.
+                    </li>
+                    <li>Finalização da contratação de forma rápida e segura.</li>
+                  </ul>
+
+                  <p className="tqf-success-whatsapp">
+                    📲 Fique atento ao WhatsApp cadastrado. Nossa equipe utilizará esse canal para
+                    dar continuidade ao seu atendimento.
+                  </p>
+
+                  <p className="tqf-success-thanks">
+                    Obrigado por escolher nossos serviços. Em breve falaremos com você!
+                  </p>
+
+                  <div className="tqf-actions tqf-actions-single">
+                    <button type="button" className="tqf-btn-primary" onClick={handleClose}>
+                      Fechar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {crmError && step !== 4 && <div className="tqf-crm-error">{crmError}</div>}
             </div>
           </motion.div>
         </motion.div>

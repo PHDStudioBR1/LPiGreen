@@ -2,20 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-type TelecomCrmStep = "plan" | "contact";
+type TelecomCrmStep = "activation" | "details" | "contact";
 
 type TelecomCrmPayload = {
   step: TelecomCrmStep;
   session_id?: string;
   values?: {
-    planType?: string;
-    dataGb?: string;
-    portability?: string;
-    name?: string;
+    activationType?: string;
     cpfCnpj?: string;
-    email?: string;
-    phone?: string;
-    cep?: string;
+    chipType?: string;
+    portNumber?: string;
+    currentOperator?: string;
+    ddd?: string;
+    selectedPlan?: string;
   };
 };
 
@@ -62,12 +61,20 @@ type CrmResponse<T = unknown> = {
 const TOKEN_CACHE: Partial<Record<CrmConfig["env"], CrmLogin>> = {};
 
 const TAGS_BY_STEP: Record<TelecomCrmStep, string[]> = {
-  plan: [
+  activation: [
     "whatsapp-n8n",
     "produto-telecom",
     "telecom-site",
     "telecom-contratacao-iniciada",
     "telecom-step-1",
+  ],
+  details: [
+    "whatsapp-n8n",
+    "produto-telecom",
+    "telecom-site",
+    "telecom-contratacao-iniciada",
+    "telecom-step-1",
+    "telecom-step-2",
   ],
   contact: [
     "whatsapp-n8n",
@@ -76,8 +83,8 @@ const TAGS_BY_STEP: Record<TelecomCrmStep, string[]> = {
     "telecom-contratacao-iniciada",
     "telecom-step-1",
     "telecom-step-2",
+    "telecom-step-3",
     "telecom-contratacao-completa",
-    "telecom-whatsapp-redirecionado",
   ],
 };
 
@@ -92,14 +99,6 @@ function cleanString(value: unknown, maxLength = 255): string {
 
 function onlyDigits(value: unknown): string {
   return cleanString(value).replace(/\D/g, "");
-}
-
-function splitName(name: string): { firstName: string; lastName: string } {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  return {
-    firstName: parts[0] || "Lead",
-    lastName: parts.slice(1).join(" ") || "Telecom",
-  };
 }
 
 function getCrmConfig(): CrmConfig {
@@ -228,20 +227,22 @@ function existingTagNames(lead: CrmLead): string[] {
 
 function buildLeadPayload(config: CrmConfig, payload: TelecomCrmPayload) {
   const values = payload.values || {};
-  const name = cleanString(values.name, 180);
-  const phoneDigits = onlyDigits(values.phone);
-  const email = cleanString(values.email, 180).toLowerCase();
   const cpfCnpj = cleanString(values.cpfCnpj, 32);
-  const cepDigits = onlyDigits(values.cep);
-  const { firstName, lastName } = splitName(name);
+  const cpfDigits = onlyDigits(values.cpfCnpj);
+  const portDigits = onlyDigits(values.portNumber);
+  const ddd = cleanString(values.ddd, 4);
+  const phoneDigits =
+    portDigits.length >= 10 ? portDigits : ddd ? `${ddd}000000000`.slice(0, 11) : cpfDigits.slice(0, 11);
   const placeholderTenant = config.tenantSlug.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "igreen";
+  const activationLabel =
+    cleanString(values.activationType) === "portabilidade" ? "Portabilidade" : "Linha Nova";
 
   if (payload.step === "contact") {
-    if (!phoneDigits || phoneDigits.length < 10) {
-      throw new Error("Telefone inválido para criar lead no CRM");
+    if (cpfDigits.length < 11) {
+      throw new Error("CPF/CNPJ inválido para criar lead no CRM");
     }
-    if (!name) {
-      throw new Error("Nome obrigatório para criar lead no CRM");
+    if (!cleanString(values.selectedPlan)) {
+      throw new Error("Plano obrigatório para criar lead no CRM");
     }
   }
 
@@ -252,17 +253,24 @@ function buildLeadPayload(config: CrmConfig, payload: TelecomCrmPayload) {
     main_pain: "contratacao plano celular",
     telecom_step: payload.step,
     telecom_session_id: cleanString(payload.session_id, 80),
-    plan_type: cleanString(values.planType, 80),
-    data_gb: cleanString(values.dataGb, 20),
-    portability: cleanString(values.portability, 20),
+    activation_type: cleanString(values.activationType, 40),
+    chip_type: cleanString(values.chipType, 20),
+    port_number: cleanString(values.portNumber, 32),
+    current_operator: cleanString(values.currentOperator, 80),
+    ddd: ddd,
+    selected_plan: cleanString(values.selectedPlan, 40),
   };
 
-  if (payload.step === "contact") {
+  if (payload.step === "details" || payload.step === "contact") {
     customValues.document_number = cpfCnpj;
-    customValues.cep = cepDigits;
+  }
+
+  if (payload.step === "contact") {
     customValues.telecom_quote_status = "contact_completed";
+  } else if (payload.step === "details") {
+    customValues.telecom_quote_status = "details_completed";
   } else {
-    customValues.telecom_quote_status = "plan_selected";
+    customValues.telecom_quote_status = "activation_selected";
   }
 
   Object.keys(customValues).forEach((key) => {
@@ -270,12 +278,9 @@ function buildLeadPayload(config: CrmConfig, payload: TelecomCrmPayload) {
   });
 
   return {
-    email:
-      payload.step === "contact" && email
-        ? email
-        : `${phoneDigits || "lead"}@w.phdcrm.${placeholderTenant}.local`,
-    first_name: firstName,
-    last_name: lastName,
+    email: `${cpfDigits || phoneDigits || "lead"}@w.phdcrm.${placeholderTenant}.local`,
+    first_name: "Lead",
+    last_name: `Telecom ${activationLabel}`.slice(0, 80),
     phone: phoneDigits || "0000000000",
     tenant_slug: config.tenantSlug,
     source: "site_telecom",
@@ -288,24 +293,25 @@ function buildLeadPayload(config: CrmConfig, payload: TelecomCrmPayload) {
 
 function buildActivityDescription(payload: TelecomCrmPayload): string {
   const values = payload.values || {};
+  const stepLabel =
+    payload.step === "contact"
+      ? "Plano selecionado"
+      : payload.step === "details"
+        ? "Dados preenchidos"
+        : "Tipo de ativacao";
+
   const lines = [
     "Origem: /telecom",
-    `Etapa: ${payload.step === "contact" ? "Dados de contato" : "Plano"}`,
+    `Etapa: ${stepLabel}`,
     payload.session_id ? `Sessao: ${payload.session_id}` : null,
-    `Tipo plano: ${cleanString(values.planType) || "-"}`,
-    `Dados: ${cleanString(values.dataGb) || "-"} GB`,
-    `Portabilidade: ${cleanString(values.portability) || "-"}`,
-    `Nome: ${cleanString(values.name) || "-"}`,
-    `WhatsApp: ${cleanString(values.phone) || "-"}`,
+    `Tipo: ${cleanString(values.activationType) || "-"}`,
+    `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
+    `Chip: ${cleanString(values.chipType) || "-"}`,
+    `Numero a portar: ${cleanString(values.portNumber) || "-"}`,
+    `Operadora atual: ${cleanString(values.currentOperator) || "-"}`,
+    `DDD: ${cleanString(values.ddd) || "-"}`,
+    `Plano: ${cleanString(values.selectedPlan) || "-"}`,
   ];
-
-  if (payload.step === "contact") {
-    lines.push(
-      `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
-      `E-mail: ${cleanString(values.email) || "-"}`,
-      `CEP: ${cleanString(values.cep) || "-"}`
-    );
-  }
 
   return lines.filter(Boolean).join("\n");
 }
@@ -392,8 +398,10 @@ async function createActivity(config: CrmConfig, leadId: number, payload: Teleco
   const auth = await login(config);
   const title =
     payload.step === "contact"
-      ? "Telecom: dados de contato preenchidos"
-      : "Telecom: contratacao iniciada";
+      ? "Telecom: plano selecionado"
+      : payload.step === "details"
+        ? "Telecom: dados preenchidos"
+        : "Telecom: contratacao iniciada";
 
   return crmRequest(config, "/api/crm/v1/activities", {
     method: "POST",
@@ -416,7 +424,7 @@ export async function POST(request: NextRequest) {
     return jsonError("JSON inválido", 400);
   }
 
-  if (payload.step !== "plan" && payload.step !== "contact") {
+  if (payload.step !== "activation" && payload.step !== "details" && payload.step !== "contact") {
     return jsonError("step inválido", 400);
   }
 
@@ -445,8 +453,15 @@ export async function POST(request: NextRequest) {
 
     let responsavelAssigned: { userId: number; representativeName: string } | null = null;
     if (payload.step === "contact") {
-      const leadName = cleanString(payload.values?.name, 180);
-      const leadPhone = onlyDigits(payload.values?.phone);
+      const leadName = "Lead Telecom";
+      const portDigits = onlyDigits(payload.values?.portNumber);
+      const ddd = cleanString(payload.values?.ddd, 4);
+      const leadPhone =
+        portDigits.length >= 10
+          ? portDigits
+          : ddd
+            ? `${ddd}000000000`.slice(0, 11)
+            : onlyDigits(payload.values?.cpfCnpj).slice(0, 11);
       try {
         const representative = await fetchNextRepresentative(leadName, leadPhone);
         if (representative) {

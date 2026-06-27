@@ -20,6 +20,10 @@
   color: #0f172a;
 }
 
+.telecom-quote-modal-shell-wide {
+  max-width: 720px;
+}
+
 .telecom-quote-modal-close {
   position: absolute;
   top: 12px;
@@ -171,4 +175,252 @@
   background: #fef2f2;
   color: #dc2626;
   font-size: 0.8125rem;
+}
+
+.tqf-error-block {
+  margin-top: 0.75rem;
+}
+
+.tqf-type-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.tqf-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  padding: 1.25rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.tqf-type-btn:hover:not(:disabled) {
+  border-color: #6c3aed;
+  box-shadow: 0 0 0 3px rgba(108, 58, 237, 0.12);
+}
+
+.tqf-type-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tqf-type-btn-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.tqf-type-btn-desc {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.tqf-plans-scroll {
+  display: flex;
+  gap: 0.875rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0.125rem 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.tqf-plans-scroll.has-error {
+  outline: 2px solid #fecaca;
+  border-radius: 1rem;
+}
+
+.tqf-plan-card {
+  position: relative;
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  padding: 1.25rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 1.125rem;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.tqf-plan-card:hover {
+  border-color: #c4b5fd;
+}
+
+.tqf-plan-card.selected {
+  border-color: #6c3aed;
+  box-shadow: 0 8px 28px rgba(108, 58, 237, 0.18);
+}
+
+.tqf-plan-selected-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #6c3aed;
+  color: #fff;
+}
+
+.tqf-plan-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #6c3aed;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tqf-plan-data {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.tqf-plan-bonus {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+.tqf-plan-detail {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.tqf-plan-features {
+  list-style: none;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0;
+  width: 100%;
+}
+
+.tqf-plan-features li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.tqf-plan-features li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #6c3aed;
+}
+
+.tqf-plan-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: auto;
+}
+
+.tqf-plan-price small {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.tqf-plan-note {
+  font-size: 0.6875rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.tqf-success {
+  text-align: center;
+}
+
+.tqf-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1.25rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.tqf-success-intro {
+  font-size: 0.9375rem;
+  color: #475569;
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+}
+
+.tqf-success-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 1.25rem 0 0.75rem;
+  text-align: left;
+}
+
+.tqf-success-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  text-align: left;
+}
+
+.tqf-success-list li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.tqf-success-list li::before {
+  content: "✅";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.tqf-success-whatsapp,
+.tqf-success-thanks {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.tqf-actions-single {
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .tqf-type-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .tqf-plan-card {
+    flex-basis: 220px;
+  }
 }
