@@ -31,6 +31,20 @@ export const SEGUROS_HERO_BADGES = [
   "Regulamentado SUSEP",
 ] as const;
 
+export const SEGUROS_HIGHLIGHTS_MARQUEE = [
+  "Modelo de Seguro por Assinatura",
+  "Sem Fidelidade ou Multas",
+  "Regulamentação SUSEP",
+  "iGreen Club (Clube de Benefícios e Descontos)",
+  "Assistência 24 Horas em Todo o Brasil",
+  "Indenização de 100% da Tabela FIPE",
+  "Aceitação de Motoristas de Aplicativo e Táxis",
+  "Aceitação de Veículos de Leilão",
+  "Vistoria Digital e Ágil",
+  "Previsibilidade Financeira (Mensalidade Fixa)",
+  "Sem Análise de Crédito Tradicional",
+] as const;
+
 export const SEGUROS_NAV_ITEMS = [
   { id: "beneficios", label: "Benefícios" },
   { id: "comparacao", label: "Comparativo" },

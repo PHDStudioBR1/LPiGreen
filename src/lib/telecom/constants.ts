@@ -20,7 +20,7 @@ export const TELECOM_SITE_URL =
 export const TELECOM_WHATSAPP_URL =
   "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20contratar%20o%20Telecom%20iGreen.";
 
-export const TELECOM_HEADER_OFFSET = 140;
+export const TELECOM_HEADER_OFFSET = 110;
 
 export const TELECOM_LOGO_SRC = "/images/logo_igreen_telecom_branco.png";
 

@@ -14,12 +14,12 @@ html:has(.telecom-page) {
 }
 
 .telecom-page [id] {
-  scroll-margin-top: 140px;
+  scroll-margin-top: 110px;
 }
 
 @media (max-width: 1023px) {
   .telecom-page [id] {
-    scroll-margin-top: 100px;
+    scroll-margin-top: 88px;
   }
 }
 
@@ -39,6 +39,21 @@ html:has(.telecom-page) {
 
 .telecom-glow {
   box-shadow: 0 4px 24px rgba(108, 58, 237, 0.12);
+}
+
+.telecom-testimonial-video {
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.telecom-testimonial-video__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

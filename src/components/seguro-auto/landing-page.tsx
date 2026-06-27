@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { trackSegurosPageView } from "@/lib/seguros/analytics";
 import { Header } from "@/components/seguro-auto/header/header";
 import { HeroSection } from "@/components/seguro-auto/hero/hero-section";
+import { HighlightsMarquee } from "@/components/seguros/highlights-marquee/highlights-marquee";
 import { PlansShowcase } from "@/components/seguro-auto/sections/plans-showcase";
 import { BenefitsSection } from "@/components/seguro-auto/sections/benefits-section";
 import { ComparisonSection } from "@/components/seguro-auto/sections/comparison-section";
 import { ClubSection } from "@/components/seguro-auto/sections/club-section";
+import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { AppSection } from "@/components/seguro-auto/sections/app-section";
 import { FaqSection } from "@/components/seguro-auto/sections/faq-section";
 import { CtaBanner } from "@/components/seguro-auto/sections/cta-banner";
@@ -31,10 +33,12 @@ export function SeguroAutoLandingPage() {
 
       <main className="pb-20 md:pb-0">
         <HeroSection onQuoteClick={openQuote} />
+        <HighlightsMarquee variant="seguro-auto" />
         <BenefitsSection />
         <PlansShowcase />
         <ComparisonSection onQuoteClick={openQuote} />
         <ClubSection onQuoteClick={openQuote} />
+        <TestimonialsSection />
         <AppSection onQuoteClick={openQuote} />
         <FaqSection />
         <CtaBanner onQuoteClick={openQuote} />

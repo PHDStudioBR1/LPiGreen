@@ -50,24 +50,12 @@ export function Header({ onQuoteClick }: HeaderProps) {
 
   return (
     <>
-      {/* Promo banner — igual referência do vídeo */}
-      <div className="fixed inset-x-0 top-0 z-[51] bg-[#00e676] py-1.5 text-center text-[11px] font-medium text-[#060806] sm:text-xs">
-        Faça sua portabilidade hoje e ganhe seu primeiro mês grátis.{" "}
-        <button
-          type="button"
-          onClick={() => scrollToSection("#como-funciona")}
-          className="font-semibold underline-offset-2 hover:underline"
-        >
-          Saiba mais →
-        </button>
-      </div>
-
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "fixed inset-x-0 top-[30px] z-50 backdrop-blur-md transition-all duration-300 sm:top-[32px]",
+          "fixed inset-x-0 top-0 z-50 backdrop-blur-md transition-all duration-300",
           isScrolled
             ? "bg-[#060806] shadow-[0_4px_24px_rgba(0,0,0,0.25)]"
             : "bg-[#060806]/80"

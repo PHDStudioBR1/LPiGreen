@@ -1,93 +1,50 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { Star } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
-import { SEGUROS_TESTIMONIALS } from "@/lib/seguros/data";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { IGREEN_VIDEO_TESTIMONIALS, getYouTubeEmbedUrl } from "@/lib/video-testimonials";
 import { SectionHeader } from "@/components/seguros/ui/section-header";
 import { MotionBlock } from "@/components/seguros/ui/motion";
 
 export function TestimonialsSection() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [
-    Autoplay({ delay: 5000, stopOnInteraction: false }),
-  ]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
   return (
     <section id="depoimentos" className="seguros-section">
       <div className="container mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="Depoimentos"
           title="O que nossos clientes dizem"
-          description="Histórias reais de quem encontrou proteção quando mais precisava."
+          description="Histórias reais de quem encontrou a proteção ideal e ainda passou a economizar todos os meses com os benefícios exclusivos do iGreen Club."
           className="mb-10 sm:mb-14"
         />
 
         <MotionBlock>
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-4 md:gap-6">
-              {SEGUROS_TESTIMONIALS.map((item) => (
-                <article
-                  key={item.id}
-                  className="min-w-0 flex-[0_0_100%] seguros-glass rounded-3xl p-5 sm:flex-[0_0_calc(50%-12px)] sm:p-6 md:p-8 lg:flex-[0_0_calc(33.333%-16px)]"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 ring-2 ring-seguros-primary/30">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        sizes="56px"
-                        className="object-cover"
+          <Carousel opts={{ align: "start", loop: true }} className="mx-auto max-w-4xl">
+            <CarouselContent className="-ml-4">
+              {IGREEN_VIDEO_TESTIMONIALS.map((testimonial) => (
+                <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2">
+                  <div className="seguros-testimonial-video">
+                    <div className="relative aspect-video w-full">
+                      <iframe
+                        src={getYouTubeEmbedUrl(testimonial.youtubeId)}
+                        className="seguros-testimonial-video__frame"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        title={`Depoimento iGreen Seguros ${testimonial.id}`}
+                        allowFullScreen
                       />
                     </div>
-                    <div>
-                      <p className="font-bold text-seguros-text">{item.name}</p>
-                      <p className="text-sm text-seguros-muted">{item.city}</p>
-                    </div>
                   </div>
-
-                  <div className="flex gap-0.5 mb-4">
-                    {Array.from({ length: item.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-seguros-primary text-seguros-primary" />
-                    ))}
-                  </div>
-
-                  <p className="text-seguros-muted leading-relaxed">&ldquo;{item.comment}&rdquo;</p>
-                </article>
+                </CarouselItem>
               ))}
-            </div>
-          </div>
-
-          <div className="flex justify-center gap-2 mt-8">
-            {SEGUROS_TESTIMONIALS.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                aria-label={`Depoimento ${i + 1}`}
-                onClick={() => emblaApi?.scrollTo(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === selectedIndex ? "w-8 bg-seguros-primary" : "w-2 bg-seguros-muted/40"
-                }`}
-              />
-            ))}
-          </div>
+            </CarouselContent>
+            <CarouselPrevious className="seguros-testimonials-carousel__nav hidden sm:flex" />
+            <CarouselNext className="seguros-testimonials-carousel__nav hidden sm:flex" />
+          </Carousel>
         </MotionBlock>
       </div>
     </section>

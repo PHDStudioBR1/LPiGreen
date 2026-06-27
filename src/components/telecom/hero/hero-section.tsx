@@ -39,7 +39,7 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
   return (
     <section
       id="inicio"
-      className="relative overflow-hidden pt-[98px] text-white sm:pt-[100px] lg:pt-[140px]"
+      className="relative overflow-hidden pt-[68px] text-white sm:pt-[72px] lg:pt-[110px]"
     >
       <Container className="relative pb-16 pt-6 sm:pb-20 sm:pt-8 lg:pb-28 lg:pt-10">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-10 xl:gap-16">
@@ -129,17 +129,6 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
                 <ArrowRight className="h-4 w-4" />
               </button>
             </motion.div>
-
-            <motion.button
-              variants={fadeUp}
-              type="button"
-              onClick={() => handleQuote("hero_portability")}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#00e676]/20 bg-[#00e676]/[0.06] px-4 py-2 text-xs font-medium text-[#00e676] transition-colors hover:bg-[#00e676]/10"
-            >
-              <span aria-hidden>💚</span>
-              Portabilidade premiada: ganhe seu primeiro mês grátis
-              <ArrowRight className="h-3 w-3" />
-            </motion.button>
 
             <motion.div
               variants={fadeUp}

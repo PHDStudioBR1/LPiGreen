@@ -44,14 +44,6 @@ export type TelecomStep = {
   description: string;
 };
 
-export type TelecomTestimonial = {
-  id: string;
-  name: string;
-  role: string;
-  quote: string;
-  rating: number;
-};
-
 export type TelecomFaqItem = {
   id: string;
   question: string;
@@ -252,44 +244,6 @@ export const TELECOM_STEPS: TelecomStep[] = [
     step: 4,
     title: "Aproveite os benefícios",
     description: "Cashback, clube de vantagens e suporte 24h desde o primeiro dia.",
-  },
-];
-
-export const TELECOM_TESTIMONIALS: TelecomTestimonial[] = [
-  {
-    id: "1",
-    name: "Camila R.",
-    role: "Empreendedora — São Paulo",
-    quote: "Migrei em 10 minutos. A fatura caiu 40% e o app é muito mais claro que da operadora anterior.",
-    rating: 5,
-  },
-  {
-    id: "2",
-    name: "Rafael M.",
-    role: "Desenvolvedor — Curitiba",
-    quote: "Portabilidade sem dor de cabeça. Mantive meu número e o cashback já pagou metade da primeira fatura.",
-    rating: 5,
-  },
-  {
-    id: "3",
-    name: "Juliana S.",
-    role: "Professora — Belo Horizonte",
-    quote: "Atendimento pelo WhatsApp resolveu tudo em minutos. Finalmente uma operadora que respeita o cliente.",
-    rating: 5,
-  },
-  {
-    id: "4",
-    name: "Diego A.",
-    role: "Motorista de app — Rio de Janeiro",
-    quote: "Internet estável o dia inteiro e plano sem fidelidade. Posso cancelar quando quiser, mas não vou.",
-    rating: 5,
-  },
-  {
-    id: "5",
-    name: "Patrícia L.",
-    role: "Designer — Florianópolis",
-    quote: "O clube de benefícios vale a pena demais. Descontos em streaming e delivery todo mês.",
-    rating: 5,
   },
 ];
 
