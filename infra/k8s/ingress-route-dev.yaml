@@ -11,7 +11,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: redirect-https
@@ -30,42 +30,42 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/admin`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/seguros`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/telecom`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api`)
       kind: Rule
@@ -73,15 +73,15 @@ spec:
         - name: api-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
-        - name: security-headers
+        - name: security-headers-dev
           namespace: lpigreen
         - name: compress
           namespace: lpigreen

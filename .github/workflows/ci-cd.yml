@@ -225,7 +225,9 @@ jobs:
           if [ -d "infra/k8s/middlewares" ]; then
             kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
           fi
+          kubectl apply -f infra/k8s/deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/ingress-route.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/ingress-route-dev.yaml -n ${{ env.K8S_NAMESPACE }}
 
       - name: Verificar rotas públicas (prod)
         run: bash scripts/verify-public-routes.sh https://lpigreen.546digitalservices.com
@@ -256,111 +258,36 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Configurar acesso ao cluster
+      - name: Configurar acesso ao cluster (prod — lpigreendev usa o mesmo cluster)
         run: |
           mkdir -p $HOME/.kube
-          KUBECONFIG_SECRET="${{ secrets.KUBECONFIG_DEV || secrets.KUBECONFIG }}"
-          if [ -z "$KUBECONFIG_SECRET" ]; then
-            echo "⚠️ Configure KUBECONFIG_DEV (ou KUBECONFIG) em Settings > Secrets > Actions"
+          if [ -z "${{ secrets.KUBECONFIG }}" ]; then
+            echo "❌ Secret KUBECONFIG não configurado. O deploy de dev usa o mesmo cluster de prod."
             exit 1
           fi
-          echo "$KUBECONFIG_SECRET" | base64 -d > $HOME/.kube/config
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
           kubectl cluster-info || { echo "⚠️ Erro ao conectar ao cluster."; exit 1; }
 
-      - name: Aplicar Namespace
-        run: kubectl apply -f infra/k8s/namespace.yaml
-
-      - name: ConfigMap mysql-init
+      - name: Definir imagem do frontend dev
+        id: dev_image
         run: |
-          kubectl create configmap mysql-init -n ${{ env.K8S_NAMESPACE }} \
-            --from-file=init.sql=infra/mysql/init.sql \
-            --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Deploy MySQL
-        run: |
-          kubectl apply -f infra/k8s/mysql-secret.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/mysql-configmap.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/mysql-pvc.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/mysql-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/mysql -n ${{ env.K8S_NAMESPACE }} --timeout=300s || true
-
-      - name: Job criar usuário MySQL (idempotente)
-        run: |
-          kubectl delete job mysql-create-app-user -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
-          kubectl apply -f infra/k8s/mysql-create-user-job.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl wait --for=condition=complete job/mysql-create-app-user -n ${{ env.K8S_NAMESPACE }} --timeout=120s || true
-
-      - name: Migrações do banco de dados
-        run: |
-          for JOB in infra/k8s/mysql-*-migration-job.yaml; do
-            JOB_NAME=$(grep "^  name:" "$JOB" | head -1 | awk '{print $2}')
-            kubectl delete job "$JOB_NAME" -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
-            kubectl apply -f "$JOB" -n ${{ env.K8S_NAMESPACE }}
-            kubectl wait --for=condition=complete job/"$JOB_NAME" -n ${{ env.K8S_NAMESPACE }} --timeout=120s || true
-          done
-
-      - name: Secret doc-ai
-        run: |
-          kubectl create secret generic doc-ai-secret -n ${{ env.K8S_NAMESPACE }} \
-            --from-literal=DOC_AI_PROVIDER="${{ secrets.DOC_AI_PROVIDER || '' }}" \
-            --from-literal=OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY || '' }}" \
-            --from-literal=OPENAI_MODEL="${{ secrets.OPENAI_MODEL || 'gpt-4.1-mini' }}" \
-            --from-literal=DOC_AI_TIMEOUT_MS="${{ secrets.DOC_AI_TIMEOUT_MS || '8000' }}" \
-            --from-literal=DEEPSEEK_API_KEY="${{ secrets.DEEPSEEK_API_KEY || '' }}" \
-            --from-literal=DEEPSEEK_MODEL="${{ secrets.DEEPSEEK_MODEL || 'deepseek-chat' }}" \
-            --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
-
-      - name: Deploy Redis
-        run: |
-          kubectl apply -f infra/k8s/redis-secret.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/redis-pvc.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/redis-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/redis -n ${{ env.K8S_NAMESPACE }} --timeout=180s || true
-
-      - name: Deploy API (backend)
-        run: |
-          kubectl apply -f infra/k8s/api-secret.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl apply -f infra/k8s/backend-deployment.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl set image deployment/lpigreen-api \
-            api=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }} \
-            -n ${{ env.K8S_NAMESPACE }}
-          if ! kubectl rollout status deployment/lpigreen-api -n ${{ env.K8S_NAMESPACE }} --timeout=300s; then
-            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o wide
-            for POD in $(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-api -o jsonpath='{.items[*].metadata.name}'); do
-              kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --tail=80 || true
-            done
-            exit 1
-          fi
-
-      - name: Secret CRM Admin
-        run: |
-          ADMIN_USER="${{ secrets.ADMIN_USER_DEV || secrets.ADMIN_USER }}"
-          ADMIN_PASS="${{ secrets.ADMIN_PASSWORD_DEV || secrets.ADMIN_PASSWORD }}"
-          ADMIN_JWT="${{ secrets.ADMIN_JWT_SECRET_DEV || secrets.ADMIN_JWT_SECRET }}"
-          if [ -n "$ADMIN_USER" ] && [ -n "$ADMIN_PASS" ] && [ -n "$ADMIN_JWT" ]; then
-            kubectl create secret generic admin-secret -n ${{ env.K8S_NAMESPACE }} \
-              --from-literal=admin-user="$ADMIN_USER" \
-              --from-literal=admin-password="$ADMIN_PASS" \
-              --from-literal=admin-jwt-secret="$ADMIN_JWT" \
-              --dry-run=client -o yaml | kubectl apply -n ${{ env.K8S_NAMESPACE }} -f -
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            kubectl apply -f infra/k8s/admin-secret.yaml -n ${{ env.K8S_NAMESPACE }}
+            echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:develop" >> $GITHUB_OUTPUT
           fi
 
-      - name: Deploy Frontend
+      - name: Deploy Frontend (dev)
         run: |
-          kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl set image deployment/lpigreen-web \
-            web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }} \
+          kubectl apply -f infra/k8s/deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl set image deployment/lpigreen-web-dev \
+            web=${{ steps.dev_image.outputs.web_image }} \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl set env deployment/lpigreen-web \
-            LEAD_API_URL=http://api-dev-service.phdcrm-dev.svc.cluster.local \
-            RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local \
-            PHDCRM_ENV=dev \
-            -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout restart deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+          kubectl rollout restart deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+          echo "Imagem em execução:"
+          kubectl get deployment lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 
       - name: Aplicar Middlewares e IngressRoute (dev)
         run: |
