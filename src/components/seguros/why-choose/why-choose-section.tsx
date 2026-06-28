@@ -37,46 +37,38 @@ function ComparisonColumn({ title, variant, items }: ComparisonColumnProps) {
   return (
     <div
       className={cn(
-        "seguros-comparison-column flex flex-col overflow-hidden rounded-2xl sm:rounded-3xl",
+        "seguros-comparison-column flex flex-col overflow-hidden rounded-2xl bg-white sm:rounded-3xl",
         variant === "igreen" && "seguros-comparison-column--igreen"
       )}
     >
-      <div
-        className={cn(
-          "border-b px-4 py-4 sm:px-6 sm:py-5",
-          variant === "igreen"
-            ? "border-seguros-primary/20 bg-seguros-primary/10"
-            : "border-seguros-primary/10 bg-seguros-secondary/30"
-        )}
-      >
+      <div className="border-b border-neutral-200 bg-white px-4 py-4 sm:px-6 sm:py-5">
         <h3
           className={cn(
             "font-seguros-headline text-base font-bold sm:text-lg",
             variant === "igreen" && "text-seguros-primary",
-            variant === "traditional" && "text-seguros-muted",
-            variant === "neutral" && "text-seguros-text"
+            variant === "traditional" && "text-red-500",
+            variant === "neutral" && "text-neutral-900"
           )}
         >
           {title}
         </h3>
       </div>
 
-      <ul className="flex flex-1 flex-col">
+      <ul className="flex flex-1 flex-col bg-white">
         {items.map((item, index) => (
           <li
             key={`${title}-${index}`}
             className={cn(
-              "flex min-h-[3.25rem] items-center gap-3 border-b border-seguros-primary/8 px-4 py-3 last:border-b-0 sm:min-h-[3.5rem] sm:px-6 sm:py-3.5",
-              index % 2 === 0 && "bg-seguros-bg/25"
+              "flex min-h-[3.25rem] items-center gap-3 border-b border-neutral-100 bg-white px-4 py-3 last:border-b-0 sm:min-h-[3.5rem] sm:px-6 sm:py-3.5",
+              index % 2 === 1 && "bg-neutral-50"
             )}
           >
             {variant !== "neutral" && <ComparisonIcon variant={variant} />}
             <span
               className={cn(
-                "text-sm leading-snug sm:text-[0.9375rem]",
-                variant === "igreen" && "font-medium text-seguros-text",
-                variant === "traditional" && "text-seguros-muted",
-                variant === "neutral" && "font-medium text-seguros-text"
+                "text-sm leading-snug text-neutral-800 sm:text-[0.9375rem]",
+                variant === "igreen" && "font-medium",
+                variant === "neutral" && "font-medium"
               )}
             >
               {item}
@@ -94,8 +86,17 @@ export function WhyChooseSection({ onQuoteClick }: WhyChooseSectionProps) {
   const traditionalItems = SEGUROS_COMPARISON.map((row) => row.traditional);
 
   return (
-    <section id="comparacao" className="seguros-section bg-seguros-dark/50">
-      <div className="container mx-auto px-4 sm:px-6">
+    <section
+      id="comparacao"
+      className="seguros-section relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, #0D3D2A 0%, #061B12 50%, #020B07 100%)",
+      }}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,200,83,0.12),transparent)]" />
+
+      <div className="container relative mx-auto px-4 sm:px-6">
         <SectionHeader
           eyebrow="Comparativo"
           title={
@@ -114,28 +115,28 @@ export function WhyChooseSection({ onQuoteClick }: WhyChooseSectionProps) {
             {SEGUROS_COMPARISON.map((row) => (
               <article
                 key={row.characteristic}
-                className="seguros-glass overflow-hidden rounded-2xl"
+                className="overflow-hidden rounded-2xl border border-neutral-200 bg-white"
               >
-                <div className="border-b border-seguros-primary/10 bg-seguros-secondary/30 px-4 py-3">
-                  <p className="text-sm font-semibold text-seguros-text">{row.characteristic}</p>
+                <div className="border-b border-neutral-200 bg-white px-4 py-3">
+                  <p className="text-sm font-semibold text-neutral-900">{row.characteristic}</p>
                 </div>
-                <div className="divide-y divide-seguros-primary/8">
-                  <div className="flex items-center gap-3 bg-seguros-primary/5 px-4 py-3">
+                <div className="divide-y divide-neutral-100">
+                  <div className="flex items-center gap-3 bg-white px-4 py-3">
                     <ComparisonIcon variant="igreen" />
                     <div className="min-w-0">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-seguros-primary">
                         Seguro iGreen
                       </p>
-                      <p className="text-sm font-medium text-seguros-text">{row.igreen}</p>
+                      <p className="text-sm font-medium text-neutral-800">{row.igreen}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
+                  <div className="flex items-center gap-3 bg-neutral-50 px-4 py-3">
                     <ComparisonIcon variant="traditional" />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-seguros-muted">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-red-500">
                         Seguro Tradicional
                       </p>
-                      <p className="text-sm text-seguros-muted">{row.traditional}</p>
+                      <p className="text-sm text-neutral-700">{row.traditional}</p>
                     </div>
                   </div>
                 </div>

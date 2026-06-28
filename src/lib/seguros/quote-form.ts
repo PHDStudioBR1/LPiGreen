@@ -1,22 +1,11 @@
 export const SEGUROS_VEHICLE_TYPES = [
   "Carro",
   "Moto",
-  "Caminhão",
-  "Van / Utilitário",
 ] as const;
 
-export const SEGUROS_VEHICLE_USES = [
-  "Uso pessoal / família",
-  "Motorista de app (Uber, 99, InDriver)",
-  "Entregador (iFood, Rappi, Loggi)",
-  "Táxi",
-  "Trabalho / Comercial",
-] as const;
-
-export const SEGUROS_GARAGE_OPTIONS = [
-  { value: "Sim", label: "Sim, tenho garagem" },
-  { value: "Não", label: "Não, fica na rua" },
-  { value: "Às vezes", label: "Às vezes (condomínio, trabalho)" },
+export const SEGUROS_YES_NO_OPTIONS = [
+  { value: "Sim", label: "Sim" },
+  { value: "Não", label: "Não" },
 ] as const;
 
 export type SegurosQuoteFormValues = {
@@ -130,7 +119,7 @@ export function validateQuoteStep(
     if (!values.vehicleType) errors.vehicleType = "Selecione o tipo de veículo.";
     if (values.plate.replace(/\W/g, "").length < 7) errors.plate = "Informe a placa.";
     if (!values.model.trim()) errors.model = "Informe marca e modelo.";
-    if (!values.vehicleUse) errors.vehicleUse = "Informe o uso do veículo.";
+    if (!values.vehicleUse) errors.vehicleUse = "Selecione uma opção.";
     if (!values.garage) errors.garage = "Selecione uma opção.";
   }
 
@@ -169,8 +158,8 @@ export function buildSegurosWhatsAppUrl(
     `Tipo: ${values.vehicleType}`,
     `Placa: ${values.plate}`,
     `Marca/Modelo: ${values.model}`,
-    `Uso: ${values.vehicleUse}`,
-    `Garagem: ${values.garage}`,
+    `Aplicativo ou Táxi: ${values.vehicleUse}`,
+    `Garagem própria para pernoite: ${values.garage}`,
     "",
     "*Meus dados*",
     `Nome: ${values.name}`,

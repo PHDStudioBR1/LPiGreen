@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { trackSegurosNavClick, trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosNavClick, trackSegurosQuoteClick } from "@/lib/seguro-auto/analytics";
 import {
   SEGURO_AUTO_HEADER_OFFSET,
   SEGURO_AUTO_NAV_ITEMS,

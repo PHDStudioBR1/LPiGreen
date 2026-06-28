@@ -16,13 +16,60 @@ export function trackHomePageView() {
   trackGtagEvent("home_page_view", homeEventParams());
 }
 
-export function trackHomeWhatsAppClick(location: string) {
-  const params = homeEventParams({ location, cta_type: "whatsapp" });
+function trackHomeConversion(location: string, ctaType: "cta" | "whatsapp_float") {
+  const params = homeEventParams({
+    location,
+    cta_type: ctaType,
+    destination: "whatsapp_redirect",
+  });
 
-  trackGtagEvent("home_whatsapp_click", params);
+  trackGtagEvent("home_cta_click", params);
+  trackGtagEvent("home_redirect_click", params);
   trackGtagEvent("generate_lead", {
     ...params,
-    lead_source: "whatsapp",
+    lead_source: "home_redirect",
+    currency: "BRL",
+    value: 1,
+  });
+}
+
+export function trackHomeCTAClick(location: string) {
+  trackHomeConversion(location, "cta");
+}
+
+export function trackHomeWhatsAppClick(location: string) {
+  trackHomeConversion(location, "whatsapp_float");
+}
+
+export function trackHomeFaqExpand(faqId: string) {
+  trackGtagEvent("home_faq_expand", homeEventParams({ faq_id: faqId }));
+}
+
+export function trackHomeSimulatorUse(billValue: number) {
+  trackGtagEvent("home_simulator_use", homeEventParams({ bill_value: billValue }));
+}
+
+export function trackHomeModalOpen() {
+  trackGtagEvent("home_modal_open", homeEventParams());
+}
+
+export function trackHomeModalClose() {
+  trackGtagEvent("home_modal_close", homeEventParams());
+}
+
+export function trackHomeFormStep(step: number) {
+  trackGtagEvent("home_form_step", homeEventParams({ step }));
+}
+
+export function trackHomeFormSubmit(params: { valor_medio_fatura: number }) {
+  const eventParams = homeEventParams({
+    valor_medio_fatura: params.valor_medio_fatura,
+  });
+
+  trackGtagEvent("home_form_submit", eventParams);
+  trackGtagEvent("generate_lead", {
+    ...eventParams,
+    lead_source: "home_form",
     currency: "BRL",
     value: 1,
   });

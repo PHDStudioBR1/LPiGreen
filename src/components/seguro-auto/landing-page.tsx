@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { trackSegurosPageView } from "@/lib/seguros/analytics";
+import { trackSeguroAutoPageView } from "@/lib/seguro-auto/analytics";
 import { Header } from "@/components/seguro-auto/header/header";
 import { HeroSection } from "@/components/seguro-auto/hero/hero-section";
+import { HighlightsMarquee } from "@/components/seguros/highlights-marquee/highlights-marquee";
 import { PlansShowcase } from "@/components/seguro-auto/sections/plans-showcase";
 import { BenefitsSection } from "@/components/seguro-auto/sections/benefits-section";
 import { ComparisonSection } from "@/components/seguro-auto/sections/comparison-section";
-import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { ClubSection } from "@/components/seguro-auto/sections/club-section";
+import { TestimonialsSection } from "@/components/seguro-auto/sections/testimonials-section";
 import { AppSection } from "@/components/seguro-auto/sections/app-section";
 import { FaqSection } from "@/components/seguro-auto/sections/faq-section";
 import { CtaBanner } from "@/components/seguro-auto/sections/cta-banner";
@@ -16,6 +17,7 @@ import { Footer } from "@/components/seguro-auto/footer/footer";
 import { StickyMobileBar } from "@/components/seguro-auto/floating/sticky-mobile-bar";
 import { ScrollCta } from "@/components/seguro-auto/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/seguro-auto/floating/exit-intent-popup";
+import { WhatsAppFloat } from "@/components/seguro-auto/floating/whatsapp-float";
 import { SegurosQuoteModal } from "@/components/seguros/modals/seguros-quote-modal";
 
 export function SeguroAutoLandingPage() {
@@ -23,7 +25,7 @@ export function SeguroAutoLandingPage() {
   const openQuote = () => setIsFormOpen(true);
 
   useEffect(() => {
-    trackSegurosPageView();
+    trackSeguroAutoPageView();
   }, []);
 
   return (
@@ -32,11 +34,12 @@ export function SeguroAutoLandingPage() {
 
       <main className="pb-20 md:pb-0">
         <HeroSection onQuoteClick={openQuote} />
+        <HighlightsMarquee variant="seguro-auto" />
         <BenefitsSection />
         <PlansShowcase />
         <ComparisonSection onQuoteClick={openQuote} />
-        <TestimonialsSection />
         <ClubSection onQuoteClick={openQuote} />
+        <TestimonialsSection />
         <AppSection onQuoteClick={openQuote} />
         <FaqSection />
         <CtaBanner onQuoteClick={openQuote} />
@@ -47,8 +50,13 @@ export function SeguroAutoLandingPage() {
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
+      <WhatsAppFloat />
 
-      <SegurosQuoteModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      <SegurosQuoteModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        variant="seguro-auto"
+      />
     </div>
   );
 }

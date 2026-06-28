@@ -2,6 +2,9 @@ export const SEGURO_AUTO_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
   "https://centraldobeneficioenergia.com.br";
 
+export const SEGURO_AUTO_WHATSAPP_URL =
+  "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20seguro%20auto%20iGreen.";
+
 export const SEGURO_AUTO_HEADER_OFFSET = 108;
 
 export const SEGURO_AUTO_UTILITY_LINKS = [
@@ -18,7 +21,6 @@ export const SEGURO_AUTO_NAV_ITEMS = [
   { label: "Vantagens", href: "#vantagens" },
   { label: "Comparativo", href: "#comparacao" },
   { label: "Planos", href: "#planos" },
-  { label: "Depoimentos", href: "#depoimentos" },
   { label: "Clube de Benefícios", href: "#igreen-club" },
   { label: "Motoristas de App", href: "#motorista-app" },
   { label: "FAQ", href: "#faq" },

@@ -31,3 +31,116 @@ html:has(.seguro-auto-page) {
   background-color: var(--sa-bg);
   color: var(--sa-text);
 }
+
+.sa-testimonial-video {
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--sa-border);
+  background: #000;
+}
+
+.sa-testimonial-video__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@keyframes sa-highlights-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.sa-highlights-marquee {
+  border-block: 1px solid rgba(0, 70, 192, 0.15);
+  background: linear-gradient(90deg, #0039a0 0%, #0046c0 50%, #0039a0 100%);
+}
+
+.sa-highlights-marquee__viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.sa-highlights-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: sa-highlights-marquee 55s linear infinite;
+}
+
+.sa-highlights-marquee__group {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 0.875rem 1.25rem;
+  list-style: none;
+  margin: 0;
+}
+
+.sa-highlights-marquee__item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+}
+
+.sa-highlights-marquee__dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: #ffffff;
+  opacity: 0.85;
+}
+
+@media (min-width: 640px) {
+  .sa-highlights-marquee__group {
+    gap: 3rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .sa-highlights-marquee__item {
+    font-size: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-highlights-marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sa-highlights-marquee__viewport {
+    mask-image: none;
+  }
+
+  .sa-highlights-marquee__group[aria-hidden="true"] {
+    display: none;
+  }
+
+  .sa-highlights-marquee__group {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .sa-highlights-marquee__item {
+    white-space: normal;
+  }
+}

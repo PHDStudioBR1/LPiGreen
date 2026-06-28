@@ -1,7 +1,7 @@
 "use client";
 
 import { SEGUROS_STEPS } from "@/lib/seguros/data";
-import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosQuoteClick } from "@/lib/seguro-auto/analytics";
 import { Container } from "@/components/seguro-auto/ui/container";
 import { SectionHeading } from "@/components/seguro-auto/ui/section-heading";
 import { Button } from "@/components/seguro-auto/ui/button";

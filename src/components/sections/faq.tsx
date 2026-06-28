@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { trackHomeFaqExpand } from '@/lib/home/analytics';
 
 const FAQS = [
   {
@@ -57,7 +58,14 @@ export function FAQSection() {
             <p className="text-lg text-muted-foreground">Transparência total para você economizar sem medo.</p>
           </div>
 
-          <Accordion type="single" collapsible className="w-full space-y-4">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full space-y-4"
+            onValueChange={(value) => {
+              if (value) trackHomeFaqExpand(value);
+            }}
+          >
             {FAQS.map((faq, idx) => (
               <AccordionItem key={idx} value={`item-${idx}`} className="border-none bg-background rounded-2xl px-6 shadow-sm overflow-hidden">
                 <AccordionTrigger className="text-left font-bold py-6 hover:no-underline hover:text-primary transition-colors">

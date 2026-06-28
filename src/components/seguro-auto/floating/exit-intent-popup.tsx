@@ -7,7 +7,7 @@ import { useExitIntent } from "@/hooks/seguros/use-exit-intent";
 import {
   trackSegurosExitIntent,
   trackSegurosQuoteClick,
-} from "@/lib/seguros/analytics";
+} from "@/lib/seguro-auto/analytics";
 import { Button } from "@/components/seguro-auto/ui/button";
 
 type ExitIntentPopupProps = {

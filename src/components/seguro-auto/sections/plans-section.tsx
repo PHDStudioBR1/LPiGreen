@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 import { SEGUROS_PLANS } from "@/lib/seguros/data";
-import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosQuoteClick } from "@/lib/seguro-auto/analytics";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/seguro-auto/ui/container";
 import { SectionHeading } from "@/components/seguro-auto/ui/section-heading";

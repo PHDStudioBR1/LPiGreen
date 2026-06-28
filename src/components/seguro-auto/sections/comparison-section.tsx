@@ -2,7 +2,7 @@
 
 import { Check, X } from "lucide-react";
 import { SEGUROS_COMPARISON } from "@/lib/seguros/data";
-import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosQuoteClick } from "@/lib/seguro-auto/analytics";
 import { Container } from "@/components/seguro-auto/ui/container";
 import { SectionHeading } from "@/components/seguro-auto/ui/section-heading";
 import { Button } from "@/components/seguro-auto/ui/button";
@@ -13,23 +13,20 @@ type ComparisonSectionProps = {
   onQuoteClick?: () => void;
 };
 
-function CellValue({ value, positive }: { value: string; positive?: boolean }) {
-  const isPositive =
-    positive ??
-  (value.toLowerCase().includes("sim") ||
-    value.toLowerCase().includes("sem") ||
-    value.toLowerCase().includes("100%") ||
-    value.toLowerCase().includes("online") ||
-    value.toLowerCase().includes("24"));
+function CellValue({ value, variant }: { value: string; variant: "igreen" | "traditional" }) {
+  if (variant === "igreen") {
+    return (
+      <span className="inline-flex items-center gap-2 text-sm">
+        <Check className="h-4 w-4 shrink-0 text-seguros-primary" strokeWidth={2.5} />
+        <span className="font-medium text-sa-text">{value}</span>
+      </span>
+    );
+  }
 
   return (
     <span className="inline-flex items-center gap-2 text-sm">
-      {isPositive ? (
-        <Check className="h-4 w-4 shrink-0 text-sa-primary" strokeWidth={2.5} />
-      ) : (
-        <X className="h-4 w-4 shrink-0 text-sa-muted/50" strokeWidth={2.5} />
-      )}
-      <span className={isPositive ? "font-medium text-sa-text" : "text-sa-muted"}>{value}</span>
+      <X className="h-4 w-4 shrink-0 text-red-500" strokeWidth={2.5} />
+      <span className="text-sa-muted">{value}</span>
     </span>
   );
 }
@@ -54,13 +51,13 @@ export function ComparisonSection({ onQuoteClick }: ComparisonSectionProps) {
                   Característica
                 </p>
               </div>
-              <div className="border-b border-sa-border/60 bg-sa-primary/[0.04] px-8 py-5 text-center">
-                <p className="text-xs font-bold uppercase tracking-wider text-sa-primary">
+              <div className="border-b border-sa-border/60 px-8 py-5 text-center">
+                <p className="text-xs font-bold uppercase tracking-wider text-seguros-primary">
                   iGreen
                 </p>
               </div>
               <div className="border-b border-sa-border/60 px-8 py-5 text-center">
-                <p className="text-xs font-semibold uppercase tracking-wider text-sa-muted">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-500">
                   Tradicional
                 </p>
               </div>
@@ -73,14 +70,14 @@ export function ComparisonSection({ onQuoteClick }: ComparisonSectionProps) {
                     <p className="text-sm font-medium text-sa-text">{row.characteristic}</p>
                   </div>
                   <div
-                    className={`bg-sa-primary/[0.02] px-8 py-5 ${i < SEGUROS_COMPARISON.length - 1 ? "border-b border-sa-border/40" : ""}`}
+                    className={`px-8 py-5 ${i < SEGUROS_COMPARISON.length - 1 ? "border-b border-sa-border/40" : ""}`}
                   >
-                    <CellValue value={row.igreen} positive />
+                    <CellValue value={row.igreen} variant="igreen" />
                   </div>
                   <div
                     className={`px-8 py-5 ${i < SEGUROS_COMPARISON.length - 1 ? "border-b border-sa-border/40" : ""}`}
                   >
-                    <CellValue value={row.traditional} positive={false} />
+                    <CellValue value={row.traditional} variant="traditional" />
                   </div>
                 </div>
               ))}
@@ -91,17 +88,17 @@ export function ComparisonSection({ onQuoteClick }: ComparisonSectionProps) {
                 <div key={row.characteristic} className="p-5">
                   <p className="mb-4 text-sm font-semibold text-sa-text">{row.characteristic}</p>
                   <div className="space-y-3">
-                    <div className="rounded-xl bg-sa-primary/[0.04] p-3">
-                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-sa-primary">
+                    <div className="rounded-xl bg-sa-surface p-3">
+                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-seguros-primary">
                         iGreen
                       </p>
-                      <CellValue value={row.igreen} positive />
+                      <CellValue value={row.igreen} variant="igreen" />
                     </div>
                     <div className="rounded-xl bg-sa-surface p-3">
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-sa-muted">
+                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-red-500">
                         Tradicional
                       </p>
-                      <CellValue value={row.traditional} positive={false} />
+                      <CellValue value={row.traditional} variant="traditional" />
                     </div>
                   </div>
                 </div>

@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { trackLicFaqExpand } from "@/lib/lic/analytics";
 
 const FAQS = [
   {
@@ -42,7 +43,12 @@ export function FAQSection() {
             </p>
           </div>
 
-          <Accordion type="single" collapsible className="w-full space-y-3">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full space-y-3"
+            onValueChange={(value) => { if (value) trackLicFaqExpand(value); }}
+          >
             {FAQS.map((faq, idx) => (
               <AccordionItem
                 key={idx}
