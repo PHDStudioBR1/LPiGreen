@@ -79,15 +79,19 @@ jobs:
         id: tags
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}" >> $GITHUB_OUTPUT
-            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:latest,${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "web_image_dev=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "api_image=${{ env.DOCKER_REGISTRY }}/lpigreen-api:${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "api_image_dev=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo "web_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-web:develop,${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "api_tags=${{ env.DOCKER_REGISTRY }}/lpigreen-api:develop,${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "web_image_dev=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
             echo "api_image=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "api_image_dev=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Build e Push imagem (frontend)
@@ -223,6 +227,9 @@ jobs:
           fi
           kubectl apply -f infra/k8s/ingress-route.yaml -n ${{ env.K8S_NAMESPACE }}
 
+      - name: Verificar rotas públicas (prod)
+        run: bash scripts/verify-public-routes.sh https://lpigreen.546digitalservices.com
+
       - name: Status final
         run: |
           echo "=== Pods ==="
@@ -238,7 +245,7 @@ jobs:
     name: Deploy - Desenvolvimento
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
     environment: development
     steps:
       - name: Checkout código
@@ -352,6 +359,7 @@ jobs:
             RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local \
             PHDCRM_ENV=dev \
             -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout restart deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
 
       - name: Aplicar Middlewares e IngressRoute (dev)
@@ -360,6 +368,9 @@ jobs:
             kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
           fi
           kubectl apply -f infra/k8s/ingress-route-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+
+      - name: Verificar rotas públicas (dev)
+        run: bash scripts/verify-public-routes.sh https://lpigreendev.546digitalservices.com
 
       - name: Status final
         run: |

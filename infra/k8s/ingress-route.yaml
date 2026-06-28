@@ -59,6 +59,14 @@ spec:
       middlewares:
         - name: security-headers
           namespace: lpigreen
+    - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api/telecom`)
+      kind: Rule
+      services:
+        - name: web-service
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: lpigreen
     - match: (Host(`lpigreen.546digitalservices.com`) || Host(`centraldobeneficioenergia.com.br`) || Host(`representanteigreen.com.br`)) && PathPrefix(`/api`)
       kind: Rule
       services:
