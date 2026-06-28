@@ -69,6 +69,7 @@ const STEPS = [
 type QuoteStep = (typeof STEPS)[number]["id"];
 
 const SEGUROS_CRM_SESSION_STORAGE_KEY = "seguros-crm-lead-session";
+const SEGUROS_CRM_LEAD_ID_STORAGE_KEY = "seguros-crm-lead-id";
 
 function createCrmSessionId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -84,6 +85,24 @@ function getOrCreateCrmSessionId(): string {
   const next = createCrmSessionId();
   sessionStorage.setItem(SEGUROS_CRM_SESSION_STORAGE_KEY, next);
   return next;
+}
+
+function loadCrmLeadId(): number | null {
+  if (typeof window === "undefined") return null;
+  const stored = sessionStorage.getItem(SEGUROS_CRM_LEAD_ID_STORAGE_KEY);
+  if (!stored) return null;
+  const parsed = Number(stored);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function persistCrmLeadId(leadId: number): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(SEGUROS_CRM_LEAD_ID_STORAGE_KEY, String(leadId));
+}
+
+function clearCrmLeadId(): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(SEGUROS_CRM_LEAD_ID_STORAGE_KEY);
 }
 
 function ArrowRightIcon() {
@@ -144,6 +163,7 @@ export function SegurosQuoteModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSyncingCrm, setIsSyncingCrm] = useState(false);
   const [crmSessionId, setCrmSessionId] = useState("");
+  const [crmLeadId, setCrmLeadId] = useState<number | null>(null);
   const [crmError, setCrmError] = useState<string | null>(null);
 
   const resetForm = useCallback(() => {
@@ -172,6 +192,7 @@ export function SegurosQuoteModal({
   useEffect(() => {
     if (!isOpen) return;
     setCrmSessionId(getOrCreateCrmSessionId());
+    setCrmLeadId(loadCrmLeadId());
     const session = loadQuoteSessionFields();
     if (session) {
       setValues((current) => ({ ...current, ...session }));
@@ -231,6 +252,8 @@ export function SegurosQuoteModal({
           body: JSON.stringify({
             step: stepName,
             session_id: sessionId,
+            crm_lead_id: crmLeadId ?? undefined,
+            funil: variant === "seguro-auto" ? "seguro-auto" : "seguros",
             values,
           }),
         });
@@ -238,6 +261,12 @@ export function SegurosQuoteModal({
         const body = await response.json().catch(() => null);
         if (!response.ok || body?.success === false) {
           throw new Error(body?.error || `CRM HTTP ${response.status}`);
+        }
+
+        const leadId = body?.data?.lead_id;
+        if (typeof leadId === "number" && leadId > 0) {
+          setCrmLeadId(leadId);
+          persistCrmLeadId(leadId);
         }
 
         return body?.data;
@@ -252,7 +281,7 @@ export function SegurosQuoteModal({
         setIsSyncingCrm(false);
       }
     },
-    [crmSessionId, values]
+    [crmLeadId, crmSessionId, values, variant]
   );
 
   const goStep = async (nextStep: 1 | 2) => {
@@ -301,6 +330,7 @@ export function SegurosQuoteModal({
 
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
+      clearCrmLeadId();
     }
 
     setStep(3);

@@ -41,6 +41,7 @@ const STEPS = [
 type QuoteStep = (typeof STEPS)[number]["id"];
 
 const TELECOM_CRM_SESSION_STORAGE_KEY = "telecom-crm-lead-session";
+const TELECOM_CRM_LEAD_ID_STORAGE_KEY = "telecom-crm-lead-id";
 
 function createCrmSessionId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -56,6 +57,24 @@ function getOrCreateCrmSessionId(): string {
   const next = createCrmSessionId();
   sessionStorage.setItem(TELECOM_CRM_SESSION_STORAGE_KEY, next);
   return next;
+}
+
+function loadCrmLeadId(): number | null {
+  if (typeof window === "undefined") return null;
+  const stored = sessionStorage.getItem(TELECOM_CRM_LEAD_ID_STORAGE_KEY);
+  if (!stored) return null;
+  const parsed = Number(stored);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function persistCrmLeadId(leadId: number): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(TELECOM_CRM_LEAD_ID_STORAGE_KEY, String(leadId));
+}
+
+function clearCrmLeadId(): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(TELECOM_CRM_LEAD_ID_STORAGE_KEY);
 }
 
 function FormGroup({
@@ -91,6 +110,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
   const [isSyncingCrm, setIsSyncingCrm] = useState(false);
   const [crmError, setCrmError] = useState<string | null>(null);
   const [crmSessionId, setCrmSessionId] = useState("");
+  const [crmLeadId, setCrmLeadId] = useState<number | null>(null);
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -115,6 +135,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     if (isOpen) {
       trackTelecomModalOpen();
       setCrmSessionId(getOrCreateCrmSessionId());
+      setCrmLeadId(loadCrmLeadId());
     } else {
       resetForm();
     }
@@ -151,6 +172,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     payloadValues: TelecomQuoteFormValues = values
   ) => {
     setIsSyncingCrm(true);
+    setCrmError(null);
     try {
       const res = await fetch("/api/telecom/crm-lead", {
         method: "POST",
@@ -158,16 +180,24 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
         body: JSON.stringify({
           step: crmStep,
           session_id: crmSessionId,
+          crm_lead_id: crmLeadId ?? undefined,
           values: payloadValues,
         }),
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body.success === false) {
         throw new Error(body.error || "Erro ao sincronizar lead");
       }
-      setCrmError(null);
+
+      const leadId = body?.data?.lead_id;
+      if (typeof leadId === "number" && leadId > 0) {
+        setCrmLeadId(leadId);
+        persistCrmLeadId(leadId);
+      }
     } catch (err) {
-      setCrmError(err instanceof Error ? err.message : "Erro ao sincronizar lead");
+      const message = err instanceof Error ? err.message : "Erro ao sincronizar lead";
+      setCrmError(message);
+      throw err;
     } finally {
       setIsSyncingCrm(false);
     }
@@ -185,8 +215,12 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     setValues(nextValues);
     setErrors({});
     trackTelecomFormStep(1);
-    await syncCrm("activation", nextValues);
-    setStep(2);
+    try {
+      await syncCrm("activation", nextValues);
+      setStep(2);
+    } catch {
+      // erro exibido em crmError
+    }
   };
 
   const goToStep3 = async () => {
@@ -197,8 +231,12 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     }
     setErrors({});
     trackTelecomFormStep(2);
-    await syncCrm("details");
-    setStep(3);
+    try {
+      await syncCrm("details");
+      setStep(3);
+    } catch {
+      // erro exibido em crmError
+    }
   };
 
   const handleSubmit = async () => {
@@ -215,10 +253,18 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
       portability: values.activationType === "portabilidade" ? "yes" : "no",
     });
     trackTelecomPlanSelect(values.selectedPlan);
-    await syncCrm("contact");
-    sessionStorage.removeItem(TELECOM_CRM_SESSION_STORAGE_KEY);
-    setIsSubmitting(false);
-    setStep(4);
+    try {
+      await syncCrm("contact");
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem(TELECOM_CRM_SESSION_STORAGE_KEY);
+        clearCrmLeadId();
+      }
+      setStep(4);
+    } catch {
+      // erro exibido em crmError
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const plans = getTelecomPlansForActivation(values.activationType);
