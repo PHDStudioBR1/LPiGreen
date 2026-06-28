@@ -22,11 +22,42 @@ import {
   trackSegurosModalClose,
   trackSegurosModalOpen,
 } from "@/lib/seguros/analytics";
+import {
+  trackSeguroAutoFormStep,
+  trackSeguroAutoFormSubmit,
+  trackSeguroAutoModalClose,
+  trackSeguroAutoModalOpen,
+} from "@/lib/seguro-auto/analytics";
 import "@/app/seguros/seguros-quote-modal.css";
+
+export type SegurosQuoteModalVariant = "seguros" | "seguro-auto";
 
 export type SegurosQuoteModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  variant?: SegurosQuoteModalVariant;
+};
+
+type QuoteModalAnalytics = {
+  trackModalOpen: () => void;
+  trackModalClose: () => void;
+  trackFormStep: (step: number) => void;
+  trackFormSubmit: (params: { vehicle_type: string; vehicle_use: string }) => void;
+};
+
+const QUOTE_MODAL_ANALYTICS: Record<SegurosQuoteModalVariant, QuoteModalAnalytics> = {
+  seguros: {
+    trackModalOpen: trackSegurosModalOpen,
+    trackModalClose: trackSegurosModalClose,
+    trackFormStep: trackSegurosFormStep,
+    trackFormSubmit: trackSegurosFormSubmit,
+  },
+  "seguro-auto": {
+    trackModalOpen: trackSeguroAutoModalOpen,
+    trackModalClose: trackSeguroAutoModalClose,
+    trackFormStep: trackSeguroAutoFormStep,
+    trackFormSubmit: trackSeguroAutoFormSubmit,
+  },
 };
 
 const STEPS = [
@@ -101,7 +132,11 @@ function FormGroup({
   );
 }
 
-export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
+export function SegurosQuoteModal({
+  isOpen,
+  onClose,
+  variant = "seguros",
+}: SegurosQuoteModalProps) {
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<QuoteStep>(1);
   const [values, setValues] = useState<SegurosQuoteFormValues>(SEGUROS_QUOTE_FORM_DEFAULTS);
@@ -121,18 +156,18 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
   }, []);
 
   const handleClose = useCallback(() => {
-    trackSegurosModalClose();
+    QUOTE_MODAL_ANALYTICS[variant].trackModalClose();
     resetForm();
     onClose();
-  }, [onClose, resetForm]);
+  }, [variant, onClose, resetForm]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (isOpen) trackSegurosModalOpen();
-  }, [isOpen]);
+    if (isOpen) QUOTE_MODAL_ANALYTICS[variant].trackModalOpen();
+  }, [isOpen, variant]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -236,7 +271,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
 
     setErrors({});
     if (nextStep > step) {
-      trackSegurosFormStep(step);
+      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(step);
     }
     setStep(nextStep);
   };
@@ -258,8 +293,8 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
       return;
     }
 
-    trackSegurosFormStep(2);
-    trackSegurosFormSubmit({
+    QUOTE_MODAL_ANALYTICS[variant].trackFormStep(2);
+    QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
       vehicle_type: values.vehicleType,
       vehicle_use: values.vehicleUse,
     });
@@ -269,7 +304,7 @@ export function SegurosQuoteModal({ isOpen, onClose }: SegurosQuoteModalProps) {
     }
 
     setStep(3);
-    trackSegurosFormStep(3);
+    QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
     setIsSubmitting(false);
   };
 

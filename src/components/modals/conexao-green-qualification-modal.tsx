@@ -22,6 +22,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { maskCurrency, maskPhone, unmaskCurrency } from "@/lib/masks";
 import { projectedAnnualSavingsFromMonthly } from "@/lib/conexao-green-savings";
+import {
+  trackHomeFormStep,
+  trackHomeFormSubmit,
+} from "@/lib/home/analytics";
 
 /** Se definido, o browser envia direto ao n8n (URL pública). Caso contrário, usa o proxy em `/api/conexao-green/n8n` + `N8N_WEBHOOK_URL` no servidor. */
 const NEXT_PUBLIC_N8N = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL?.trim() ?? "";
@@ -129,6 +133,8 @@ export function ConexaoGreenQualificationModal({
         description:
           "Em instantes nosso time continua a conversa com você no WhatsApp — sem custo oculto e sem compromisso.",
       });
+      trackHomeFormStep(1);
+      trackHomeFormSubmit({ valor_medio_fatura: valorNum });
       onClose();
     } catch (e) {
       console.error("n8n webhook:", e);

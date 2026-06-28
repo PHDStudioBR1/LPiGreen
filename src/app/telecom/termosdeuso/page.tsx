@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TermosDeUsoContent } from "@/components/legal/termos-de-uso-content";
+import { TelecomPageViewTracker } from "@/components/analytics/telecom-page-view-tracker";
 
 export const metadata: Metadata = {
   title: "Termos de Uso | Telecom iGreen",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function TelecomTermosDeUsoPage() {
   return (
     <div className="telecom-page min-h-screen font-tc-body bg-white">
+      <TelecomPageViewTracker />
       <header className="border-b border-telecom-border">
         <div className="container mx-auto flex items-center justify-between px-4 py-4 sm:px-6">
           <Link

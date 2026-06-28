@@ -16,6 +16,7 @@ import { FaqSection } from "@/components/seguros/faq/faq-section";
 import { StickyMobileBar } from "@/components/seguros/floating/sticky-mobile-bar";
 import { ScrollCta } from "@/components/seguros/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/seguros/floating/exit-intent-popup";
+import { WhatsAppFloat } from "@/components/seguros/floating/whatsapp-float";
 import { SegurosFooter } from "@/components/seguros/footer/seguros-footer";
 import { SegurosQuoteModal } from "@/components/seguros/modals/seguros-quote-modal";
 import { SegurosHeader } from "@/components/seguros/header/seguros-header";
@@ -50,6 +51,7 @@ export function SegurosLandingPage() {
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
+      <WhatsAppFloat />
 
       <SegurosQuoteModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
     </div>

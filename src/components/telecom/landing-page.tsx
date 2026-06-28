@@ -16,6 +16,7 @@ import { Footer } from "@/components/telecom/footer/footer";
 import { StickyMobileBar } from "@/components/telecom/floating/sticky-mobile-bar";
 import { ScrollCta } from "@/components/telecom/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/telecom/floating/exit-intent-popup";
+import { WhatsAppFloat } from "@/components/telecom/floating/whatsapp-float";
 import { TelecomQuoteModal } from "@/components/telecom/modals/telecom-quote-modal";
 import { TelecomPageBackground } from "@/components/telecom/ui/telecom-page-background";
 
@@ -52,6 +53,7 @@ export function TelecomLandingPage() {
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
+      <WhatsAppFloat />
 
       <TelecomQuoteModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
     </div>

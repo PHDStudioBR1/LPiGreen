@@ -154,9 +154,17 @@ const defaultValues: LeadFormValues = {
   has_pending_debts: "nao",
 };
 
+export type LeadFormAnalyticsHandlers = {
+  onModalOpen?: () => void;
+  onModalClose?: () => void;
+  onFormStep?: (step: number) => void;
+  onFormSubmit?: (params: { cep?: string; valor_conta?: string }) => void;
+};
+
 export interface LeadFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  analytics?: LeadFormAnalyticsHandlers;
 }
 
 function FileUploadField(props: {
@@ -235,7 +243,7 @@ function FileUploadField(props: {
   );
 }
 
-export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
+export function LeadFormModal({ isOpen, onClose, analytics }: LeadFormModalProps) {
   const [step, setStep] = useState(0);
   const [sessionId, setSessionId] = useState<string>("");
   const [files, setFiles] = useState<{
@@ -256,8 +264,11 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isOpen) setSubmissionErrors(null);
-  }, [isOpen]);
+    if (isOpen) {
+      setSubmissionErrors(null);
+      analytics?.onModalOpen?.();
+    }
+  }, [analytics, isOpen]);
 
   const form = useForm<LeadFormValues>({ defaultValues });
   const watchHasPendingDebts = form.watch("has_pending_debts");
@@ -545,6 +556,11 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
             ? "Seus dados foram registrados. Nossa equipe irá conferir os documentos e entrará em contato."
             : "Seus dados foram registrados. Em breve entraremos em contato.";
       toast({ title: "Enviado!", description: desc });
+      const values = form.getValues();
+      analytics?.onFormSubmit?.({
+        cep: values.cep_landing,
+        valor_conta: values.valor_conta,
+      });
       await clearRemoteProgress();
       const newSessionId =
         typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
@@ -555,6 +571,7 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
       form.reset(defaultValues);
       setFiles({});
       setStep(0);
+      analytics?.onModalClose?.();
       onClose();
     } finally {
       setSubmitting(false);
@@ -564,7 +581,9 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const next = () => {
     if (step < STEPS.length - 1) {
       void persistProgress(step);
-      setStep((s) => s + 1);
+      const nextStep = step + 1;
+      analytics?.onFormStep?.(nextStep);
+      setStep(nextStep);
     }
     else form.handleSubmit(onSubmit)();
   };
@@ -575,7 +594,15 @@ export function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const isLast = step === STEPS.length - 1;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          analytics?.onModalClose?.();
+          onClose();
+        }
+      }}
+    >
       <DialogContent
         className="max-w-lg max-h-[90vh] flex flex-col gap-0 overflow-hidden p-0"
         aria-describedby="lead-form-description"

@@ -11,12 +11,23 @@ export function trackTelecomPageView() {
   trackGtagEvent("telecom_page_view", { page_path: resolvePagePath() });
 }
 
+export function trackTelecomCTAClick(location: string) {
+  trackGtagEvent("telecom_cta_click", { location, page_path: resolvePagePath() });
+}
+
 export function trackTelecomQuoteClick(location: string) {
-  trackGtagEvent("telecom_quote_click", { location, page_path: resolvePagePath() });
+  trackTelecomCTAClick(location);
 }
 
 export function trackTelecomWhatsAppClick(location: string) {
-  trackGtagEvent("telecom_whatsapp_click", { location, page_path: resolvePagePath() });
+  const params = { location, page_path: resolvePagePath(), cta_type: "whatsapp" };
+  trackGtagEvent("telecom_whatsapp_click", params);
+  trackGtagEvent("generate_lead", {
+    ...params,
+    lead_source: "whatsapp",
+    currency: "BRL",
+    value: 1,
+  });
 }
 
 export function trackTelecomNavClick(section: string) {
@@ -47,9 +58,13 @@ export function trackTelecomFormSubmit(params: {
   plan_type: string;
   portability: string;
 }) {
-  trackGtagEvent("telecom_form_submit", {
-    ...params,
-    page_path: resolvePagePath(),
+  const eventParams = { ...params, page_path: resolvePagePath() };
+  trackGtagEvent("telecom_form_submit", eventParams);
+  trackGtagEvent("generate_lead", {
+    ...eventParams,
+    lead_source: "telecom_form",
+    currency: "BRL",
+    value: 1,
   });
 }
 

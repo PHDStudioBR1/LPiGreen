@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TermosDeUsoContent } from "@/components/legal/termos-de-uso-content";
+import { SeguroAutoPageViewTracker } from "@/components/analytics/seguro-auto-page-view-tracker";
 
 export const metadata: Metadata = {
   title: "Termos de Uso | Seguro Auto iGreen",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function SeguroAutoTermosDeUsoPage() {
   return (
     <div className="seguro-auto-page min-h-screen font-sa-body">
+      <SeguroAutoPageViewTracker />
       <header className="border-b border-sa-border bg-white">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <Link

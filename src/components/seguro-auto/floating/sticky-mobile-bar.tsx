@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { trackSegurosQuoteClick } from "@/lib/seguros/analytics";
+import { trackSegurosQuoteClick } from "@/lib/seguro-auto/analytics";
 import { Button } from "@/components/seguro-auto/ui/button";
 
 type StickyMobileBarProps = {
