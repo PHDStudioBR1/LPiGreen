@@ -278,8 +278,8 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           if [ -z "${{ secrets.KUBECONFIG_DEV }}" ]; then
-            echo "⚠️ KUBECONFIG_DEV não configurado — pulando deploy no cluster legado."
-            exit 0
+            echo "::error::KUBECONFIG_DEV não configurado. lpigreendev depende deste cluster legado — configure o secret no GitHub."
+            exit 1
           fi
           echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config

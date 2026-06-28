@@ -6,23 +6,43 @@ BASE_URL="${1:?Usage: verify-public-routes.sh <base-url>}"
 ROUTES=(/ /seguros /seguro-auto /telecom /lic)
 MAX_ATTEMPTS="${VERIFY_ROUTES_ATTEMPTS:-12}"
 SLEEP_SECONDS="${VERIFY_ROUTES_SLEEP:-15}"
-HOME_MODAL_MARKER="${HOME_MODAL_MARKER:-começar é simples}"
+
+is_dev_host() {
+  [[ "$BASE_URL" == *"lpigreendev"* ]]
+}
 
 echo "Verificando rotas em ${BASE_URL} (até ${MAX_ATTEMPTS} tentativas) ..."
 
-verify_home_without_modal() {
-  local html chunk
+verify_home_bundle() {
+  local html chunk js
   html="$(curl -sS --max-time 30 "${BASE_URL}/")"
   chunk="$(echo "$html" | grep -oE '/_next/static/chunks/app/page-[^"]+\.js' | head -1 || true)"
   if [ -z "$chunk" ]; then
-    echo "  WARN / — não foi possível localizar chunk da home"
+    echo "  FAIL / — chunk da home não encontrado no HTML"
     return 1
   fi
-  if curl -sS --max-time 30 "${BASE_URL}${chunk}" | grep -q "$HOME_MODAL_MARKER"; then
-    echo "  FAIL / — home ainda contém modal legado (\"${HOME_MODAL_MARKER}\")"
+
+  js="$(curl -sS --max-time 30 "${BASE_URL}${chunk}")"
+
+  if echo "$js" | grep -q 'conexao_green'; then
+    echo "  FAIL / — home ainda contém formulário legado (conexao_green)"
     return 1
   fi
-  echo "  OK  / — home sem modal legado"
+
+  if is_dev_host; then
+    if ! echo "$js" | grep -q 'redirect-to-whatsapp-dev'; then
+      echo "  FAIL / — home em dev deve redirecionar para redirect-to-whatsapp-dev"
+      return 1
+    fi
+    echo "  OK  / — home dev sem modal e com redirect dev"
+  else
+    if ! echo "$js" | grep -q 'redirect-to-whatsapp.546digitalservices.com'; then
+      echo "  FAIL / — home em prod deve redirecionar para redirect-to-whatsapp"
+      return 1
+    fi
+    echo "  OK  / — home prod sem modal e com redirect prod"
+  fi
+
   return 0
 }
 
@@ -41,7 +61,7 @@ for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
     fi
   done
 
-  if ! verify_home_without_modal; then
+  if ! verify_home_bundle; then
     failed=1
   fi
 
