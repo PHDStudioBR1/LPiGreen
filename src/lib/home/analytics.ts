@@ -16,24 +16,37 @@ export function trackHomePageView() {
   trackGtagEvent("home_page_view", homeEventParams());
 }
 
-export function trackHomeCTAClick(location: string) {
-  trackGtagEvent("home_cta_click", homeEventParams({ location, cta_type: "form" }));
-}
+function trackHomeConversion(location: string, ctaType: "cta" | "whatsapp_float") {
+  const params = homeEventParams({
+    location,
+    cta_type: ctaType,
+    destination: "whatsapp_redirect",
+  });
 
-export function trackHomeWhatsAppClick(location: string) {
-  const params = homeEventParams({ location, cta_type: "whatsapp" });
-
-  trackGtagEvent("home_whatsapp_click", params);
+  trackGtagEvent("home_cta_click", params);
+  trackGtagEvent("home_redirect_click", params);
   trackGtagEvent("generate_lead", {
     ...params,
-    lead_source: "whatsapp",
+    lead_source: "home_redirect",
     currency: "BRL",
     value: 1,
   });
 }
 
+export function trackHomeCTAClick(location: string) {
+  trackHomeConversion(location, "cta");
+}
+
+export function trackHomeWhatsAppClick(location: string) {
+  trackHomeConversion(location, "whatsapp_float");
+}
+
 export function trackHomeFaqExpand(faqId: string) {
   trackGtagEvent("home_faq_expand", homeEventParams({ faq_id: faqId }));
+}
+
+export function trackHomeSimulatorUse(billValue: number) {
+  trackGtagEvent("home_simulator_use", homeEventParams({ bill_value: billValue }));
 }
 
 export function trackHomeModalOpen() {
