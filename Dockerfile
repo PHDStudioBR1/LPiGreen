@@ -13,6 +13,8 @@ COPY . .
 # Garante que public exista (Next.js não cria se o projeto não tiver a pasta)
 RUN mkdir -p /app/public
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_PHDCRM_ENV=dev
+ENV NEXT_PUBLIC_PHDCRM_ENV=$NEXT_PUBLIC_PHDCRM_ENV
 RUN npm run build
 
 # Estágio de produção - standalone

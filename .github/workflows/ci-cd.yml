@@ -94,6 +94,15 @@ jobs:
             echo "api_image_dev=${{ env.DOCKER_REGISTRY }}/lpigreen-api:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Definir build args do frontend
+        id: web_build_args
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "phdcrm_env=prod" >> $GITHUB_OUTPUT
+          else
+            echo "phdcrm_env=dev" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build e Push imagem (frontend)
         uses: docker/build-push-action@v5
         with:
@@ -102,6 +111,8 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.web_tags }}
           cache-to: type=inline
+          build-args: |
+            NEXT_PUBLIC_PHDCRM_ENV=${{ steps.web_build_args.outputs.phdcrm_env }}
 
       - name: Build e Push imagem (backend API)
         uses: docker/build-push-action@v5
