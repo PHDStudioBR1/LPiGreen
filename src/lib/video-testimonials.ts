@@ -1,28 +1,13 @@
 export type VideoTestimonial = {
   id: string;
-  youtubeId: string;
+  vimeoId: string;
 };
 
 export const IGREEN_VIDEO_TESTIMONIALS: VideoTestimonial[] = [
-  { id: "1", youtubeId: "anmPY2T5TrM" },
-  { id: "2", youtubeId: "LIpUReV1TOY" },
-  { id: "3", youtubeId: "b6QIJYsbZcg" },
-  { id: "4", youtubeId: "danXALufu0Q" },
-  { id: "5", youtubeId: "aNiHtSx36s4" },
-  { id: "6", youtubeId: "9er77ntLcao" },
+  { id: "1", vimeoId: "1205287602" },
+  { id: "2", vimeoId: "1205287620" },
+  { id: "3", vimeoId: "1205287621" },
+  { id: "4", vimeoId: "1205287604" },
+  { id: "5", vimeoId: "1205287601" },
+  { id: "6", vimeoId: "1205287603" },
 ];
-
-export function getYouTubeEmbedUrl(youtubeId: string) {
-  const params = new URLSearchParams({
-    modestbranding: "1",
-    rel: "0",
-    iv_load_policy: "3",
-    playsinline: "1",
-    fs: "1",
-    controls: "1",
-    cc_load_policy: "0",
-    disablekb: "1",
-  });
-
-  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
-}

@@ -7,7 +7,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { IGREEN_VIDEO_TESTIMONIALS, getYouTubeEmbedUrl } from "@/lib/video-testimonials";
+import { IGREEN_VIDEO_TESTIMONIALS } from "@/lib/video-testimonials";
+import { VimeoTestimonialPlayer } from "@/components/shared/vimeo-testimonial-player";
 import { Container } from "@/components/telecom/ui/container";
 import { SectionHeading } from "@/components/telecom/ui/section-heading";
 import { MotionBlock } from "@/components/telecom/ui/motion";
@@ -30,16 +31,10 @@ export function TestimonialsSection() {
               {IGREEN_VIDEO_TESTIMONIALS.map((testimonial) => (
                 <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2">
                   <div className="telecom-testimonial-video">
-                    <div className="relative aspect-video w-full">
-                      <iframe
-                        src={getYouTubeEmbedUrl(testimonial.youtubeId)}
-                        className="telecom-testimonial-video__frame"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        title={`Depoimento iGreen Telecom ${testimonial.id}`}
-                        allowFullScreen
-                      />
-                    </div>
+                    <VimeoTestimonialPlayer
+                      vimeoId={testimonial.vimeoId}
+                      title={`Depoimento iGreen Telecom ${testimonial.id}`}
+                    />
                   </div>
                 </CarouselItem>
               ))}

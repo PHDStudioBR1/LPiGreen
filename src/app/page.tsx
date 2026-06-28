@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { HeroSection } from '@/components/sections/hero';
 import { SimulatorSection } from '@/components/sections/simulator';
+import { IgreenClubSection } from '@/components/sections/igreen-club-section';
+import { VideoTestimonialsSection } from '@/components/sections/video-testimonials-section';
 import { FAQSection } from '@/components/sections/faq';
 import { Footer } from '@/components/sections/footer';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
@@ -28,6 +30,8 @@ export default function Home() {
           billValue={simulatedMonthlyBill}
           onBillValueChange={setSimulatedMonthlyBill}
         />
+        <IgreenClubSection onCTAClick={() => redirectHomeConversion("igreen_club")} />
+        <VideoTestimonialsSection />
         <FAQSection />
       </main>
 
