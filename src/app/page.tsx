@@ -35,7 +35,7 @@ export default function Home() {
         <FAQSection />
       </main>
 
-      <Footer onCTAClick={() => redirectHomeConversion("footer")} />
+      <Footer />
 
       <WhatsAppButton onClick={redirectHomeWhatsAppFloat} />
     </div>

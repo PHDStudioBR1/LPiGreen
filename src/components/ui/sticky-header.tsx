@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { HOME_LOGO_SRC } from "@/lib/home/constants";
 
 export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
   return (
@@ -13,13 +14,12 @@ export function StickyHeader({ onCTAClick }: { onCTAClick: () => void }) {
         "bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md shadow-md"
       )}
     >
-      <div className="flex items-center gap-2 min-w-0 shrink">
-        <div className="w-8 h-8 shrink-0 bg-primary rounded-full flex items-center justify-center">
-          <span className="text-white font-bold text-xs">iG</span>
-        </div>
-        <span className="font-headline font-bold text-lg sm:text-xl text-primary truncate">
-          iGreen Energy
-        </span>
+      <div className="flex items-center min-w-0 shrink">
+        <img
+          src={HOME_LOGO_SRC}
+          alt="iGreen Energy"
+          className="h-9 w-auto sm:h-10"
+        />
       </div>
       <div className="flex items-center gap-3 sm:gap-4 shrink-0">
         <Button

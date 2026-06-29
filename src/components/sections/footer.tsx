@@ -1,29 +1,35 @@
-"use client"
+import Link from "next/link";
+import { HOME_LOGO_SRC } from "@/lib/home/constants";
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-
-export function Footer({ onCTAClick }: { onCTAClick?: () => void }) {
+export function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400 py-16">
-      <div className="container mx-auto px-6">
-        <div className="space-y-4 text-center">
-          <h3 className="text-xl font-headline font-bold text-white">
-            iGreen Energy — Energia limpa por assinatura
-          </h3>
-          <p className="text-sm text-gray-400">
-            Parceria Vibra e Comerc Energia • Mais de 500.000 clientes no Brasil • Selo Great Place to Work (GPTW 2025-2026) • Modelo 100% regulamentado pela ANEEL
+    <footer className="relative border-t border-border bg-white py-12 pb-28 dark:bg-neutral-950 md:pb-12">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <img
+            src={HOME_LOGO_SRC}
+            alt="iGreen Energy"
+            className="h-9 w-auto"
+          />
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Serviços de energia por assinatura oferecidos por licenciado independente iGreen, em
+            parceria com Vibra e Comerc Energia. Modelo 100% regulamentado pela ANEEL (Lei
+            14.300/2022). Consulte condições e disponibilidade na sua região antes da contratação.
           </p>
-          {onCTAClick && (
-            <div className="pt-4">
-              <Button
-                onClick={onCTAClick}
-                className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-all dark:text-white"
-              >
-                Faça parte da transição energética
-              </Button>
-            </div>
-          )}
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            <Link
+              href="/politicadeprivacidade"
+              className="transition-colors hover:text-primary"
+            >
+              Política de privacidade
+            </Link>
+            <Link href="/termosdeuso" className="transition-colors hover:text-primary">
+              Termos de uso
+            </Link>
+          </div>
+          <p className="text-xs text-muted-foreground/70">
+            © 2026 iGreen Energy. Todos os direitos reservados.
+          </p>
         </div>
       </div>
     </footer>

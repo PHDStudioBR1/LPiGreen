@@ -25,11 +25,11 @@ export function VideoTestimonialsSection() {
           </p>
         </div>
 
-        <Carousel opts={{ align: "start", loop: true }} className="mx-auto max-w-4xl">
+        <Carousel opts={{ align: "start", loop: true }} className="mx-auto max-w-6xl px-2 sm:px-8">
           <CarouselContent className="-ml-4">
             {IGREEN_VIDEO_TESTIMONIALS.map((testimonial) => (
-              <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2">
-                <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-lg">
+              <CarouselItem key={testimonial.id} className="pl-4 basis-full">
+                <div className="overflow-hidden rounded-3xl border border-border bg-black shadow-xl">
                   <VimeoTestimonialPlayer
                     vimeoId={testimonial.vimeoId}
                     title={`Depoimento iGreen Energy ${testimonial.id}`}

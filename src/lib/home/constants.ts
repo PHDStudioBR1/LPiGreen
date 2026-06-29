@@ -1,3 +1,5 @@
+export const HOME_LOGO_SRC = "/images/logo_igreen_verde.png";
+
 export const HOME_WHATSAPP_REDIRECT_URL_DEV =
   "https://redirect-to-whatsapp-dev.546digitalservices.com/";
 
