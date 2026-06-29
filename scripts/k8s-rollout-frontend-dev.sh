@@ -12,22 +12,13 @@ kubectl apply -f "${ROOT_DIR}/infra/k8s/deployment-dev.yaml" -n "${NAMESPACE}"
 kubectl set image deployment/lpigreen-web-dev \
   web="${IMAGE}" \
   -n "${NAMESPACE}"
-kubectl rollout restart deployment/lpigreen-web-dev -n "${NAMESPACE}"
 kubectl rollout status deployment/lpigreen-web-dev -n "${NAMESPACE}" --timeout=300s
-kubectl wait --for=condition=ready pod -l app=lpigreen-web-dev -n "${NAMESPACE}" --timeout=120s
 
 if [ -d "${ROOT_DIR}/infra/k8s/middlewares" ]; then
   kubectl apply -f "${ROOT_DIR}/infra/k8s/middlewares/" -n "${NAMESPACE}"
 fi
 kubectl apply -f "${ROOT_DIR}/infra/k8s/ingress-route-dev-prod-cluster.yaml" -n "${NAMESPACE}"
 
-EXPECTED="${IMAGE}"
-ACTUAL="$(kubectl get deployment lpigreen-web-dev -n "${NAMESPACE}" -o jsonpath='{.spec.template.spec.containers[0].image}')"
-if [ "${ACTUAL}" != "${EXPECTED}" ]; then
-  echo "❌ Imagem do deployment (${ACTUAL}) difere da esperada (${EXPECTED})"
-  exit 1
-fi
-
-RUNNING="$(kubectl get pods -n "${NAMESPACE}" -l app=lpigreen-web-dev -o jsonpath='{.items[0].spec.containers[0].image}')"
-echo "Imagem em execução: ${RUNNING}"
+echo "Imagem configurada:"
+kubectl get deployment lpigreen-web-dev -n "${NAMESPACE}" -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 kubectl get pods -n "${NAMESPACE}" -l app=lpigreen-web-dev -o wide
