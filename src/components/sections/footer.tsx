@@ -12,9 +12,9 @@ export function Footer() {
             className="h-9 w-auto"
           />
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Serviços de energia por assinatura oferecidos por licenciado independente iGreen, em
-            parceria com Vibra e Comerc Energia. Modelo 100% regulamentado pela ANEEL (Lei
-            14.300/2022). Consulte condições e disponibilidade na sua região antes da contratação.
+            Serviços de energia por assinatura oferecidos por licenciado independente iGreen.
+            Modelo 100% regulamentado pela ANEEL (Lei 14.300/2022). Consulte condições e
+            disponibilidade na sua região antes da contratação.
           </p>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
             <Link
