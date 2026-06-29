@@ -95,7 +95,7 @@ spec:
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /seguro-auto
+            path: /
             port: 3000
           initialDelaySeconds: 15
           periodSeconds: 5
