@@ -46,7 +46,7 @@
   background: #ffffff;
   border-radius: 1.5rem;
   padding: 2rem 1.5rem;
-  box-shadow: 0 24px 80px rgba(108, 58, 237, 0.15);
+  box-shadow: 0 24px 80px rgba(0, 230, 118, 0.15);
 }
 
 .telecom-quote-modal-card h2 {
@@ -78,7 +78,7 @@
 }
 
 .tqf-step.active {
-  background: #6c3aed;
+  background: #00e676;
 }
 
 .tqf-group {
@@ -113,8 +113,8 @@
 .tqf-group input:focus,
 .tqf-group select:focus {
   outline: none;
-  border-color: #6c3aed;
-  box-shadow: 0 0 0 3px rgba(108, 58, 237, 0.12);
+  border-color: #00e676;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.12);
 }
 
 .tqf-group.has-error input,
@@ -139,7 +139,7 @@
   height: 48px;
   border: none;
   border-radius: 999px;
-  background: #6c3aed;
+  background: #00e676;
   color: #fff;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -148,7 +148,7 @@
 }
 
 .tqf-btn-primary:hover:not(:disabled) {
-  background: #5b21b6;
+  background: #00c853;
 }
 
 .tqf-btn-primary:disabled {
@@ -202,8 +202,8 @@
 }
 
 .tqf-type-btn:hover:not(:disabled) {
-  border-color: #6c3aed;
-  box-shadow: 0 0 0 3px rgba(108, 58, 237, 0.12);
+  border-color: #00e676;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.12);
 }
 
 .tqf-type-btn:disabled {
@@ -256,12 +256,12 @@
 }
 
 .tqf-plan-card:hover {
-  border-color: #c4b5fd;
+  border-color: #6ee7b7;
 }
 
 .tqf-plan-card.selected {
-  border-color: #6c3aed;
-  box-shadow: 0 8px 28px rgba(108, 58, 237, 0.18);
+  border-color: #00e676;
+  box-shadow: 0 8px 28px rgba(0, 230, 118, 0.18);
 }
 
 .tqf-plan-selected-badge {
@@ -274,14 +274,14 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 999px;
-  background: #6c3aed;
+  background: #00e676;
   color: #fff;
 }
 
 .tqf-plan-name {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #6c3aed;
+  color: #00e676;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
@@ -326,7 +326,7 @@
   content: "•";
   position: absolute;
   left: 0;
-  color: #6c3aed;
+  color: #00e676;
 }
 
 .tqf-plan-price {
