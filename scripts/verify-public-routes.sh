@@ -6,23 +6,45 @@ BASE_URL="${1:?Usage: verify-public-routes.sh <base-url>}"
 ROUTES=(/ /seguros /seguro-auto /telecom /lic)
 MAX_ATTEMPTS="${VERIFY_ROUTES_ATTEMPTS:-12}"
 SLEEP_SECONDS="${VERIFY_ROUTES_SLEEP:-15}"
+INITIAL_WAIT_SECONDS="${VERIFY_ROUTES_INITIAL_WAIT:-30}"
 
 is_dev_host() {
   [[ "$BASE_URL" == *"lpigreendev"* ]]
 }
 
+curl_public() {
+  curl -sS --max-time 30 \
+    -H 'Cache-Control: no-cache' \
+    -H 'Pragma: no-cache' \
+    "$1"
+}
+
+curl_http_code() {
+  curl -sS --max-time 30 \
+    -H 'Cache-Control: no-cache' \
+    -H 'Pragma: no-cache' \
+    -o /dev/null \
+    -w "%{http_code}" \
+    "$1"
+}
+
 echo "Verificando rotas em ${BASE_URL} (até ${MAX_ATTEMPTS} tentativas) ..."
+if [ "${INITIAL_WAIT_SECONDS}" -gt 0 ]; then
+  echo "Aguardando ${INITIAL_WAIT_SECONDS}s para propagação do rollout..."
+  sleep "${INITIAL_WAIT_SECONDS}"
+fi
 
 verify_home_bundle() {
-  local html chunk js
-  html="$(curl -sS --max-time 30 "${BASE_URL}/")"
+  local html chunk js cache_bust
+  cache_bust="deploy=$(date +%s)"
+  html="$(curl_public "${BASE_URL}/?${cache_bust}")"
   chunk="$(echo "$html" | grep -oE '/_next/static/chunks/app/page-[^"]+\.js' | head -1 || true)"
   if [ -z "$chunk" ]; then
     echo "  FAIL / — chunk da home não encontrado no HTML"
     return 1
   fi
 
-  js="$(curl -sS --max-time 30 "${BASE_URL}${chunk}")"
+  js="$(curl_public "${BASE_URL}${chunk}?${cache_bust}")"
 
   if echo "$js" | grep -q 'conexao_green'; then
     echo "  FAIL / — home ainda contém formulário legado (conexao_green)"
@@ -52,7 +74,7 @@ for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   echo "--- tentativa ${attempt}/${MAX_ATTEMPTS} ---"
 
   for route in "${ROUTES[@]}"; do
-    code="$(curl -sS -o /dev/null -w "%{http_code}" --max-time 30 "${BASE_URL}${route}")"
+    code="$(curl_http_code "${BASE_URL}${route}?deploy=$(date +%s)")"
     if [ "$code" = "200" ]; then
       echo "  OK  ${route} → HTTP ${code}"
     else

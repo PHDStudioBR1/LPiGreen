@@ -1,9 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BarChart3, Gift, Sparkles } from "lucide-react";
-import { trackTelecomQuoteClick, trackTelecomSimulatorUse } from "@/lib/telecom/analytics";
-import { TELECOM_TRUST_ITEMS } from "@/lib/telecom/constants";
+import { trackTelecomNavClick, trackTelecomQuoteClick } from "@/lib/telecom/analytics";
+import { TELECOM_HEADER_OFFSET, TELECOM_TRUST_ITEMS } from "@/lib/telecom/constants";
 import { Container } from "@/components/telecom/ui/container";
 import { HeroPhoneMockup } from "@/components/telecom/hero/hero-phone-mockup";
 
@@ -31,10 +32,14 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
     onQuoteClick?.();
   };
 
-  const handleSimulate = () => {
-    trackTelecomSimulatorUse("hero");
-    handleQuote("hero_plans");
-  };
+  const scrollToPlans = useCallback(() => {
+    trackTelecomNavClick("planos");
+    const target = document.getElementById("planos");
+    if (!target) return;
+    const top =
+      target.getBoundingClientRect().top + window.scrollY - TELECOM_HEADER_OFFSET;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, []);
 
   return (
     <section
@@ -111,7 +116,7 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
             <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-3">
               <motion.button
                 type="button"
-                onClick={handleSimulate}
+                onClick={scrollToPlans}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-[#00e676] px-7 text-sm font-semibold text-[#060806] shadow-[0_4px_24px_rgba(0,230,118,0.35)] transition-shadow hover:shadow-[0_6px_32px_rgba(0,230,118,0.45)]"

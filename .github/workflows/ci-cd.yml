@@ -238,6 +238,7 @@ jobs:
             kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
           fi
           kubectl apply -f infra/k8s/ingress-route.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/ingress-route-dev-prod-cluster.yaml -n ${{ env.K8S_NAMESPACE }}
 
       - name: Verificar rotas públicas (prod)
         run: bash scripts/verify-public-routes.sh https://lpigreen.546digitalservices.com
@@ -268,48 +269,95 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Configurar acesso ao cluster
+      - name: Definir imagem do frontend dev
+        id: dev_image
         run: |
-          mkdir -p $HOME/.kube
-          KUBECONFIG_SECRET="${{ secrets.KUBECONFIG_DEV || secrets.KUBECONFIG }}"
-          if [ -z "$KUBECONFIG_SECRET" ]; then
-            echo "⚠️ Configure KUBECONFIG_DEV (ou KUBECONFIG) em Settings > Secrets > Actions"
-            exit 1
-          fi
-          echo "$KUBECONFIG_SECRET" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-          kubectl cluster-info || { echo "⚠️ Erro ao conectar ao cluster."; exit 1; }
+          echo "web_image=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }}" >> $GITHUB_OUTPUT
 
-      - name: Deploy Frontend (dev)
+      - name: Detectar clusters dev/prod
+        id: clusters
         run: |
-          kubectl apply -f infra/k8s/deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          same_cluster=false
+          if [ -n "${{ secrets.KUBECONFIG_DEV }}" ] && [ -n "${{ secrets.KUBECONFIG }}" ]; then
+            echo "${{ secrets.KUBECONFIG }}" | base64 -d > /tmp/prod-kubeconfig
+            echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > /tmp/dev-kubeconfig
+            prod_cluster="$(KUBECONFIG=/tmp/prod-kubeconfig kubectl config view --minify -o jsonpath='{.contexts[0].context.cluster}')"
+            dev_cluster="$(KUBECONFIG=/tmp/dev-kubeconfig kubectl config view --minify -o jsonpath='{.contexts[0].context.cluster}')"
+            echo "Cluster prod: ${prod_cluster}"
+            echo "Cluster legado: ${dev_cluster}"
+            if [ "${prod_cluster}" = "${dev_cluster}" ]; then
+              same_cluster=true
+            fi
+          fi
+          echo "same_cluster=${same_cluster}" >> $GITHUB_OUTPUT
+
+      - name: Deploy Frontend — cluster DEV legado (KUBECONFIG_DEV)
+        run: |
+          if [ -z "${{ secrets.KUBECONFIG_DEV }}" ]; then
+            echo "⚠️ KUBECONFIG_DEV não configurado — pulando deploy no cluster legado."
+            exit 0
+          fi
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          kubectl cluster-info
+
+          kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
           kubectl apply -f infra/k8s/network-policy-allow-lpigreen-to-random-service-dev.yaml
-          kubectl set image deployment/lpigreen-web-dev \
-            web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }} \
+          kubectl set image deployment/lpigreen-web \
+            web=${{ steps.dev_image.outputs.web_image }} \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl set env deployment/lpigreen-web-dev \
+          kubectl set env deployment/lpigreen-web \
             LEAD_API_URL=http://api-dev-service.phdcrm-dev.svc.cluster.local \
             RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local:3000 \
             PHDCRM_ENV=dev \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout restart deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+          kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
 
-      - name: Aplicar Middlewares e IngressRoute (dev)
-        run: |
           if [ -d "infra/k8s/middlewares" ]; then
             kubectl apply -f infra/k8s/middlewares/ -n ${{ env.K8S_NAMESPACE }}
           fi
-          kubectl apply -f infra/k8s/ingress-route-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          if [ "${{ steps.clusters.outputs.same_cluster }}" != "true" ]; then
+            kubectl apply -f infra/k8s/ingress-route-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+            echo "Ingress legado aplicado (clusters distintos)."
+          else
+            echo "⚠️ Mesmo cluster que prod — mantendo ingress lpigreen-web-dev (web-dev-service)."
+          fi
+          echo "Cluster legado — imagem:"
+          kubectl get deployment lpigreen-web -n ${{ env.K8S_NAMESPACE }} -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+
+      - name: Deploy Frontend — cluster PROD (lpigreen-web-dev)
+        run: |
+          if [ -z "${{ secrets.KUBECONFIG }}" ]; then
+            echo "❌ KUBECONFIG não configurado — lpigreendev depende de lpigreen-web-dev neste cluster."
+            exit 1
+          fi
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          kubectl cluster-info
+          bash scripts/k8s-rollout-frontend-dev.sh ${{ env.K8S_NAMESPACE }} "${{ steps.dev_image.outputs.web_image }}" || {
+            echo "=== Diagnóstico lpigreen-web-dev ==="
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-web-dev -o wide || true
+            kubectl describe deployment lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} || true
+            for POD in $(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-web-dev -o jsonpath='{.items[*].metadata.name}'); do
+              kubectl logs "$POD" -n ${{ env.K8S_NAMESPACE }} --tail=80 || true
+            done
+            exit 1
+          }
 
       - name: Verificar rotas públicas (dev)
+        env:
+          VERIFY_ROUTES_INITIAL_WAIT: 45
         run: bash scripts/verify-public-routes.sh https://lpigreendev.546digitalservices.com
 
       - name: Status final
         run: |
-          echo "=== Pods ==="
-          kubectl get pods -n ${{ env.K8S_NAMESPACE }}
-          echo "=== Services ==="
-          kubectl get services -n ${{ env.K8S_NAMESPACE }}
-          echo "=== IngressRoutes ==="
-          kubectl get ingressroute -n ${{ env.K8S_NAMESPACE }}
+          echo "Deploy dev concluído. Imagem: ${{ steps.dev_image.outputs.web_image }}"
+          echo "=== Pods (cluster prod / web-dev) ==="
+          if [ -n "${{ secrets.KUBECONFIG }}" ]; then
+            mkdir -p $HOME/.kube
+            echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+            chmod 600 $HOME/.kube/config
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=lpigreen-web-dev
+          fi
