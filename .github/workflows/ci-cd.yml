@@ -221,12 +221,13 @@ jobs:
       - name: Deploy Frontend
         run: |
           kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/network-policy-allow-lpigreen-to-random-service-prod.yaml
           kubectl set image deployment/lpigreen-web \
             web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl set env deployment/lpigreen-web \
             LEAD_API_URL=http://api-service.phdstudio.svc.cluster.local \
-            RANDOM_SERVICE_URL=http://random-service-api.phdstudio.svc.cluster.local \
+            RANDOM_SERVICE_URL=http://random-service-api.phdstudio.svc.cluster.local:3000 \
             PHDCRM_ENV=prod \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
@@ -282,12 +283,13 @@ jobs:
       - name: Deploy Frontend (dev)
         run: |
           kubectl apply -f infra/k8s/deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f infra/k8s/network-policy-allow-lpigreen-to-random-service-dev.yaml
           kubectl set image deployment/lpigreen-web-dev \
             web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl set env deployment/lpigreen-web-dev \
             LEAD_API_URL=http://api-dev-service.phdcrm-dev.svc.cluster.local \
-            RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local \
+            RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local:3000 \
             PHDCRM_ENV=dev \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout restart deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }}

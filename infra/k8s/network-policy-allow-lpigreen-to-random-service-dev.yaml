@@ -1,0 +1,25 @@
+# Permite que o frontend LPiGreen (namespace lpigreen) chame o random-service em phdcrm-dev.
+# Aplicar no namespace phdcrm-dev:
+#   kubectl apply -f infra/k8s/network-policy-allow-lpigreen-to-random-service-dev.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-lpigreen-to-random-service-api-dev
+  namespace: phdcrm-dev
+  labels:
+    app: random-service
+spec:
+  podSelector:
+    matchLabels:
+      app: random-service
+      component: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: lpigreen
+      ports:
+        - protocol: TCP
+          port: 3000

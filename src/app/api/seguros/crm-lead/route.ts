@@ -255,7 +255,8 @@ export async function POST(request: NextRequest) {
       } catch (responsavelError) {
         console.error(
           "Seguros CRM responsavel:",
-          responsavelError instanceof Error ? responsavelError.message : responsavelError
+          responsavelError instanceof Error ? responsavelError.message : responsavelError,
+          { lead_id: lead.id, session_id: payload.session_id }
         );
       }
     }

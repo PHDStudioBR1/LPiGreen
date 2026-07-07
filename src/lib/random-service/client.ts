@@ -21,7 +21,11 @@ export type RandomServiceNextResponse = {
 export type RandomServiceSegment = "bot" | "seguros" | "telecom";
 
 function getRandomServiceBaseUrl(): string {
-  return (process.env.RANDOM_SERVICE_URL ?? "http://random-service-api").replace(/\/$/, "");
+  const raw = (process.env.RANDOM_SERVICE_URL ?? "http://random-service-api:3000").replace(/\/$/, "");
+  if (/^https?:\/\/[^/:]+$/i.test(raw)) {
+    return `${raw}:3000`;
+  }
+  return raw;
 }
 
 export async function fetchNextRepresentative(params: {
