@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { assignCrmLeadRepresentative } from "@/lib/crm/assign-crm-lead-representative";
 import {
-  assignLeadResponsavel,
   brazilIsoNow,
   buildSessionLeadEmail,
   cleanString,
   createLeadActivity,
   existingTagNames,
-  findCrmUserIdByRepresentative,
   getCrmConfig,
   onlyDigits,
+  splitName,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
-import { notifyRepresentativeOfNewLead } from "@/lib/email/representative-lead-notification";
-import { assignRepresentativeToLead } from "@/lib/random-service/client";
 
 export const runtime = "nodejs";
 
@@ -24,6 +22,8 @@ type TelecomCrmPayload = {
   crm_lead_id?: number;
   values?: {
     activationType?: string;
+    name?: string;
+    email?: string;
     cpfCnpj?: string;
     chipType?: string;
     portNumber?: string;
@@ -77,14 +77,23 @@ function resolveTelecomPhone(values: TelecomCrmPayload["values"]): string {
 
 function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: TelecomCrmPayload) {
   const values = payload.values || {};
+  const name = cleanString(values.name, 180);
+  const contactEmail = cleanString(values.email, 180).toLowerCase();
   const cpfCnpj = cleanString(values.cpfCnpj, 32);
   const cpfDigits = onlyDigits(values.cpfCnpj);
   const phoneDigits = resolveTelecomPhone(values);
   const sessionId = cleanString(payload.session_id, 80);
   const activationLabel =
     cleanString(values.activationType) === "portabilidade" ? "Portabilidade" : "Linha Nova";
+  const { firstName, lastName } = splitName(name || `Lead Telecom ${activationLabel}`);
 
   if (payload.step === "details" || payload.step === "contact") {
+    if (!name) {
+      throw new Error("Nome obrigatório para criar lead no CRM");
+    }
+    if (!contactEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+      throw new Error("E-mail inválido para criar lead no CRM");
+    }
     if (cpfDigits.length < 11) {
       throw new Error("CPF/CNPJ inválido para criar lead no CRM");
     }
@@ -117,6 +126,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
 
   if (payload.step === "details" || payload.step === "contact") {
     customValues.document_number = cpfCnpj;
+    customValues.contact_name = name;
+    if (contactEmail) customValues.contact_email = contactEmail;
   }
 
   if (payload.step === "contact") {
@@ -133,8 +144,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
 
   return {
     email: buildSessionLeadEmail(sessionId || `telecom-${Date.now()}`, config.tenantSlug, "telecom"),
-    first_name: "Lead",
-    last_name: `Telecom ${activationLabel}`.slice(0, 80),
+    first_name: firstName,
+    last_name: lastName,
     phone: phoneDigits || "0000000000",
     tenant_slug: config.tenantSlug,
     source: "site_telecom",
@@ -158,6 +169,8 @@ function buildActivityDescription(payload: TelecomCrmPayload): string {
     "Origem: /telecom",
     `Etapa: ${stepLabel}`,
     payload.session_id ? `Sessao: ${payload.session_id}` : null,
+    `Nome: ${cleanString(values.name) || "-"}`,
+    `E-mail: ${cleanString(values.email) || "-"}`,
     `Tipo: ${cleanString(values.activationType) || "-"}`,
     `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
     `Chip: ${cleanString(values.chipType) || "-"}`,
@@ -222,23 +235,17 @@ export async function POST(request: NextRequest) {
     let rotationApproved = false;
 
     if (payload.step === "contact") {
-      const leadPhone = resolveTelecomPhone(payload.values);
-      const leadName = "Lead Telecom";
       try {
-        const assignment = await assignRepresentativeToLead({
+        const assignment = await assignCrmLeadRepresentative({
+          config,
+          leadId: lead.id,
           segmento: "telecom",
-          leadName,
-          leadPhone,
-          assignResponsavel: async (representative) => {
-            const userId = await findCrmUserIdByRepresentative(
-              config,
-              representative,
-              "Telecom CRM responsavel"
-            );
-            if (userId != null) {
-              await assignLeadResponsavel(config, lead.id, userId);
-            }
-            return userId;
+          leadName: cleanString(payload.values?.name) || "Lead Telecom",
+          leadPhone: resolveTelecomPhone(payload.values),
+          logPrefix: "Telecom CRM responsavel",
+          notify: {
+            segmento: "telecom",
+            formValues: payload.values,
           },
         });
 
@@ -248,21 +255,6 @@ export async function POST(request: NextRequest) {
             userId: assignment.responsavelId,
             representativeName: assignment.representative.name,
           };
-        }
-
-        if (assignment.representative.email) {
-          void notifyRepresentativeOfNewLead({
-            segmento: "telecom",
-            representative: assignment.representative,
-            leadId: lead.id,
-            crmEnv: config.env,
-            formValues: payload.values,
-          }).catch((err) =>
-            console.error(
-              "Telecom rep email:",
-              err instanceof Error ? err.message : err
-            )
-          );
         }
       } catch (responsavelError) {
         console.error(

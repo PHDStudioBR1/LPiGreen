@@ -333,6 +333,28 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
 
               {step === 2 && (
                 <>
+                  <FormGroup id="name" label="Nome completo" error={errors.name}>
+                    <input
+                      id="name-field"
+                      type="text"
+                      value={values.name}
+                      onChange={(e) => updateField("name", e.target.value)}
+                      placeholder="Seu nome completo"
+                      autoComplete="name"
+                    />
+                  </FormGroup>
+
+                  <FormGroup id="email" label="E-mail" error={errors.email}>
+                    <input
+                      id="email-field"
+                      type="email"
+                      value={values.email}
+                      onChange={(e) => updateField("email", e.target.value)}
+                      placeholder="seu@email.com"
+                      autoComplete="email"
+                    />
+                  </FormGroup>
+
                   <FormGroup id="cpfCnpj" label="CPF ou CNPJ" error={errors.cpfCnpj}>
                     <input
                       id="cpfCnpj-field"

@@ -561,6 +561,31 @@ export function LeadFormModal({ isOpen, onClose, analytics }: LeadFormModalProps
         cep: values.cep_landing,
         valor_conta: values.valor_conta,
       });
+
+      void fetch("/api/captacao/crm-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          mysql_lead_id: data.id,
+          source: "site_captacao",
+          values: {
+            name: values.name,
+            phone: values.phone,
+            email: values.email,
+            document_number: values.document_number,
+            cep_landing: values.cep_landing,
+            valor_conta: values.valor_conta,
+            city: values.city,
+            state: values.state,
+            power_company: values.power_company,
+            installation_number: values.installation_number,
+          },
+        }),
+      }).catch((crmError) => {
+        console.error("Captacao CRM sync:", crmError);
+      });
+
       await clearRemoteProgress();
       const newSessionId =
         typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"

@@ -219,6 +219,8 @@ export const TELECOM_NEW_LINE_PLANS: TelecomFormPlan[] = [
 
 export type TelecomQuoteFormValues = {
   activationType: TelecomActivationType | "";
+  name: string;
+  email: string;
   cpfCnpj: string;
   chipType: TelecomChipType | "";
   portNumber: string;
@@ -231,6 +233,8 @@ export type TelecomQuoteFieldErrors = Partial<Record<keyof TelecomQuoteFormValue
 
 export const TELECOM_QUOTE_FORM_DEFAULTS: TelecomQuoteFormValues = {
   activationType: "",
+  name: "",
+  email: "",
   cpfCnpj: "",
   chipType: "",
   portNumber: "",
@@ -271,6 +275,10 @@ export function validateTelecomQuoteStep(
   }
 
   if (step === 2) {
+    if (!values.name.trim()) errors.name = "Informe seu nome";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
+      errors.email = "Informe um e-mail válido";
+    }
     const cpfDigits = values.cpfCnpj.replace(/\D/g, "");
     if (cpfDigits.length < 11) errors.cpfCnpj = "CPF/CNPJ inválido";
     if (!values.chipType) errors.chipType = "Selecione o tipo do chip";
@@ -302,6 +310,8 @@ export function buildTelecomLeadSummary(values: TelecomQuoteFormValues): string 
   const plan = getTelecomPlanById(values.activationType, values.selectedPlan);
 
   const lines = [
+    `Nome: ${values.name}`,
+    `E-mail: ${values.email}`,
     `Tipo: ${activationLabel}`,
     `CPF/CNPJ: ${values.cpfCnpj}`,
     `Chip: ${chipLabel}`,

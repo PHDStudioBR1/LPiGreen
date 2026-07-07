@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { assignCrmLeadRepresentative } from "@/lib/crm/assign-crm-lead-representative";
 import {
-  assignLeadResponsavel,
   brazilIsoNow,
   buildSessionLeadEmail,
   cleanString,
   createLeadActivity,
   existingTagNames,
-  findCrmUserIdByRepresentative,
   getCrmConfig,
   onlyDigits,
   splitName,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
-import { notifyRepresentativeOfNewLead } from "@/lib/email/representative-lead-notification";
-import { assignRepresentativeToLead } from "@/lib/random-service/client";
 
 export const runtime = "nodejs";
 
@@ -210,23 +207,17 @@ export async function POST(request: NextRequest) {
     let rotationApproved = false;
 
     if (payload.step === "contact") {
-      const leadName = cleanString(payload.values?.name, 180);
-      const leadPhone = onlyDigits(payload.values?.phone);
       try {
-        const assignment = await assignRepresentativeToLead({
+        const assignment = await assignCrmLeadRepresentative({
+          config,
+          leadId: lead.id,
           segmento: "seguros",
-          leadName,
-          leadPhone,
-          assignResponsavel: async (representative) => {
-            const userId = await findCrmUserIdByRepresentative(
-              config,
-              representative,
-              "Seguros CRM responsavel"
-            );
-            if (userId != null) {
-              await assignLeadResponsavel(config, lead.id, userId);
-            }
-            return userId;
+          leadName: cleanString(payload.values?.name, 180) || "Lead Seguros",
+          leadPhone: onlyDigits(payload.values?.phone),
+          logPrefix: "Seguros CRM responsavel",
+          notify: {
+            segmento: "seguros",
+            formValues: payload.values,
           },
         });
 
@@ -236,21 +227,6 @@ export async function POST(request: NextRequest) {
             userId: assignment.responsavelId,
             representativeName: assignment.representative.name,
           };
-        }
-
-        if (assignment.representative.email) {
-          void notifyRepresentativeOfNewLead({
-            segmento: "seguros",
-            representative: assignment.representative,
-            leadId: lead.id,
-            crmEnv: config.env,
-            formValues: payload.values,
-          }).catch((err) =>
-            console.error(
-              "Seguros rep email:",
-              err instanceof Error ? err.message : err
-            )
-          );
         }
       } catch (responsavelError) {
         console.error(

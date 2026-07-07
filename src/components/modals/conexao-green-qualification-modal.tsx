@@ -27,9 +27,24 @@ import {
   trackHomeFormSubmit,
 } from "@/lib/home/analytics";
 
-/** Se definido, o browser envia direto ao n8n (URL pública). Caso contrário, usa o proxy em `/api/conexao-green/n8n` + `N8N_WEBHOOK_URL` no servidor. */
-const NEXT_PUBLIC_N8N = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL?.trim() ?? "";
+/** Sempre usa o proxy no servidor (CRM + representante + n8n). */
 const SUBMIT_PATH = "/api/conexao-green/n8n";
+const CONEXAO_SESSION_STORAGE_KEY = "conexao-green-crm-session";
+
+function createConexaoSessionId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `conexao-${Date.now()}`;
+}
+
+function startConexaoSession(): string {
+  const next = createConexaoSessionId();
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(CONEXAO_SESSION_STORAGE_KEY, next);
+  }
+  return next;
+}
 
 export type ConexaoGreenQualificationValues = {
   name: string;
@@ -87,8 +102,10 @@ export function ConexaoGreenQualificationModal({
     }
 
     const whatsappDigits = onlyDigitsPhone(values.whatsapp);
+    const sessionId = startConexaoSession();
     const payload = {
       funil: "conexao_green",
+      session_id: sessionId,
       nome: values.name.trim(),
       whatsapp: values.whatsapp.trim(),
       whatsapp_apenas_numeros: whatsappDigits,
@@ -101,19 +118,13 @@ export function ConexaoGreenQualificationModal({
       enviado_em: new Date().toISOString(),
     };
 
-    const targetUrl = NEXT_PUBLIC_N8N || SUBMIT_PATH;
-    const fetchInit: RequestInit = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    };
-    if (NEXT_PUBLIC_N8N) {
-      fetchInit.mode = "cors";
-    }
-
     try {
-      const res = await fetch(targetUrl, fetchInit);
+      const res = await fetch(SUBMIT_PATH, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
 
       if (!res.ok) {
         let detail = `HTTP ${res.status}`;
@@ -126,6 +137,11 @@ export function ConexaoGreenQualificationModal({
           /* ignore */
         }
         throw new Error(detail);
+      }
+
+      const result = await res.json().catch(() => null);
+      if (result?.success === false) {
+        throw new Error(result.error || "Erro ao registrar lead");
       }
 
       toast({

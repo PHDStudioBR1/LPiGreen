@@ -1,60 +1,221 @@
 import { NextRequest, NextResponse } from "next/server";
+import { assignCrmLeadRepresentative } from "@/lib/crm/assign-crm-lead-representative";
+import {
+  brazilIsoNow,
+  buildSessionLeadEmail,
+  cleanString,
+  createLeadActivity,
+  getCrmConfig,
+  onlyDigits,
+  splitName,
+  upsertCrmLead,
+} from "@/lib/crm/phd-crm-client";
+
+export const runtime = "nodejs";
 
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL?.trim() ?? "";
 
-/**
- * Encaminha o lead do funil Conexão Green para o webhook do n8n (URL só no servidor).
- * O browser chama esta rota; não expõe o endpoint do n8n nem depende de CORS no n8n.
- */
-export async function POST(request: NextRequest) {
+const CONEXAO_GREEN_TAGS = [
+  "whatsapp-n8n",
+  "produto-conexao",
+  "conexao-green-site",
+  "conexao-green-qualificacao",
+];
+
+function jsonError(message: string, status = 500) {
+  return NextResponse.json({ success: false, error: message }, { status });
+}
+
+async function forwardToN8n(body: Record<string, unknown>) {
   if (!N8N_WEBHOOK_URL) {
-    return NextResponse.json(
-      {
-        error:
-          "N8N_WEBHOOK_URL não está definida no servidor Next. Configure o Secret ou a variável de ambiente.",
-      },
-      { status: 503 }
-    );
+    return { skipped: true as const, status: 503, detail: "N8N_WEBHOOK_URL não configurada" };
   }
 
-  let body: unknown;
+  const res = await fetch(N8N_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const text = await res.text();
+  return { skipped: false as const, status: res.status, text };
+}
+
+export async function POST(request: NextRequest) {
+  let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    body = (await request.json()) as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+    return jsonError("JSON inválido", 400);
   }
 
-  if (!body || typeof body !== "object") {
-    return NextResponse.json({ error: "Corpo inválido" }, { status: 400 });
+  const nome = typeof body.nome === "string" ? body.nome.trim() : "";
+  if (nome.length < 2) {
+    return jsonError("Campo nome é obrigatório", 400);
   }
 
-  const nome = (body as Record<string, unknown>).nome;
-  if (typeof nome !== "string" || nome.trim().length < 2) {
-    return NextResponse.json({ error: "Campo nome é obrigatório" }, { status: 400 });
+  const whatsappRaw =
+    typeof body.whatsapp === "string"
+      ? body.whatsapp
+      : typeof body.whatsapp_apenas_numeros === "string"
+        ? body.whatsapp_apenas_numeros
+        : "";
+  const phoneDigits = onlyDigits(whatsappRaw);
+  if (phoneDigits.length < 10) {
+    return jsonError("WhatsApp inválido", 400);
   }
+
+  let config: ReturnType<typeof getCrmConfig>;
+  try {
+    config = getCrmConfig(request.headers.get("host"));
+  } catch (error) {
+    console.error("Conexao Green CRM config:", error instanceof Error ? error.message : error);
+    return jsonError("CRM não configurado", 503);
+  }
+
+  const sessionId =
+    cleanString(body.session_id, 80) ||
+    cleanString(body.conexao_session_id, 80) ||
+    `conexao-${Date.now()}`;
+  const { firstName, lastName } = splitName(nome);
+  const valorFatura =
+    body.valor_medio_fatura_mensal != null
+      ? String(body.valor_medio_fatura_mensal)
+      : body.valor_medio_fatura_formatado != null
+        ? String(body.valor_medio_fatura_formatado)
+        : "";
 
   try {
-    const res = await fetch(N8N_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    const text = await res.text();
-    const ct = res.headers.get("content-type") || "";
-    if (ct.includes("application/json") && text) {
-      try {
-        return NextResponse.json(JSON.parse(text), { status: res.status });
-      } catch {
-        return new NextResponse(text, { status: res.status });
-      }
-    }
-    return new NextResponse(text || null, { status: res.status });
-  } catch (err) {
-    console.error("POST /api/conexao-green/n8n → n8n:", err);
-    return NextResponse.json(
-      { error: "Falha ao contactar o webhook n8n" },
-      { status: 502 }
+    const lead = await upsertCrmLead(
+      config,
+      {
+        email: buildSessionLeadEmail(sessionId, config.tenantSlug, "conexao-green"),
+        first_name: firstName,
+        last_name: lastName,
+        phone: phoneDigits,
+        tenant_slug: config.tenantSlug,
+        source: "site_conexao_green",
+        status: "new",
+        stage: "Curioso",
+        pain_point: "economia na conta de luz",
+        custom_values: {
+          funil: "conexao_green",
+          origem_canal: "site",
+          lead_intention: "Qualificacao conexao green",
+          main_pain: "economia na conta de luz",
+          conexao_session_id: sessionId,
+          site_submitted_at: brazilIsoNow(),
+          valor_medio_fatura_mensal: valorFatura,
+          valor_medio_fatura_formatado: cleanString(body.valor_medio_fatura_formatado, 40),
+          poupanca_anual_projetada:
+            body.poupanca_anual_projetada != null ? String(body.poupanca_anual_projetada) : "",
+        },
+        tags: CONEXAO_GREEN_TAGS,
+      },
+      { tags: CONEXAO_GREEN_TAGS }
     );
+
+    try {
+      await createLeadActivity(
+        config,
+        lead.id,
+        "Conexao Green: qualificacao enviada",
+        [
+          "Origem: / (Conexao Green)",
+          `Sessao: ${sessionId}`,
+          `Nome: ${nome}`,
+          `WhatsApp: ${cleanString(body.whatsapp, 32) || phoneDigits}`,
+          `Valor medio fatura: ${valorFatura || "-"}`,
+        ].join("\n")
+      );
+    } catch (activityError) {
+      console.error(
+        "Conexao Green CRM activity:",
+        activityError instanceof Error ? activityError.message : activityError
+      );
+    }
+
+    let responsavelAssigned: { userId: number; representativeName: string } | null = null;
+    let rotationApproved = false;
+
+    try {
+      const assignment = await assignCrmLeadRepresentative({
+        config,
+        leadId: lead.id,
+        segmento: "bot",
+        leadName: nome,
+        leadPhone: phoneDigits,
+        logPrefix: "Conexao Green CRM responsavel",
+        notify: {
+          segmento: "conexao_green",
+          formValues: {
+            name: nome,
+            whatsapp: cleanString(body.whatsapp, 32) || phoneDigits,
+            valor_medio_fatura: valorFatura,
+          },
+        },
+      });
+
+      rotationApproved = assignment.rotationApproved;
+      if (assignment.responsavelId != null) {
+        responsavelAssigned = {
+          userId: assignment.responsavelId,
+          representativeName: assignment.representative.name,
+        };
+      }
+    } catch (responsavelError) {
+      console.error(
+        "Conexao Green CRM responsavel:",
+        responsavelError instanceof Error ? responsavelError.message : responsavelError,
+        { lead_id: lead.id, session_id: sessionId }
+      );
+    }
+
+    const n8nPayload = {
+      ...body,
+      session_id: sessionId,
+      crm_lead_id: lead.id,
+      crm_env: config.env,
+      representante_nome: responsavelAssigned?.representativeName ?? null,
+      representante_crm_user_id: responsavelAssigned?.userId ?? null,
+    };
+
+    let n8nResult: { skipped: boolean; status: number; text?: string; detail?: string };
+    try {
+      n8nResult = await forwardToN8n(n8nPayload);
+    } catch (err) {
+      console.error("Conexao Green n8n:", err);
+      n8nResult = { skipped: false, status: 502, detail: "Falha ao contactar o webhook n8n" };
+    }
+
+    if (!n8nResult.skipped && n8nResult.status >= 400) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: n8nResult.detail || `Webhook n8n HTTP ${n8nResult.status}`,
+          data: {
+            crm_env: config.env,
+            lead_id: lead.id,
+            responsavel_assigned: responsavelAssigned,
+            rotation_approved: rotationApproved,
+          },
+        },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        crm_env: config.env,
+        lead_id: lead.id,
+        responsavel_assigned: responsavelAssigned,
+        rotation_approved: rotationApproved,
+        n8n_skipped: n8nResult.skipped,
+      },
+    });
+  } catch (error) {
+    console.error("Conexao Green CRM lead:", error instanceof Error ? error.message : error);
+    return jsonError(error instanceof Error ? error.message : "Erro ao registrar lead", 502);
   }
 }
