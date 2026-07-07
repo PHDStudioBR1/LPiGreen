@@ -179,9 +179,30 @@ export function existingTagNames(lead: CrmLead): string[] {
     .filter((name): name is string => Boolean(name));
 }
 
+export function buildStableLeadEmail(phoneDigits: string, tenantSlug: string): string {
+  const tenant = tenantSlug.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "igreen";
+  return `${phoneDigits}@w.phdcrm.${tenant}.local`;
+}
+
+export function extractCrmLead(data: unknown): CrmLead | null {
+  if (!data || typeof data !== "object") return null;
+  const record = data as Record<string, unknown>;
+  if (typeof record.id === "number") return record as CrmLead;
+  const nested = record.lead;
+  if (nested && typeof nested === "object" && typeof (nested as CrmLead).id === "number") {
+    return nested as CrmLead;
+  }
+  return null;
+}
+
+export function isLikelyTagError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /tag/i.test(message);
+}
+
 export async function getLeadById(config: CrmConfig, leadId: number): Promise<CrmLead | null> {
-  const body = await crmRequest<CrmLead>(config, `/api/crm/v1/leads/${leadId}`, { method: "GET" });
-  return body.data?.id ? body.data : null;
+  const body = await crmRequest<unknown>(config, `/api/crm/v1/leads/${leadId}`, { method: "GET" });
+  return extractCrmLead(body.data);
 }
 
 export async function findLeadByPhone(config: CrmConfig, phoneDigits: string): Promise<CrmLead | null> {
@@ -230,6 +251,7 @@ export async function upsertCrmLead(
   options: {
     crmLeadId?: number;
     phoneDigits?: string;
+    tags?: string[];
   } = {}
 ): Promise<CrmLead> {
   const nextCustomValues =
@@ -247,26 +269,44 @@ export async function upsertCrmLead(
     existing = await findLeadByPhone(config, options.phoneDigits);
   }
 
-  const body = {
+  const mergedTags =
+    options.tags && options.tags.length > 0
+      ? [...new Set([...existingTagNames(existing ?? { id: 0 }), ...options.tags])]
+      : undefined;
+
+  const body: Record<string, unknown> = {
     ...payload,
     custom_values: mergeCustomValues(existing, nextCustomValues),
   };
+  if (mergedTags) body.tags = mergedTags;
 
-  if (existing?.id) {
-    const result = await crmRequest<CrmLead>(config, `/api/crm/v1/leads/${existing.id}`, {
-      method: "PUT",
-      body: JSON.stringify(body),
+  const upsert = async (requestBody: Record<string, unknown>): Promise<CrmLead> => {
+    if (existing?.id) {
+      const result = await crmRequest<unknown>(config, `/api/crm/v1/leads/${existing.id}`, {
+        method: "PUT",
+        body: JSON.stringify(requestBody),
+      });
+      const lead = extractCrmLead(result.data);
+      if (!lead) throw new Error("CRM did not return lead id on update");
+      return lead;
+    }
+
+    const result = await crmRequest<unknown>(config, "/api/crm/v1/leads", {
+      method: "POST",
+      body: JSON.stringify(requestBody),
     });
-    if (!result.data?.id) throw new Error("CRM did not return lead id on update");
-    return result.data;
-  }
+    const lead = extractCrmLead(result.data);
+    if (!lead) throw new Error("CRM did not return lead id");
+    return lead;
+  };
 
-  const result = await crmRequest<CrmLead>(config, "/api/crm/v1/leads", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-  if (!result.data?.id) throw new Error("CRM did not return lead id");
-  return result.data;
+  try {
+    return await upsert(body);
+  } catch (error) {
+    if (!mergedTags || !isLikelyTagError(error)) throw error;
+    const { tags: _tags, ...bodyWithoutTags } = body;
+    return upsert(bodyWithoutTags);
+  }
 }
 
 export async function mergeLeadTags(
@@ -274,12 +314,16 @@ export async function mergeLeadTags(
   lead: CrmLead,
   tags: string[]
 ): Promise<string[]> {
-  const merged = [...new Set([...existingTagNames(lead), ...tags])];
-  const result = await crmRequest<CrmLead>(config, `/api/crm/v1/leads/${lead.id}`, {
-    method: "PUT",
-    body: JSON.stringify({ tags: merged }),
-  });
-  return existingTagNames(result.data || { id: lead.id, tags: merged });
+  try {
+    const updated = await upsertCrmLead(config, {}, { crmLeadId: lead.id, tags });
+    return existingTagNames(updated);
+  } catch (error) {
+    console.warn(
+      "mergeLeadTags:",
+      error instanceof Error ? error.message : error
+    );
+    return existingTagNames(lead);
+  }
 }
 
 export async function searchCrmUsers(config: CrmConfig, search: string): Promise<CrmUser[]> {
@@ -341,15 +385,16 @@ export async function createLeadActivity(
   description: string
 ): Promise<void> {
   const auth = await login(config);
+  const activity: Record<string, unknown> = {
+    lead_id: leadId,
+    type: "note",
+    title,
+    description,
+    due_date: null,
+  };
+  if (auth.userId != null) activity.user_id = auth.userId;
   await crmRequest(config, "/api/crm/v1/activities", {
     method: "POST",
-    body: JSON.stringify({
-      lead_id: leadId,
-      user_id: auth.userId,
-      type: "note",
-      title,
-      description,
-      due_date: null,
-    }),
+    body: JSON.stringify(activity),
   });
 }

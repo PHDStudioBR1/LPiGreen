@@ -3,9 +3,9 @@ import {
   assignLeadResponsavel,
   cleanString,
   createLeadActivity,
+  existingTagNames,
   findCrmUserIdByRepresentative,
   getCrmConfig,
-  mergeLeadTags,
   onlyDigits,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
@@ -65,9 +65,6 @@ function jsonError(message: string, status = 500) {
 function resolveTelecomPhone(values: TelecomCrmPayload["values"]): string {
   const portDigits = onlyDigits(values?.portNumber);
   if (portDigits.length >= 10) return portDigits;
-
-  const cpfDigits = onlyDigits(values?.cpfCnpj);
-  if (cpfDigits.length >= 11) return cpfDigits.slice(0, 11);
 
   const ddd = onlyDigits(values?.ddd).slice(0, 2);
   if (ddd) return `${ddd}900000000`.slice(0, 11);
@@ -204,8 +201,11 @@ export async function POST(request: NextRequest) {
     const lead = await upsertCrmLead(config, leadBody, {
       crmLeadId: payload.crm_lead_id,
       phoneDigits: phoneDigits.length >= 10 ? phoneDigits : undefined,
+      tags: TAGS_BY_STEP[payload.step],
     });
-    const tags = await mergeLeadTags(config, lead, TAGS_BY_STEP[payload.step]);
+    const tags = existingTagNames(lead).length
+      ? existingTagNames(lead)
+      : TAGS_BY_STEP[payload.step];
 
     let activityCreated = false;
     try {

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   assignLeadResponsavel,
+  buildStableLeadEmail,
   cleanString,
   createLeadActivity,
   existingTagNames,
   findCrmUserIdByRepresentative,
   getCrmConfig,
-  mergeLeadTags,
   onlyDigits,
   splitName,
   upsertCrmLead,
@@ -74,7 +74,6 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
   const cpfCnpj = cleanString(values.cpfCnpj, 32);
   const cepDigits = onlyDigits(values.cep);
   const { firstName, lastName } = splitName(name);
-  const placeholderTenant = config.tenantSlug.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "igreen";
 
   if (!phoneDigits || phoneDigits.length < 10) {
     throw new Error("Telefone inválido para criar lead no CRM");
@@ -101,6 +100,7 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
     customValues.document_number = cpfCnpj;
     customValues.cep = cepDigits;
     customValues.seguros_quote_status = "contact_completed";
+    if (email) customValues.contact_email = email;
   } else {
     customValues.seguros_quote_status = "vehicle_completed";
   }
@@ -109,13 +109,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
     if (!customValues[key]) delete customValues[key];
   });
 
-  const stableEmail =
-    payload.step === "contact" && email
-      ? email
-      : `${phoneDigits}@w.phdcrm.${placeholderTenant}.local`;
-
   return {
-    email: stableEmail,
+    email: buildStableLeadEmail(phoneDigits, config.tenantSlug),
     first_name: firstName,
     last_name: lastName,
     phone: phoneDigits,
@@ -182,8 +177,11 @@ export async function POST(request: NextRequest) {
     const lead = await upsertCrmLead(config, leadBody, {
       crmLeadId: payload.crm_lead_id,
       phoneDigits,
+      tags: TAGS_BY_STEP[payload.step],
     });
-    const tags = await mergeLeadTags(config, lead, TAGS_BY_STEP[payload.step]);
+    const tags = existingTagNames(lead).length
+      ? existingTagNames(lead)
+      : TAGS_BY_STEP[payload.step];
 
     let activityCreated = false;
     try {
