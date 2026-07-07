@@ -20,6 +20,7 @@ export type CrmLead = {
   phone?: string;
   first_name?: string;
   last_name?: string;
+  created_at?: string;
 };
 
 export type CrmUser = {
@@ -226,6 +227,44 @@ export function buildStableLeadEmail(phoneDigits: string, tenantSlug: string): s
   return `${phoneDigits}@w.phdcrm.${tenant}.local`;
 }
 
+/** E-mail técnico único por sessão do formulário (evita deduplicação no CRM por e-mail/telefone). */
+export function buildSessionLeadEmail(
+  sessionId: string,
+  tenantSlug: string,
+  prefix = "lead"
+): string {
+  const tenant = tenantSlug.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "igreen";
+  const safePrefix = prefix.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "lead";
+  const sessionSlug = sessionId.replace(/[^a-z0-9_.-]/gi, "").toLowerCase().slice(0, 48);
+  const uniquePart = sessionSlug || `anon-${Date.now()}`;
+  return `${safePrefix}-${uniquePart}@draft.phdcrm.${tenant}.local`;
+}
+
+export function resolveLeadEmail(
+  phoneDigits: string,
+  tenantSlug: string,
+  realEmail?: string
+): string {
+  const normalized = cleanString(realEmail, 180).toLowerCase();
+  if (normalized.includes("@")) return normalized;
+  return buildStableLeadEmail(phoneDigits, tenantSlug);
+}
+
+export function isPlaceholderCrmEmail(email: string | null | undefined): boolean {
+  const normalized = cleanString(email, 255).toLowerCase();
+  if (!normalized) return true;
+  return (
+    normalized.includes("@w.phdcrm.") ||
+    normalized.includes("@draft.phdcrm.") ||
+    normalized.endsWith(".local")
+  );
+}
+
+/** Data/hora atual em America/Sao_Paulo (YYYY-MM-DD HH:mm:ss). */
+export function brazilIsoNow(): string {
+  return new Date().toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" });
+}
+
 export function extractCrmLead(data: unknown): CrmLead | null {
   if (!data || typeof data !== "object") return null;
   const record = data as Record<string, unknown>;
@@ -264,7 +303,15 @@ export async function findLeadByPhone(config: CrmConfig, phoneDigits: string): P
       ? body.data.items
       : [];
 
-  return leads.find((lead) => onlyDigits(lead.phone) === phoneDigits) ?? leads[0] ?? null;
+  const matches = leads
+    .filter((lead) => onlyDigits(lead.phone) === phoneDigits)
+    .sort((a, b) => {
+      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return bTime - aTime;
+    });
+
+  return matches[0] ?? null;
 }
 
 function mergeCustomValues(
@@ -287,12 +334,16 @@ function mergeCustomValues(
   return merged;
 }
 
+/**
+ * Cria ou atualiza lead no CRM.
+ * Só atualiza (PUT) quando `crmLeadId` pertence à mesma sessão do formulário.
+ * Nunca busca lead existente por telefone ou e-mail — cada envio gera registro novo.
+ */
 export async function upsertCrmLead(
   config: CrmConfig,
   payload: Record<string, unknown>,
   options: {
     crmLeadId?: number;
-    phoneDigits?: string;
     tags?: string[];
   } = {}
 ): Promise<CrmLead> {
@@ -305,10 +356,6 @@ export async function upsertCrmLead(
 
   if (options.crmLeadId) {
     existing = await getLeadById(config, options.crmLeadId);
-  }
-
-  if (!existing && options.phoneDigits && options.phoneDigits.length >= 10) {
-    existing = await findLeadByPhone(config, options.phoneDigits);
   }
 
   const mergedTags =

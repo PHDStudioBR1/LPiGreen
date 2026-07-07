@@ -78,21 +78,13 @@ function createCrmSessionId(): string {
   return `seguros-${Date.now()}`;
 }
 
-function getOrCreateCrmSessionId(): string {
-  if (typeof window === "undefined") return createCrmSessionId();
-  const stored = sessionStorage.getItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
-  if (stored) return stored;
+function startCrmSession(): string {
   const next = createCrmSessionId();
-  sessionStorage.setItem(SEGUROS_CRM_SESSION_STORAGE_KEY, next);
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(SEGUROS_CRM_SESSION_STORAGE_KEY, next);
+    sessionStorage.removeItem(SEGUROS_CRM_LEAD_ID_STORAGE_KEY);
+  }
   return next;
-}
-
-function loadCrmLeadId(): number | null {
-  if (typeof window === "undefined") return null;
-  const stored = sessionStorage.getItem(SEGUROS_CRM_LEAD_ID_STORAGE_KEY);
-  if (!stored) return null;
-  const parsed = Number(stored);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
 function persistCrmLeadId(leadId: number): void {
@@ -191,8 +183,8 @@ export function SegurosQuoteModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    setCrmSessionId(getOrCreateCrmSessionId());
-    setCrmLeadId(loadCrmLeadId());
+    setCrmSessionId(startCrmSession());
+    setCrmLeadId(null);
     const session = loadQuoteSessionFields();
     if (session) {
       setValues((current) => ({ ...current, ...session }));
@@ -243,8 +235,10 @@ export function SegurosQuoteModal({
       setCrmError(null);
 
       try {
-        const sessionId = crmSessionId || getOrCreateCrmSessionId();
-        if (!crmSessionId) setCrmSessionId(sessionId);
+        const sessionId = crmSessionId;
+        if (!sessionId) {
+          throw new Error("Sessão do formulário indisponível");
+        }
 
         const response = await fetch("/api/seguros/crm-lead", {
           method: "POST",

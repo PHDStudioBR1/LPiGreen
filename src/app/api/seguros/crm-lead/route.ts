@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   assignLeadResponsavel,
-  buildStableLeadEmail,
+  brazilIsoNow,
+  buildSessionLeadEmail,
   cleanString,
   createLeadActivity,
   existingTagNames,
@@ -11,6 +12,7 @@ import {
   splitName,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
+import { notifyRepresentativeOfNewLead } from "@/lib/email/representative-lead-notification";
 import { assignRepresentativeToLead } from "@/lib/random-service/client";
 
 export const runtime = "nodejs";
@@ -70,7 +72,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
   const funil = resolveFunil(payload);
   const name = cleanString(values.name, 180);
   const phoneDigits = onlyDigits(values.phone);
-  const email = cleanString(values.email, 180).toLowerCase();
+  const contactEmail = cleanString(values.email, 180).toLowerCase();
+  const sessionId = cleanString(payload.session_id, 80);
   const cpfCnpj = cleanString(values.cpfCnpj, 32);
   const cepDigits = onlyDigits(values.cep);
   const { firstName, lastName } = splitName(name);
@@ -88,7 +91,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
     lead_intention: funil === "seguro-auto" ? "Cotacao seguro auto" : "Cotacao seguro veicular",
     main_pain: funil === "seguro-auto" ? "cotacao de seguro auto" : "cotacao de seguro veicular",
     seguros_step: payload.step,
-    seguros_session_id: cleanString(payload.session_id, 80),
+    seguros_session_id: sessionId,
+    site_submitted_at: brazilIsoNow(),
     vehicle_type: cleanString(values.vehicleType, 80),
     vehicle_plate: cleanString(values.plate, 20),
     vehicle_model: cleanString(values.model, 160),
@@ -100,7 +104,7 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
     customValues.document_number = cpfCnpj;
     customValues.cep = cepDigits;
     customValues.seguros_quote_status = "contact_completed";
-    if (email) customValues.contact_email = email;
+    if (contactEmail) customValues.contact_email = contactEmail;
   } else {
     customValues.seguros_quote_status = "vehicle_completed";
   }
@@ -109,8 +113,14 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
     if (!customValues[key]) delete customValues[key];
   });
 
+  const funilPrefix = funil === "seguro-auto" ? "seguro-auto" : "seguros";
+
   return {
-    email: buildStableLeadEmail(phoneDigits, config.tenantSlug),
+    email: buildSessionLeadEmail(
+      sessionId || `${funilPrefix}-${Date.now()}`,
+      config.tenantSlug,
+      funilPrefix
+    ),
     first_name: firstName,
     last_name: lastName,
     phone: phoneDigits,
@@ -172,11 +182,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const leadBody = buildLeadPayload(config, payload);
-    const phoneDigits = onlyDigits(payload.values?.phone);
 
     const lead = await upsertCrmLead(config, leadBody, {
       crmLeadId: payload.crm_lead_id,
-      phoneDigits,
       tags: TAGS_BY_STEP[payload.step],
     });
     const tags = existingTagNames(lead).length
@@ -228,6 +236,21 @@ export async function POST(request: NextRequest) {
             userId: assignment.responsavelId,
             representativeName: assignment.representative.name,
           };
+        }
+
+        if (assignment.representative.email) {
+          void notifyRepresentativeOfNewLead({
+            segmento: "seguros",
+            representative: assignment.representative,
+            leadId: lead.id,
+            crmEnv: config.env,
+            formValues: payload.values,
+          }).catch((err) =>
+            console.error(
+              "Seguros rep email:",
+              err instanceof Error ? err.message : err
+            )
+          );
         }
       } catch (responsavelError) {
         console.error(

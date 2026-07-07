@@ -255,7 +255,7 @@ router.post('/', uploadFields, async (req, res) => {
     let leadId;
 
     const existingDraft = sessionIdParam ? await getLeadBySessionId(sessionIdParam) : null;
-    if (existingDraft) {
+    if (existingDraft && existingDraft.status === 'draft') {
       await updateLeadFull(existingDraft.id, { ...parsed.data, status: 'new' });
       leadId = existingDraft.id;
     } else {

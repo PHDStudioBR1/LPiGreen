@@ -50,21 +50,13 @@ function createCrmSessionId(): string {
   return `telecom-${Date.now()}`;
 }
 
-function getOrCreateCrmSessionId(): string {
-  if (typeof window === "undefined") return createCrmSessionId();
-  const stored = sessionStorage.getItem(TELECOM_CRM_SESSION_STORAGE_KEY);
-  if (stored) return stored;
+function startCrmSession(): string {
   const next = createCrmSessionId();
-  sessionStorage.setItem(TELECOM_CRM_SESSION_STORAGE_KEY, next);
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(TELECOM_CRM_SESSION_STORAGE_KEY, next);
+    sessionStorage.removeItem(TELECOM_CRM_LEAD_ID_STORAGE_KEY);
+  }
   return next;
-}
-
-function loadCrmLeadId(): number | null {
-  if (typeof window === "undefined") return null;
-  const stored = sessionStorage.getItem(TELECOM_CRM_LEAD_ID_STORAGE_KEY);
-  if (!stored) return null;
-  const parsed = Number(stored);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
 function persistCrmLeadId(leadId: number): void {
@@ -134,8 +126,8 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
   useEffect(() => {
     if (isOpen) {
       trackTelecomModalOpen();
-      setCrmSessionId(getOrCreateCrmSessionId());
-      setCrmLeadId(loadCrmLeadId());
+      setCrmSessionId(startCrmSession());
+      setCrmLeadId(null);
     } else {
       resetForm();
     }

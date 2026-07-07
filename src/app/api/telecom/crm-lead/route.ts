@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   assignLeadResponsavel,
+  brazilIsoNow,
+  buildSessionLeadEmail,
   cleanString,
   createLeadActivity,
   existingTagNames,
@@ -9,6 +11,7 @@ import {
   onlyDigits,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
+import { notifyRepresentativeOfNewLead } from "@/lib/email/representative-lead-notification";
 import { assignRepresentativeToLead } from "@/lib/random-service/client";
 
 export const runtime = "nodejs";
@@ -78,7 +81,6 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
   const cpfDigits = onlyDigits(values.cpfCnpj);
   const phoneDigits = resolveTelecomPhone(values);
   const sessionId = cleanString(payload.session_id, 80);
-  const placeholderTenant = config.tenantSlug.replace(/[^a-z0-9_.-]/gi, "").toLowerCase() || "igreen";
   const activationLabel =
     cleanString(values.activationType) === "portabilidade" ? "Portabilidade" : "Linha Nova";
 
@@ -104,6 +106,7 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
     main_pain: "contratacao plano celular",
     telecom_step: payload.step,
     telecom_session_id: sessionId,
+    site_submitted_at: brazilIsoNow(),
     activation_type: cleanString(values.activationType, 40),
     chip_type: cleanString(values.chipType, 20),
     port_number: cleanString(values.portNumber, 32),
@@ -128,15 +131,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
     if (!customValues[key]) delete customValues[key];
   });
 
-  const email =
-    cpfDigits.length >= 11
-      ? `${cpfDigits}@w.phdcrm.${placeholderTenant}.local`
-      : sessionId
-        ? `telecom-${sessionId}@draft.phdcrm.${placeholderTenant}.local`
-        : `telecom-lead@w.phdcrm.${placeholderTenant}.local`;
-
   return {
-    email,
+    email: buildSessionLeadEmail(sessionId || `telecom-${Date.now()}`, config.tenantSlug, "telecom"),
     first_name: "Lead",
     last_name: `Telecom ${activationLabel}`.slice(0, 80),
     phone: phoneDigits || "0000000000",
@@ -196,11 +192,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const leadBody = buildLeadPayload(config, payload);
-    const phoneDigits = resolveTelecomPhone(payload.values);
 
     const lead = await upsertCrmLead(config, leadBody, {
       crmLeadId: payload.crm_lead_id,
-      phoneDigits: phoneDigits.length >= 10 ? phoneDigits : undefined,
       tags: TAGS_BY_STEP[payload.step],
     });
     const tags = existingTagNames(lead).length
@@ -254,6 +248,21 @@ export async function POST(request: NextRequest) {
             userId: assignment.responsavelId,
             representativeName: assignment.representative.name,
           };
+        }
+
+        if (assignment.representative.email) {
+          void notifyRepresentativeOfNewLead({
+            segmento: "telecom",
+            representative: assignment.representative,
+            leadId: lead.id,
+            crmEnv: config.env,
+            formValues: payload.values,
+          }).catch((err) =>
+            console.error(
+              "Telecom rep email:",
+              err instanceof Error ? err.message : err
+            )
+          );
         }
       } catch (responsavelError) {
         console.error(
