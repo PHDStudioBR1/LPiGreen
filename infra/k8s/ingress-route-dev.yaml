@@ -1,4 +1,4 @@
-# IngressRoute DEV no cluster legado (lpigreen-web → web-service).
+# IngressRoute DEV — lpigreen-web-dev → web-dev-service (isolado do prod).
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -11,7 +11,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`) && !PathPrefix(`/.well-known/acme-challenge`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: redirect-https
@@ -29,7 +29,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/leads`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev
@@ -37,7 +37,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/admin`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev
@@ -45,7 +45,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/representantes`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev
@@ -53,7 +53,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/seguros`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev
@@ -61,7 +61,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/telecom`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev
@@ -77,7 +77,7 @@ spec:
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/`)
       kind: Rule
       services:
-        - name: web-service
+        - name: web-dev-service
           port: 80
       middlewares:
         - name: security-headers-dev

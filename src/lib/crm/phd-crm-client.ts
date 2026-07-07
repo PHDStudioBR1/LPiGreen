@@ -55,26 +55,60 @@ export function splitName(name: string): { firstName: string; lastName: string }
   };
 }
 
-export function getCrmConfig(): CrmConfig {
+export function isDevCrmHost(host: string | null | undefined): boolean {
+  const normalized = cleanString(host, 255).toLowerCase();
+  if (!normalized) return false;
+  return (
+    normalized.includes("localhost") ||
+    normalized.includes("127.0.0.1") ||
+    normalized.includes("lpigreendev") ||
+    normalized.endsWith(".local")
+  );
+}
+
+function resolveCrmEnv(requestHost?: string | null): CrmConfig["env"] {
   const rawEnv = cleanString(process.env.PHDCRM_ENV || process.env.CRM_ENV || "dev").toLowerCase();
-  const env: CrmConfig["env"] = rawEnv === "prod" || rawEnv === "production" ? "prod" : "dev";
+  let env: CrmConfig["env"] = rawEnv === "prod" || rawEnv === "production" ? "prod" : "dev";
+
+  if (isDevCrmHost(requestHost)) {
+    if (env === "prod") {
+      console.warn(
+        `PHDCRM_ENV=prod ignorado para host de desenvolvimento: ${requestHost}`
+      );
+    }
+    return "dev";
+  }
+
+  if (process.env.NODE_ENV !== "production" && env === "prod") {
+    const allowProd = cleanString(process.env.PHDCRM_ALLOW_PROD).toLowerCase();
+    if (allowProd !== "true" && allowProd !== "1") {
+      console.warn("PHDCRM_ENV=prod ignorado em NODE_ENV !== production (use PHDCRM_ALLOW_PROD=true para forçar)");
+      return "dev";
+    }
+  }
+
+  return env;
+}
+
+export function getCrmConfig(requestHost?: string | null): CrmConfig {
+  const env = resolveCrmEnv(requestHost);
   const prefix = env === "prod" ? "PHDCRM_PROD" : "PHDCRM_DEV";
 
   const baseUrl =
-    cleanString(process.env.PHDCRM_BASE_URL) ||
     cleanString(process.env[`${prefix}_BASE_URL`]) ||
+    cleanString(process.env.PHDCRM_BASE_URL) ||
     (env === "prod"
       ? "https://phdcrm.546digitalservices.com"
       : "https://phdcrmdev.546digitalservices.com");
 
   const email =
-    cleanString(process.env.PHDCRM_EMAIL) ||
     cleanString(process.env[`${prefix}_EMAIL`]) ||
+    cleanString(process.env.PHDCRM_EMAIL) ||
     "admin@igreen";
 
   const password =
-    cleanString(process.env.PHDCRM_PASSWORD, 1024) ||
-    cleanString(process.env[`${prefix}_PASSWORD`], 1024);
+    cleanString(process.env[`${prefix}_PASSWORD`], 1024) ||
+    cleanString(process.env.PHDCRM_PASSWORD, 1024);
 
   const tenantSlug =
     cleanString(process.env.PHDCRM_TENANT_SLUG) ||
@@ -85,13 +119,21 @@ export function getCrmConfig(): CrmConfig {
     throw new Error(`PHDCRM password missing for ${env}`);
   }
 
-  return {
+  const config = {
     env,
     baseUrl: baseUrl.replace(/\/$/, ""),
     email,
     password,
     tenantSlug,
   };
+
+  if (env === "dev" && config.baseUrl.includes("phdcrm.546digitalservices.com")) {
+    throw new Error(
+      "Configuração CRM inconsistente: PHDCRM_ENV=dev com URL de produção. Verifique PHDCRM_DEV_BASE_URL."
+    );
+  }
+
+  return config;
 }
 
 async function readCrmJson<T>(res: Response): Promise<CrmResponse<T>> {

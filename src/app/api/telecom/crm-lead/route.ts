@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
 
   let config: ReturnType<typeof getCrmConfig>;
   try {
-    config = getCrmConfig();
+    config = getCrmConfig(request.headers.get("host"));
   } catch (error) {
     console.error("Telecom CRM config:", error instanceof Error ? error.message : error);
     return jsonError("CRM não configurado", 503);

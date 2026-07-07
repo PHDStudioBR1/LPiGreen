@@ -281,17 +281,17 @@ jobs:
 
       - name: Deploy Frontend (dev)
         run: |
-          kubectl apply -f infra/k8s/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
-          kubectl set image deployment/lpigreen-web \
+          kubectl apply -f infra/k8s/deployment-dev.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl set image deployment/lpigreen-web-dev \
             web=${{ env.DOCKER_REGISTRY }}/lpigreen-web:dev-${{ github.sha }} \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl set env deployment/lpigreen-web \
+          kubectl set env deployment/lpigreen-web-dev \
             LEAD_API_URL=http://api-dev-service.phdcrm-dev.svc.cluster.local \
             RANDOM_SERVICE_URL=http://random-service-api.phdcrm-dev.svc.cluster.local \
             PHDCRM_ENV=dev \
             -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout restart deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/lpigreen-web -n ${{ env.K8S_NAMESPACE }} --timeout=300s
+          kubectl rollout restart deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/lpigreen-web-dev -n ${{ env.K8S_NAMESPACE }} --timeout=300s
 
       - name: Aplicar Middlewares e IngressRoute (dev)
         run: |
