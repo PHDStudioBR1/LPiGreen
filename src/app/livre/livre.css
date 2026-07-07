@@ -1,0 +1,168 @@
+html:has(.livre-page) {
+  scroll-behavior: smooth;
+}
+
+.livre-page {
+  --lv-green-500: #00c853;
+  --lv-green-400: #1fcf75;
+  --lv-green-600: #00a844;
+  --lv-green-s-500: #1b6b47;
+  --lv-petrol-900: #0a1f26;
+  --lv-petrol-800: #0f2d35;
+  --lv-petrol-700: #163d47;
+  --lv-petrol-600: #1e4f5a;
+  --lv-petrol-500: #356974;
+  --lv-accent: #64ffda;
+  --lv-bg-base: #061419;
+  --lv-bg-default: #0a1f26;
+  --lv-bg-elevated: #0f2d35;
+  --lv-bg-surface: #163d47;
+  --lv-error: #ef4444;
+  --lv-success: #10b981;
+  --lv-whatsapp: #25d366;
+}
+
+.livre-page [id] {
+  scroll-margin-top: 110px;
+}
+
+@media (max-width: 1023px) {
+  .livre-page [id] {
+    scroll-margin-top: 88px;
+  }
+}
+
+.livre-gradient-hero {
+  background: linear-gradient(135deg, #061419 0%, #0a1f26 40%, #0f2d35 70%, #0a2a1c 100%);
+}
+
+.livre-gradient-cta {
+  background: linear-gradient(135deg, #00a844 0%, #00c853 50%, #1fcf75 100%);
+}
+
+.livre-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.livre-glow {
+  box-shadow: 0 0 24px rgba(0, 200, 83, 0.2);
+}
+
+.livre-glass-strong {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.livre-hero-mesh {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 200, 83, 0.18), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(100, 255, 218, 0.1), transparent),
+    radial-gradient(ellipse 50% 50% at 0% 50%, rgba(30, 79, 90, 0.35), transparent),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(0, 200, 83, 0.08), transparent);
+}
+
+.livre-hero-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 85% 65% at 50% 35%, black 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 35%, black 20%, transparent 75%);
+}
+
+.livre-hero-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #64ffda 45%, #00c853 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.livre-cta-final-section {
+  background: linear-gradient(
+    180deg,
+    #061419 0%,
+    #0a1f26 25%,
+    #0a2a1c 55%,
+    #0f2d35 80%,
+    #061419 100%
+  );
+}
+
+.livre-cta-final-mesh {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% 40%, rgba(0, 200, 83, 0.14), transparent),
+    radial-gradient(ellipse 60% 45% at 80% 60%, rgba(100, 255, 218, 0.1), transparent),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(0, 200, 83, 0.08), transparent);
+}
+
+.livre-cta-gradient-text {
+  background: linear-gradient(135deg, #64ffda 0%, #00c853 50%, #1fcf75 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.livre-cta-form-border {
+  padding: 2px;
+  border-radius: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 200, 83, 0.8) 0%,
+    rgba(100, 255, 218, 0.5) 50%,
+    rgba(0, 200, 83, 0.8) 100%
+  );
+  background-size: 200% 200%;
+  animation: livre-cta-border-shift 4s ease infinite;
+}
+
+.livre-cta-form-glow {
+  box-shadow:
+    0 0 60px rgba(0, 200, 83, 0.2),
+    0 0 120px rgba(0, 200, 83, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.livre-cta-submit-btn {
+  box-shadow:
+    0 0 32px rgba(0, 200, 83, 0.45),
+    0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: livre-cta-btn-pulse 3s ease-in-out infinite;
+}
+
+@keyframes livre-cta-border-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes livre-cta-btn-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 32px rgba(0, 200, 83, 0.45),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 48px rgba(0, 200, 83, 0.6),
+      0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .livre-page *,
+  .livre-page *::before,
+  .livre-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
