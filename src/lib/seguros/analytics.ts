@@ -1,4 +1,11 @@
 import { trackGtagEvent } from "@/lib/analytics/gtag";
+import {
+  trackMetaFormProgress,
+  trackMetaLeadConversion,
+  trackMetaQuoteStarted,
+} from "@/lib/analytics/meta-events";
+
+const FUNNEL = "seguros" as const;
 
 function resolvePagePath(): string {
   if (typeof window !== "undefined") {
@@ -40,6 +47,7 @@ export function trackSegurosExitIntent(action: "show" | "dismiss" | "quote" | "w
 
 export function trackSegurosModalOpen() {
   trackGtagEvent("seguros_modal_open", { page_path: resolvePagePath() });
+  trackMetaQuoteStarted(FUNNEL);
 }
 
 export function trackSegurosModalClose() {
@@ -48,6 +56,7 @@ export function trackSegurosModalClose() {
 
 export function trackSegurosFormStep(step: number) {
   trackGtagEvent("seguros_form_step", { step, page_path: resolvePagePath() });
+  trackMetaFormProgress(FUNNEL, step);
 }
 
 export function trackSegurosPlanSelect(plan: string) {
@@ -66,6 +75,7 @@ export function trackSegurosFormSubmit(params: {
     currency: "BRL",
     value: 1,
   });
+  trackMetaLeadConversion(FUNNEL, params);
 }
 
 export function trackSegurosFaqExpand(faqId: string) {

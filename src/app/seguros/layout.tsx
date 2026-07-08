@@ -6,6 +6,7 @@ import {
   getInsuranceAgencySchema,
 } from "@/lib/seguros/seo";
 import { SEGUROS_SITE_URL } from "@/lib/seguros/constants";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import "./seguros.css";
 
 const poppins = Poppins({
@@ -74,6 +75,7 @@ export default function SegurosLayout({
 
   return (
     <div className={poppins.variable}>
+      <MetaPixel funnel="seguros" />
       {schemas.map((schema, i) => (
         <script
           key={i}

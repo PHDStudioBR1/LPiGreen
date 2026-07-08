@@ -9,7 +9,7 @@ import { MotionBlock, MotionStagger, MotionItem } from "@/components/seguro-auto
 
 export function PlansShowcase() {
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section id="planos" className="bg-white py-20 md:py-28">
       <Container>
         <MotionBlock>
           <SectionHeading
