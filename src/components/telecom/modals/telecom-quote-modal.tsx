@@ -186,6 +186,8 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
         setCrmLeadId(leadId);
         persistCrmLeadId(leadId);
       }
+
+      return body?.data;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao sincronizar lead";
       setCrmError(message);
@@ -246,12 +248,20 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     });
     trackTelecomPlanSelect(values.selectedPlan);
     try {
-      await syncCrm("contact");
+      const crmData = await syncCrm("contact");
       if (typeof window !== "undefined") {
         sessionStorage.removeItem(TELECOM_CRM_SESSION_STORAGE_KEY);
         clearCrmLeadId();
       }
       setStep(4);
+
+      const representativeLink =
+        typeof crmData?.representative_link === "string"
+          ? crmData.representative_link.trim()
+          : "";
+      if (representativeLink) {
+        window.open(representativeLink, "_blank", "noopener,noreferrer");
+      }
     } catch {
       // erro exibido em crmError
     } finally {

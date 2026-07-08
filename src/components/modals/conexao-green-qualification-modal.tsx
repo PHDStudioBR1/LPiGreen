@@ -152,6 +152,14 @@ export function ConexaoGreenQualificationModal({
       trackHomeFormStep(1);
       trackHomeFormSubmit({ valor_medio_fatura: valorNum });
       onClose();
+
+      const representativeLink =
+        typeof result?.data?.representative_link === "string"
+          ? result.data.representative_link.trim()
+          : "";
+      if (representativeLink) {
+        window.location.href = representativeLink;
+      }
     } catch (e) {
       console.error("n8n webhook:", e);
       const msg =

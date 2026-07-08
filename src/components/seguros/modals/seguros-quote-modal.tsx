@@ -310,25 +310,34 @@ export function SegurosQuoteModal({
     setCrmError(null);
 
     try {
-      await syncLeadToCrm("contact");
+      const crmData = await syncLeadToCrm("contact");
+      const representativeLink =
+        typeof crmData?.representative_link === "string"
+          ? crmData.representative_link.trim()
+          : "";
+
+      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(2);
+      QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
+        vehicle_type: values.vehicleType,
+        vehicle_use: values.vehicleUse,
+      });
+
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
+        clearCrmLeadId();
+      }
+
+      setStep(3);
+      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
+
+      if (representativeLink) {
+        window.open(representativeLink, "_blank", "noopener,noreferrer");
+      }
     } catch {
       setIsSubmitting(false);
       return;
     }
 
-    QUOTE_MODAL_ANALYTICS[variant].trackFormStep(2);
-    QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
-      vehicle_type: values.vehicleType,
-      vehicle_use: values.vehicleUse,
-    });
-
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
-      clearCrmLeadId();
-    }
-
-    setStep(3);
-    QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
     setIsSubmitting(false);
   };
 

@@ -10,6 +10,8 @@ import {
   splitName,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
+import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
+import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
 
 export const runtime = "nodejs";
 
@@ -148,12 +150,13 @@ export async function POST(request: NextRequest) {
 
     let responsavelAssigned: { userId: number; representativeName: string } | null = null;
     let rotationApproved = false;
+    let representativeLink: string | null = null;
 
     try {
       const assignment = await assignCrmLeadRepresentative({
         config,
         leadId: lead.id,
-        segmento: "bot",
+        segmento: PAGE_SEGMENT_MAP.captacao,
         leadName: cleanString(payload.values?.name, 180) || "Lead Captacao",
         leadPhone: onlyDigits(payload.values?.phone),
         logPrefix: "Captacao CRM responsavel",
@@ -164,6 +167,10 @@ export async function POST(request: NextRequest) {
       });
 
       rotationApproved = assignment.rotationApproved;
+      representativeLink = getRepresentativeLinkForSegment(
+        assignment.representative,
+        PAGE_SEGMENT_MAP.captacao
+      );
       if (assignment.responsavelId != null) {
         responsavelAssigned = {
           userId: assignment.responsavelId,
@@ -185,6 +192,7 @@ export async function POST(request: NextRequest) {
         lead_id: lead.id,
         responsavel_assigned: responsavelAssigned,
         rotation_approved: rotationApproved,
+        representative_link: representativeLink,
       },
     });
   } catch (error) {

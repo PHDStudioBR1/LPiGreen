@@ -3,7 +3,33 @@ export type RandomServiceRepresentative = {
   name: string;
   email: string | null;
   phone: string | null;
+  autoconnection_link?: string | null;
+  link_seguros?: string | null;
+  link_telecom?: string | null;
+  license_link?: string | null;
+  evolution_whats?: string | null;
 };
+
+function nonEmptyLink(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
+export function getRepresentativeLinkForSegment(
+  representative: RandomServiceRepresentative,
+  segmento: RandomServiceSegment
+): string | null {
+  switch (segmento) {
+    case "bot":
+      return nonEmptyLink(representative.autoconnection_link);
+    case "seguros":
+      return nonEmptyLink(representative.link_seguros);
+    case "telecom":
+      return nonEmptyLink(representative.link_telecom);
+    default:
+      return null;
+  }
+}
 
 export type RandomServiceAssignment = {
   id: string;
@@ -81,11 +107,15 @@ export async function assignRepresentativeToLead(params: {
   responsavelId: number | null;
   rotationApproved: boolean;
 }> {
-  const { representative } = await fetchNextRepresentative({
+  const body = await fetchNextRepresentative({
     nome_lead: params.leadName,
     telefone: params.leadPhone,
     segmento: params.segmento,
   });
+  const representative = body.representative;
+  if (!representative) {
+    throw new Error("random-service: representative ausente na resposta");
+  }
 
   const responsavelId = await params.assignResponsavel(representative);
 

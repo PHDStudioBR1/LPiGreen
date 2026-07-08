@@ -10,6 +10,8 @@ import {
   splitName,
   upsertCrmLead,
 } from "@/lib/crm/phd-crm-client";
+import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
+import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
 
 export const runtime = "nodejs";
 
@@ -137,12 +139,13 @@ export async function POST(request: NextRequest) {
 
     let responsavelAssigned: { userId: number; representativeName: string } | null = null;
     let rotationApproved = false;
+    let representativeLink: string | null = null;
 
     try {
       const assignment = await assignCrmLeadRepresentative({
         config,
         leadId: lead.id,
-        segmento: "bot",
+        segmento: PAGE_SEGMENT_MAP.conexao_green,
         leadName: nome,
         leadPhone: phoneDigits,
         logPrefix: "Conexao Green CRM responsavel",
@@ -157,6 +160,10 @@ export async function POST(request: NextRequest) {
       });
 
       rotationApproved = assignment.rotationApproved;
+      representativeLink = getRepresentativeLinkForSegment(
+        assignment.representative,
+        PAGE_SEGMENT_MAP.conexao_green
+      );
       if (assignment.responsavelId != null) {
         responsavelAssigned = {
           userId: assignment.responsavelId,
@@ -178,6 +185,7 @@ export async function POST(request: NextRequest) {
       crm_env: config.env,
       representante_nome: responsavelAssigned?.representativeName ?? null,
       representante_crm_user_id: responsavelAssigned?.userId ?? null,
+      representante_link: representativeLink,
     };
 
     let n8nResult: { skipped: boolean; status: number; text?: string; detail?: string };
@@ -198,6 +206,7 @@ export async function POST(request: NextRequest) {
             lead_id: lead.id,
             responsavel_assigned: responsavelAssigned,
             rotation_approved: rotationApproved,
+            representative_link: representativeLink,
           },
         },
         { status: 502 }
@@ -211,6 +220,7 @@ export async function POST(request: NextRequest) {
         lead_id: lead.id,
         responsavel_assigned: responsavelAssigned,
         rotation_approved: rotationApproved,
+        representative_link: representativeLink,
         n8n_skipped: n8nResult.skipped,
       },
     });

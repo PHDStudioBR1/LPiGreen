@@ -562,29 +562,40 @@ export function LeadFormModal({ isOpen, onClose, analytics }: LeadFormModalProps
         valor_conta: values.valor_conta,
       });
 
-      void fetch("/api/captacao/crm-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          mysql_lead_id: data.id,
-          source: "site_captacao",
-          values: {
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            document_number: values.document_number,
-            cep_landing: values.cep_landing,
-            valor_conta: values.valor_conta,
-            city: values.city,
-            state: values.state,
-            power_company: values.power_company,
-            installation_number: values.installation_number,
-          },
-        }),
-      }).catch((crmError) => {
+      let representativeLink: string | null = null;
+      try {
+        const crmRes = await fetch("/api/captacao/crm-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            mysql_lead_id: data.id,
+            source: "site_captacao",
+            values: {
+              name: values.name,
+              phone: values.phone,
+              email: values.email,
+              document_number: values.document_number,
+              cep_landing: values.cep_landing,
+              valor_conta: values.valor_conta,
+              city: values.city,
+              state: values.state,
+              power_company: values.power_company,
+              installation_number: values.installation_number,
+            },
+          }),
+        });
+        const crmBody = await crmRes.json().catch(() => null);
+        if (
+          crmRes.ok &&
+          typeof crmBody?.data?.representative_link === "string" &&
+          crmBody.data.representative_link.trim()
+        ) {
+          representativeLink = crmBody.data.representative_link.trim();
+        }
+      } catch (crmError) {
         console.error("Captacao CRM sync:", crmError);
-      });
+      }
 
       await clearRemoteProgress();
       const newSessionId =
@@ -598,6 +609,10 @@ export function LeadFormModal({ isOpen, onClose, analytics }: LeadFormModalProps
       setStep(0);
       analytics?.onModalClose?.();
       onClose();
+
+      if (representativeLink) {
+        window.location.href = representativeLink;
+      }
     } finally {
       setSubmitting(false);
     }
