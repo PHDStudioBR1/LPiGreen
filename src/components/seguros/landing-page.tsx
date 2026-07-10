@@ -51,7 +51,7 @@ export function SegurosLandingPage() {
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
-      <WhatsAppFloat />
+      <WhatsAppFloat onQuoteClick={openQuote} />
 
       <SegurosQuoteModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
     </div>

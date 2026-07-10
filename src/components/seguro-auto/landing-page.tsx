@@ -50,7 +50,7 @@ export function SeguroAutoLandingPage() {
       <StickyMobileBar onQuoteClick={openQuote} />
       <ScrollCta onQuoteClick={openQuote} />
       <ExitIntentPopup onQuoteClick={openQuote} />
-      <WhatsAppFloat />
+      <WhatsAppFloat onQuoteClick={openQuote} />
 
       <SegurosQuoteModal
         isOpen={isFormOpen}
