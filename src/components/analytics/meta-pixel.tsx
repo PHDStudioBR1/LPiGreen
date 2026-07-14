@@ -4,14 +4,15 @@ import Script from "next/script";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
-  META_PIXEL_ID,
+  META_PIXEL_IDS,
+  type MetaPixelFunnel,
   resetMetaPixelOnceKeys,
   trackMetaPageView,
 } from "@/lib/analytics/meta-pixel";
 import { MetaJourneyTracker } from "@/components/analytics/meta-journey-tracker";
 
 type MetaPixelProps = {
-  funnel: "seguros" | "seguro-auto";
+  funnel: MetaPixelFunnel;
   sectionIds?: string[];
 };
 
@@ -77,11 +78,12 @@ export function MetaPixel({ funnel, sectionIds }: MetaPixelProps) {
   }, [pathname, funnel]);
 
   const sections = sectionIds ?? DEFAULT_SECTIONS[funnel];
+  const pixelId = META_PIXEL_IDS[funnel];
 
   return (
     <>
       <Script
-        id={`meta-pixel-${META_PIXEL_ID}`}
+        id={`meta-pixel-${pixelId}`}
         strategy="afterInteractive"
         onReady={markReadyAndTrack}
       >
@@ -94,9 +96,9 @@ export function MetaPixel({ funnel, sectionIds }: MetaPixelProps) {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          if (!window.__igreenMetaPixelInit) {
-            window.__igreenMetaPixelInit = '${META_PIXEL_ID}';
-            fbq('init', '${META_PIXEL_ID}');
+          if (window.__igreenMetaPixelInit !== '${pixelId}') {
+            window.__igreenMetaPixelInit = '${pixelId}';
+            fbq('init', '${pixelId}');
           }
         `}
       </Script>
@@ -105,7 +107,7 @@ export function MetaPixel({ funnel, sectionIds }: MetaPixelProps) {
           height="1"
           width="1"
           style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>

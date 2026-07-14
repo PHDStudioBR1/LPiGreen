@@ -1,4 +1,12 @@
-export const META_PIXEL_ID = "2456316114837467";
+/** Pixel Meta por funil. /seguros usa ID próprio; /seguro-auto mantém o anterior. */
+export const META_PIXEL_IDS = {
+  seguros: "1051522610657600",
+  "seguro-auto": "2456316114837467",
+} as const;
+
+export type MetaPixelFunnel = keyof typeof META_PIXEL_IDS;
+
+export const META_PIXEL_ID = META_PIXEL_IDS["seguro-auto"];
 
 type FbqFunction = {
   (...args: unknown[]): void;
