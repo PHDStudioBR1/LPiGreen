@@ -240,6 +240,24 @@ export function buildSessionLeadEmail(
   return `${safePrefix}-${uniquePart}@draft.phdcrm.${tenant}.local`;
 }
 
+/**
+ * Telefone técnico único por sessão do formulário.
+ * Evita colisão em `idx_leads_phone_unique_active` enquanto o lead ainda não tem número real
+ * (ex.: etapa inicial do telecom antes de portabilidade/DDD definitivo).
+ */
+export function buildSessionPlaceholderPhone(sessionId: string): string {
+  const seed = cleanString(sessionId, 80) || `anon-${Date.now()}`;
+  let hash = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  // 1..999999999 — nunca gera o placeholder compartilhado antigo (0000000000).
+  const digits = (Math.abs(hash % 999_999_999) + 1).toString().padStart(9, "0");
+  // Prefixo 000 marca como não discável; 11 dígitos no total.
+  return `000${digits}`.slice(0, 11);
+}
+
 export function resolveLeadEmail(
   phoneDigits: string,
   tenantSlug: string,

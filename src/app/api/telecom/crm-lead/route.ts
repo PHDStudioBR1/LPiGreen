@@ -3,6 +3,7 @@ import { assignCrmLeadRepresentative } from "@/lib/crm/assign-crm-lead-represent
 import {
   brazilIsoNow,
   buildSessionLeadEmail,
+  buildSessionPlaceholderPhone,
   cleanString,
   createLeadActivity,
   existingTagNames,
@@ -67,14 +68,24 @@ function jsonError(message: string, status = 500) {
   return NextResponse.json({ success: false, error: message }, { status });
 }
 
-function resolveTelecomPhone(values: TelecomCrmPayload["values"]): string {
+/**
+ * Número real só na portabilidade (portNumber).
+ * Em linha nova / etapa inicial usamos placeholder por sessão — o DDD fica em custom_values.
+ * Placeholder compartilhado (ex.: 0000000000 ou DDD+900000000) colide em idx_leads_phone_unique_active.
+ */
+function resolveTelecomPhone(
+  values: TelecomCrmPayload["values"],
+  sessionId: string
+): { phone: string; isPlaceholder: boolean } {
   const portDigits = onlyDigits(values?.portNumber);
-  if (portDigits.length >= 10) return portDigits;
+  if (portDigits.length >= 10) {
+    return { phone: portDigits, isPlaceholder: false };
+  }
 
-  const ddd = onlyDigits(values?.ddd).slice(0, 2);
-  if (ddd) return `${ddd}900000000`.slice(0, 11);
-
-  return "";
+  return {
+    phone: buildSessionPlaceholderPhone(sessionId || `telecom-${Date.now()}`),
+    isPlaceholder: true,
+  };
 }
 
 function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: TelecomCrmPayload) {
@@ -83,8 +94,8 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
   const contactEmail = cleanString(values.email, 180).toLowerCase();
   const cpfCnpj = cleanString(values.cpfCnpj, 32);
   const cpfDigits = onlyDigits(values.cpfCnpj);
-  const phoneDigits = resolveTelecomPhone(values);
   const sessionId = cleanString(payload.session_id, 80);
+  const { phone: phoneDigits, isPlaceholder } = resolveTelecomPhone(values, sessionId);
   const activationLabel =
     cleanString(values.activationType) === "portabilidade" ? "Portabilidade" : "Linha Nova";
   const { firstName, lastName } = splitName(name || `Lead Telecom ${activationLabel}`);
@@ -105,8 +116,15 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
     if (!cleanString(values.selectedPlan)) {
       throw new Error("Plano obrigatório para criar lead no CRM");
     }
-    if (phoneDigits.length < 10) {
+    // Portabilidade exige número real; linha nova segue com placeholder único + DDD em custom_values.
+    if (
+      cleanString(values.activationType) === "portabilidade" &&
+      (isPlaceholder || phoneDigits.length < 10)
+    ) {
       throw new Error("Telefone inválido para criar lead no CRM");
+    }
+    if (cleanString(values.activationType) === "linha_nova" && !onlyDigits(values?.ddd)) {
+      throw new Error("DDD obrigatório para criar lead no CRM");
     }
   }
 
@@ -148,7 +166,7 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
     email: buildSessionLeadEmail(sessionId || `telecom-${Date.now()}`, config.tenantSlug, "telecom"),
     first_name: firstName,
     last_name: lastName,
-    phone: phoneDigits || "0000000000",
+    phone: phoneDigits,
     tenant_slug: config.tenantSlug,
     source: "site_telecom",
     status: "new",
@@ -244,7 +262,7 @@ export async function POST(request: NextRequest) {
           leadId: lead.id,
           segmento: PAGE_SEGMENT_MAP.telecom,
           leadName: cleanString(payload.values?.name) || "Lead Telecom",
-          leadPhone: resolveTelecomPhone(payload.values),
+          leadPhone: resolveTelecomPhone(payload.values, cleanString(payload.session_id, 80)).phone,
           logPrefix: "Telecom CRM responsavel",
           notify: {
             segmento: "telecom",
@@ -286,6 +304,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Telecom CRM lead:", error instanceof Error ? error.message : error);
-    return jsonError(error instanceof Error ? error.message : "Erro ao sincronizar lead no CRM", 502);
+    const message = error instanceof Error ? error.message : "Erro ao sincronizar lead no CRM";
+    // Evitar 502: proxies (Traefik/Cloudflare) substituem o body e a UI perde a mensagem real.
+    const status = /unique constraint|duplicate key/i.test(message) ? 409 : 400;
+    return jsonError(message, status);
   }
 }
