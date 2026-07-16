@@ -202,12 +202,17 @@ function buildNotificationContent(
 export async function notifyRepresentativeOfNewLead(
   params: NotifyRepresentativeParams
 ): Promise<void> {
-  if (!isEmailConfigured()) return;
+  if (!isEmailConfigured()) {
+    console.warn(
+      `Email rep (${params.segmento}): envio desabilitado ou SMTP não configurado`
+    );
+    return;
+  }
 
   const repEmail = params.representative.email?.trim().toLowerCase() ?? "";
   if (!repEmail || !isValidEmail(repEmail)) {
     console.warn(
-      `Email rep (${params.segmento}): representante sem e-mail válido (${params.representative.name})`
+      `Email rep (${params.segmento}): representante sem e-mail válido (${params.representative.name}, email=${JSON.stringify(params.representative.email)})`
     );
     return;
   }
@@ -246,4 +251,8 @@ export async function notifyRepresentativeOfNewLead(
     text,
     html,
   });
+
+  console.log(
+    `Email rep (${params.segmento}): enviado para ${repEmail} (lead #${params.leadId})`
+  );
 }

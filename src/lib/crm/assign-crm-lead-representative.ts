@@ -48,19 +48,27 @@ export async function assignCrmLeadRepresentative(params: {
     },
   });
 
-  if (params.notify && assignment.representative.email) {
-    void notifyRepresentativeOfNewLead({
-      segmento: params.notify.segmento,
-      representative: assignment.representative,
-      leadId: params.leadId,
-      crmEnv: params.config.env,
-      formValues: params.notify.formValues,
-    }).catch((err) =>
-      console.error(
-        `${params.logPrefix} rep email:`,
-        err instanceof Error ? err.message : err
-      )
-    );
+  if (params.notify) {
+    if (!assignment.representative.email) {
+      console.warn(
+        `${params.logPrefix} rep email: representante sem e-mail (${assignment.representative.name})`
+      );
+    } else {
+      try {
+        await notifyRepresentativeOfNewLead({
+          segmento: params.notify.segmento,
+          representative: assignment.representative,
+          leadId: params.leadId,
+          crmEnv: params.config.env,
+          formValues: params.notify.formValues,
+        });
+      } catch (err) {
+        console.error(
+          `${params.logPrefix} rep email:`,
+          err instanceof Error ? err.message : err
+        );
+      }
+    }
   }
 
   return {

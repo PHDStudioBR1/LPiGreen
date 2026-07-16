@@ -25,13 +25,22 @@ export async function sendMail(params: SendMailParams): Promise<void> {
     port: config.port,
     secure: config.secure,
     auth,
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 30_000,
   });
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: config.fromName ? `"${config.fromName}" <${config.from}>` : config.from,
     to: params.to,
     subject: params.subject,
     text: params.text,
     html: params.html,
   });
+
+  if (info.rejected?.length) {
+    throw new Error(
+      `SMTP rejeitou destinatário(s): ${info.rejected.join(", ")} (${info.response || "sem response"})`
+    );
+  }
 }

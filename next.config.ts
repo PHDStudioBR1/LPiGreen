@@ -2,6 +2,8 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Garante require() nativo no standalone (nodemailer quebra se só for bundlado pelo webpack).
+  serverExternalPackages: ['nodemailer'],
   typescript: {
     ignoreBuildErrors: true,
   },
