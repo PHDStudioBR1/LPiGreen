@@ -39,6 +39,47 @@ export type CrmResponse<T = unknown> = {
 
 const TOKEN_CACHE: Partial<Record<CrmConfig["env"], CrmLogin>> = {};
 
+function isTransientFetchError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  const causeCode =
+    error.cause && typeof error.cause === "object" && "code" in error.cause
+      ? String((error.cause as { code?: unknown }).code || "")
+      : "";
+  return (
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("econnreset") ||
+    message.includes("econnrefused") ||
+    message.includes("etimedout") ||
+    message.includes("socket") ||
+    ["ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"].includes(
+      causeCode
+    )
+  );
+}
+
+async function crmFetch(url: string, init?: RequestInit, attempts = 3): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fetch(url, { ...init, cache: "no-store" });
+    } catch (error) {
+      lastError = error;
+      if (!isTransientFetchError(error) || attempt === attempts) {
+        throw error;
+      }
+      const delayMs = 250 * attempt;
+      console.warn(
+        `CRM fetch retry ${attempt}/${attempts} after ${delayMs}ms:`,
+        error instanceof Error ? error.message : error
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("CRM fetch failed");
+}
+
 export function cleanString(value: unknown, maxLength = 255): string {
   if (typeof value !== "string") return "";
   return value.trim().slice(0, maxLength);
@@ -153,7 +194,7 @@ export async function login(config: CrmConfig, force = false): Promise<CrmLogin>
     return cached;
   }
 
-  const res = await fetch(`${config.baseUrl}/api/crm/v1/auth/login`, {
+  const res = await crmFetch(`${config.baseUrl}/api/crm/v1/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -161,7 +202,6 @@ export async function login(config: CrmConfig, force = false): Promise<CrmLogin>
       password: config.password,
       tenant_slug: config.tenantSlug,
     }),
-    cache: "no-store",
   });
   const body = await readCrmJson<{
     accessToken?: string;
@@ -194,14 +234,13 @@ export async function crmRequest<T>(
   retry = true
 ): Promise<CrmResponse<T>> {
   const auth = await login(config);
-  const res = await fetch(`${config.baseUrl}${path}`, {
+  const res = await crmFetch(`${config.baseUrl}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${auth.accessToken}`,
       ...(init.headers || {}),
     },
-    cache: "no-store",
   });
 
   if (res.status === 401 && retry) {

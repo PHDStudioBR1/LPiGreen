@@ -66,6 +66,22 @@ spec:
       middlewares:
         - name: security-headers-dev
           namespace: lpigreen
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/captacao`)
+      kind: Rule
+      services:
+        - name: web-dev-service
+          port: 80
+      middlewares:
+        - name: security-headers-dev
+          namespace: lpigreen
+    - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api/conexao-green`)
+      kind: Rule
+      services:
+        - name: web-dev-service
+          port: 80
+      middlewares:
+        - name: security-headers-dev
+          namespace: lpigreen
     - match: Host(`lpigreendev.546digitalservices.com`) && PathPrefix(`/api`)
       kind: Rule
       services:
