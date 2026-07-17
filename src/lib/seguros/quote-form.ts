@@ -18,7 +18,10 @@ export type SegurosQuoteFormValues = {
   cpfCnpj: string;
   email: string;
   phone: string;
+  address: string;
+  addressNumber: string;
   cep: string;
+  complement: string;
 };
 
 export const SEGUROS_QUOTE_SESSION_STORAGE_KEY = "seguros-quote-form-session";
@@ -57,7 +60,10 @@ export const SEGUROS_QUOTE_FORM_DEFAULTS: SegurosQuoteFormValues = {
   cpfCnpj: "",
   email: "",
   phone: "",
+  address: "",
+  addressNumber: "",
   cep: "",
+  complement: "",
 };
 
 export type SegurosQuoteFieldErrors = Partial<Record<keyof SegurosQuoteFormValues, string>>;
@@ -106,7 +112,7 @@ function isValidCnpj(digits: string): boolean {
 }
 
 export function validateQuoteStep(
-  step: 1 | 2,
+  step: 1 | 2 | 3,
   values: SegurosQuoteFormValues
 ): SegurosQuoteFieldErrors {
   const errors: SegurosQuoteFieldErrors = {};
@@ -139,6 +145,11 @@ export function validateQuoteStep(
     if (values.phone.replace(/\D/g, "").length < 10) {
       errors.phone = "Informe um telefone válido.";
     }
+  }
+
+  if (step === 3) {
+    if (!values.address.trim()) errors.address = "Informe o endereço completo.";
+    if (!values.addressNumber.trim()) errors.addressNumber = "Informe o número.";
     if (values.cep.replace(/\D/g, "").length !== 8) {
       errors.cep = "Informe um CEP válido.";
     }
@@ -166,7 +177,12 @@ export function buildSegurosWhatsAppUrl(
     `CPF/CNPJ: ${values.cpfCnpj}`,
     `E-mail: ${values.email}`,
     `WhatsApp: ${values.phone}`,
+    "",
+    "*Endereço de estacionamento*",
+    `Endereço: ${values.address}`,
+    `Número: ${values.addressNumber}`,
     `CEP: ${values.cep}`,
+    `Complemento: ${values.complement || "-"}`,
   ].join("\n");
 
   const url = new URL(baseUrl);

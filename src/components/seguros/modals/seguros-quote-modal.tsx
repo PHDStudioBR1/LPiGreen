@@ -77,7 +77,8 @@ const QUOTE_MODAL_ANALYTICS: Record<SegurosQuoteModalVariant, QuoteModalAnalytic
 const STEPS = [
   { id: 1, label: "Veículo" },
   { id: 2, label: "Seus dados" },
-  { id: 3, label: "Concluído" },
+  { id: 3, label: "Endereço" },
+  { id: 4, label: "Concluído" },
 ] as const;
 
 type QuoteStep = (typeof STEPS)[number]["id"];
@@ -139,17 +140,20 @@ function FormGroup({
   id,
   label,
   error,
+  required = true,
   children,
 }: {
   id: string;
   label: string;
   error?: string;
+  required?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className={`igf-group${error ? " has-error" : ""}`} id={id}>
       <label htmlFor={`${id}-field`}>
-        {label} <span className="igf-req">*</span>
+        {label}
+        {required && <span className="igf-req">*</span>}
       </label>
       {children}
       {error && <div className="igf-error-msg">{error}</div>}
@@ -345,9 +349,9 @@ export function SegurosQuoteModal({
     [crmLeadId, crmSessionId, values, variant]
   );
 
-  const goStep = async (nextStep: 1 | 2) => {
+  const goStep = async (nextStep: 1 | 2 | 3) => {
     if (nextStep > step) {
-      const stepErrors = validateQuoteStep(step as 1 | 2, values);
+      const stepErrors = validateQuoteStep(step as 1 | 2 | 3, values);
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors);
         trackMetaFormError(variant, {
@@ -356,15 +360,17 @@ export function SegurosQuoteModal({
         });
         return;
       }
-      try {
-        await syncLeadToCrm("vehicle");
-      } catch {
-        trackMetaFormError(variant, {
-          step,
-          fields: "crm_sync",
-          message: "CRM sync failed on vehicle step",
-        });
-        return;
+      if (step === 1) {
+        try {
+          await syncLeadToCrm("vehicle");
+        } catch {
+          trackMetaFormError(variant, {
+            step,
+            fields: "crm_sync",
+            message: "CRM sync failed on vehicle step",
+          });
+          return;
+        }
       }
     }
 
@@ -376,11 +382,11 @@ export function SegurosQuoteModal({
   };
 
   const handleSubmit = async () => {
-    const stepErrors = validateQuoteStep(2, values);
+    const stepErrors = validateQuoteStep(3, values);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
       trackMetaFormError(variant, {
-        step: 2,
+        step: 3,
         fields: Object.keys(stepErrors).join(","),
       });
       return;
@@ -396,7 +402,7 @@ export function SegurosQuoteModal({
           ? crmData.representative_link.trim()
           : "";
 
-      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(2);
+      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
       QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
         vehicle_type: values.vehicleType,
         vehicle_use: values.vehicleUse,
@@ -408,15 +414,15 @@ export function SegurosQuoteModal({
       }
 
       setFormCompleted(true);
-      setStep(3);
-      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
+      setStep(4);
+      QUOTE_MODAL_ANALYTICS[variant].trackFormStep(4);
 
       if (representativeLink) {
         window.open(representativeLink, "_blank", "noopener,noreferrer");
       }
     } catch {
       trackMetaFormError(variant, {
-        step: 2,
+        step: 3,
         fields: "crm_sync",
         message: "CRM sync failed on contact step",
       });
@@ -469,8 +475,10 @@ export function SegurosQuoteModal({
                   </div>
 
                   <h2 className="igf-title" id="seguros-quote-modal-title">
-                    {step === 3 ? (
+                    {step === 4 ? (
                       <>Solicitação enviada com <em>sucesso!</em></>
+                    ) : step === 3 ? (
+                      <>Diga onde seu veículo fica <em>estacionado</em></>
                     ) : (
                       <>
                         Receba sua cotação personalizada em{" "}
@@ -478,9 +486,11 @@ export function SegurosQuoteModal({
                       </>
                     )}
                   </h2>
-                  {step !== 3 && (
+                  {step !== 4 && (
                     <p className="igf-sub">
-                      Preencha os dados abaixo · Sem consulta no SPC/Serasa · Sem compromisso
+                      {step === 3
+                        ? "Com o endereço, conseguimos ajustar o melhor valor ideal para sua região."
+                        : "Preencha os dados abaixo · Sem consulta no SPC/Serasa · Sem compromisso"}
                     </p>
                   )}
 
@@ -676,18 +686,69 @@ export function SegurosQuoteModal({
                         />
                       </FormGroup>
 
+                      <FormGroup id="w-grp-tel" label="WhatsApp" error={errors.phone}>
+                        <input
+                          id="w-grp-tel-field"
+                          type="tel"
+                          className={`igf-input igf-input-locked${errors.phone ? " error" : ""}`}
+                          placeholder="(00) 00000-0000"
+                          maxLength={15}
+                          inputMode="numeric"
+                          value={values.phone}
+                          readOnly
+                          aria-readonly="true"
+                        />
+                      </FormGroup>
+
+                      <div className="igf-btn-row">
+                        <button
+                          type="button"
+                          className="igf-btn igf-btn-ghost"
+                          onClick={() => void goStep(1)}
+                          aria-label="Voltar"
+                        >
+                          <ArrowLeftIcon />
+                        </button>
+                        <button
+                          type="button"
+                          className="igf-btn igf-btn-green"
+                          onClick={() => void goStep(3)}
+                        >
+                          <span className="igf-btn-text" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            Continuar
+                            <span className="igf-arrow">
+                              <ArrowRightIcon />
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 3 && (
+                    <div id="igf-ws-3">
+                      <FormGroup id="w-grp-endereco" label="Endereço Completo" error={errors.address}>
+                        <input
+                          id="w-grp-endereco-field"
+                          type="text"
+                          className={`igf-input${errors.address ? " error" : ""}`}
+                          placeholder="Rua, avenida..."
+                          autoComplete="street-address"
+                          value={values.address}
+                          onChange={(event) => updateField("address", event.target.value)}
+                        />
+                      </FormGroup>
+
                       <div className="igf-row">
-                        <FormGroup id="w-grp-tel" label="WhatsApp" error={errors.phone}>
+                        <FormGroup id="w-grp-numero" label="Número do endereço" error={errors.addressNumber}>
                           <input
-                            id="w-grp-tel-field"
-                            type="tel"
-                            className={`igf-input igf-input-locked${errors.phone ? " error" : ""}`}
-                            placeholder="(00) 00000-0000"
-                            maxLength={15}
-                            inputMode="numeric"
-                            value={values.phone}
-                            readOnly
-                            aria-readonly="true"
+                            id="w-grp-numero-field"
+                            type="text"
+                            className={`igf-input${errors.addressNumber ? " error" : ""}`}
+                            placeholder="Nº"
+                            autoComplete="address-line2"
+                            value={values.addressNumber}
+                            onChange={(event) => updateField("addressNumber", event.target.value)}
                           />
                         </FormGroup>
 
@@ -699,17 +760,34 @@ export function SegurosQuoteModal({
                             placeholder="00000-000"
                             maxLength={9}
                             inputMode="numeric"
+                            autoComplete="postal-code"
                             value={values.cep}
                             onChange={(event) => updateField("cep", maskCep(event.target.value))}
                           />
                         </FormGroup>
                       </div>
 
+                      <FormGroup
+                        id="w-grp-complemento"
+                        label="Complemento"
+                        error={errors.complement}
+                        required={false}
+                      >
+                        <input
+                          id="w-grp-complemento-field"
+                          type="text"
+                          className={`igf-input${errors.complement ? " error" : ""}`}
+                          placeholder="Apto, bloco, referência..."
+                          value={values.complement}
+                          onChange={(event) => updateField("complement", event.target.value)}
+                        />
+                      </FormGroup>
+
                       <div className="igf-btn-row">
                         <button
                           type="button"
                           className="igf-btn igf-btn-ghost"
-                          onClick={() => goStep(1)}
+                          onClick={() => void goStep(2)}
                           aria-label="Voltar"
                         >
                           <ArrowLeftIcon />
@@ -733,8 +811,8 @@ export function SegurosQuoteModal({
                     </div>
                   )}
 
-                  {step === 3 && (
-                    <div id="igf-ws-3" className="igf-success">
+                  {step === 4 && (
+                    <div id="igf-ws-4" className="igf-success">
                       <div className="igf-success-icon" aria-hidden>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M20 6L9 17l-5-5" />
@@ -774,7 +852,7 @@ export function SegurosQuoteModal({
                   )}
                 </div>
 
-                {step !== 3 && (
+                {step !== 4 && (
                   <div className="igf-footer">
                     <div className="igf-footer-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

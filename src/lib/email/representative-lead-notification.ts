@@ -15,7 +15,10 @@ type SegurosFormValues = {
   cpfCnpj?: string;
   email?: string;
   phone?: string;
+  address?: string;
+  addressNumber?: string;
   cep?: string;
+  complement?: string;
 };
 
 type TelecomFormValues = {
@@ -110,7 +113,10 @@ function buildSegurosContent(values: SegurosFormValues) {
     `Telefone: ${phone}`,
     `E-mail: ${email}`,
     `CPF/CNPJ: ${cpfCnpj}`,
+    `Endereço: ${cleanString(values.address) || "-"}`,
+    `Número: ${cleanString(values.addressNumber) || "-"}`,
     `CEP: ${cep}`,
+    `Complemento: ${cleanString(values.complement) || "-"}`,
     `Tipo de veículo: ${cleanString(values.vehicleType) || "-"}`,
     `Placa: ${cleanString(values.plate) || "-"}`,
     `Modelo: ${cleanString(values.model) || "-"}`,

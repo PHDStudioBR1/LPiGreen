@@ -838,6 +838,10 @@
   #igform-wrap .igf-title {
     font-size: 18px;
   }
+
+  #igform-wrap .igf-step-label {
+    font-size: 0.55rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

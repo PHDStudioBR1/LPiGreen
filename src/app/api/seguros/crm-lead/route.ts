@@ -34,7 +34,10 @@ type SegurosCrmPayload = {
     cpfCnpj?: string;
     email?: string;
     phone?: string;
+    address?: string;
+    addressNumber?: string;
     cep?: string;
+    complement?: string;
   };
 };
 
@@ -53,6 +56,7 @@ const TAGS_BY_STEP: Record<SegurosCrmStep, string[]> = {
     "seguros-cotacao-iniciada",
     "seguros-step-1",
     "seguros-step-2",
+    "seguros-step-3",
     "seguros-cotacao-completa",
     "seguros-whatsapp-redirecionado",
   ],
@@ -101,7 +105,10 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
 
   if (payload.step === "contact") {
     customValues.document_number = cpfCnpj;
+    customValues.address = cleanString(values.address, 200);
+    customValues.address_number = cleanString(values.addressNumber, 40);
     customValues.cep = cepDigits;
+    customValues.complement = cleanString(values.complement, 120);
     customValues.seguros_quote_status = "contact_completed";
     if (contactEmail) customValues.contact_email = contactEmail;
   } else {
@@ -152,7 +159,10 @@ function buildActivityDescription(payload: SegurosCrmPayload): string {
     lines.push(
       `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
       `E-mail: ${cleanString(values.email) || "-"}`,
-      `CEP: ${cleanString(values.cep) || "-"}`
+      `Endereço: ${cleanString(values.address) || "-"}`,
+      `Número: ${cleanString(values.addressNumber) || "-"}`,
+      `CEP: ${cleanString(values.cep) || "-"}`,
+      `Complemento: ${cleanString(values.complement) || "-"}`
     );
   }
 
