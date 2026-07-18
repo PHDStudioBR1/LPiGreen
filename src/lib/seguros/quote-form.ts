@@ -1,3 +1,5 @@
+import { validateBirthDateMinAge } from "@/lib/validation";
+
 export const SEGUROS_VEHICLE_TYPES = [
   "Carro",
   "Moto",
@@ -16,6 +18,7 @@ export type SegurosQuoteFormValues = {
   garage: string;
   name: string;
   cpfCnpj: string;
+  birthDate: string;
   email: string;
   phone: string;
   address: string;
@@ -58,6 +61,7 @@ export const SEGUROS_QUOTE_FORM_DEFAULTS: SegurosQuoteFormValues = {
   garage: "",
   name: "",
   cpfCnpj: "",
+  birthDate: "",
   email: "",
   phone: "",
   address: "",
@@ -139,6 +143,8 @@ export function validateQuoteStep(
     } else {
       errors.cpfCnpj = "Informe um CPF válido.";
     }
+    const birthDateError = validateBirthDateMinAge(values.birthDate);
+    if (birthDateError !== true) errors.birthDate = birthDateError;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
       errors.email = "Informe um e-mail válido.";
     }
@@ -175,6 +181,7 @@ export function buildSegurosWhatsAppUrl(
     "*Meus dados*",
     `Nome: ${values.name}`,
     `CPF/CNPJ: ${values.cpfCnpj}`,
+    `Data de nascimento: ${values.birthDate}`,
     `E-mail: ${values.email}`,
     `WhatsApp: ${values.phone}`,
     "",
