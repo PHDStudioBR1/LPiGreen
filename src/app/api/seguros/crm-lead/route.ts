@@ -32,6 +32,7 @@ type SegurosCrmPayload = {
     garage?: string;
     name?: string;
     cpfCnpj?: string;
+    birthDate?: string;
     email?: string;
     phone?: string;
     address?: string;
@@ -105,6 +106,7 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
 
   if (payload.step === "contact") {
     customValues.document_number = cpfCnpj;
+    customValues.birth_date = cleanString(values.birthDate, 10);
     customValues.address = cleanString(values.address, 200);
     customValues.address_number = cleanString(values.addressNumber, 40);
     customValues.cep = cepDigits;
@@ -158,6 +160,7 @@ function buildActivityDescription(payload: SegurosCrmPayload): string {
   if (payload.step === "contact") {
     lines.push(
       `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
+      `Data de Nascimento: ${cleanString(values.birthDate) || "-"}`,
       `E-mail: ${cleanString(values.email) || "-"}`,
       `Endereço: ${cleanString(values.address) || "-"}`,
       `Número: ${cleanString(values.addressNumber) || "-"}`,

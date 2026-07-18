@@ -16,6 +16,7 @@ export type SegurosQuoteFormValues = {
   garage: string;
   name: string;
   cpfCnpj: string;
+  birthDate: string;
   email: string;
   phone: string;
   address: string;
@@ -58,6 +59,7 @@ export const SEGUROS_QUOTE_FORM_DEFAULTS: SegurosQuoteFormValues = {
   garage: "",
   name: "",
   cpfCnpj: "",
+  birthDate: "",
   email: "",
   phone: "",
   address: "",
@@ -111,6 +113,27 @@ function isValidCnpj(digits: string): boolean {
   return d1 === Number(digits[12]) && d2 === Number(digits[13]);
 }
 
+export function isValidBirthDate(value: string): boolean {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());
+  if (!match) return false;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return false;
+  }
+
+  const now = new Date();
+  return year >= 1900 && date <= now;
+}
+
 export function validateQuoteStep(
   step: 1 | 2 | 3,
   values: SegurosQuoteFormValues
@@ -138,6 +161,9 @@ export function validateQuoteStep(
       if (!isValidCnpj(docDigits)) errors.cpfCnpj = "Informe um CNPJ válido.";
     } else {
       errors.cpfCnpj = "Informe um CPF válido.";
+    }
+    if (!isValidBirthDate(values.birthDate)) {
+      errors.birthDate = "Informe uma data de nascimento válida (DD/MM/AAAA).";
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
       errors.email = "Informe um e-mail válido.";
@@ -175,6 +201,7 @@ export function buildSegurosWhatsAppUrl(
     "*Meus dados*",
     `Nome: ${values.name}`,
     `CPF/CNPJ: ${values.cpfCnpj}`,
+    `Data de Nascimento: ${values.birthDate}`,
     `E-mail: ${values.email}`,
     `WhatsApp: ${values.phone}`,
     "",

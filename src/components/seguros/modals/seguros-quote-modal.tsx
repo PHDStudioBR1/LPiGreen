@@ -11,7 +11,7 @@ import {
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { maskCep, maskCpfCnpj, maskPhone } from "@/lib/masks";
+import { maskBirthDate, maskCep, maskCpfCnpj, maskPhone } from "@/lib/masks";
 import {
   loadQuoteSessionFields,
   maskPlate,
@@ -671,6 +671,24 @@ export function SegurosQuoteModal({
                           inputMode="numeric"
                           value={values.cpfCnpj}
                           onChange={(event) => updateField("cpfCnpj", maskCpfCnpj(event.target.value))}
+                        />
+                      </FormGroup>
+
+                      <FormGroup
+                        id="w-grp-nascimento"
+                        label="Data de Nascimento"
+                        error={errors.birthDate}
+                      >
+                        <input
+                          id="w-grp-nascimento-field"
+                          type="text"
+                          className={`igf-input${errors.birthDate ? " error" : ""}`}
+                          placeholder="DD/MM/AAAA"
+                          maxLength={10}
+                          inputMode="numeric"
+                          autoComplete="bday"
+                          value={values.birthDate}
+                          onChange={(event) => updateField("birthDate", maskBirthDate(event.target.value))}
                         />
                       </FormGroup>
 
