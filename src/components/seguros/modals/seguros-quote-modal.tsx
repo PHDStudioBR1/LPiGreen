@@ -674,11 +674,7 @@ export function SegurosQuoteModal({
                         />
                       </FormGroup>
 
-                      <FormGroup
-                        id="w-grp-nascimento"
-                        label="Data de Nascimento"
-                        error={errors.birthDate}
-                      >
+                      <FormGroup id="w-grp-nascimento" label="Data de Nascimento" error={errors.birthDate}>
                         <input
                           id="w-grp-nascimento-field"
                           type="text"
@@ -688,7 +684,9 @@ export function SegurosQuoteModal({
                           inputMode="numeric"
                           autoComplete="bday"
                           value={values.birthDate}
-                          onChange={(event) => updateField("birthDate", maskBirthDate(event.target.value))}
+                          onChange={(event) =>
+                            updateField("birthDate", maskBirthDate(event.target.value))
+                          }
                         />
                       </FormGroup>
 

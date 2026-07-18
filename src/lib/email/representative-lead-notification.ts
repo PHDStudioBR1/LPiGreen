@@ -13,6 +13,7 @@ type SegurosFormValues = {
   garage?: string;
   name?: string;
   cpfCnpj?: string;
+  birthDate?: string;
   email?: string;
   phone?: string;
   address?: string;
@@ -113,6 +114,7 @@ function buildSegurosContent(values: SegurosFormValues) {
     `Telefone: ${phone}`,
     `E-mail: ${email}`,
     `CPF/CNPJ: ${cpfCnpj}`,
+    `Data de nascimento: ${cleanString(values.birthDate) || "-"}`,
     `Endereço: ${cleanString(values.address) || "-"}`,
     `Número: ${cleanString(values.addressNumber) || "-"}`,
     `CEP: ${cep}`,

@@ -160,7 +160,7 @@ function buildActivityDescription(payload: SegurosCrmPayload): string {
   if (payload.step === "contact") {
     lines.push(
       `CPF/CNPJ: ${cleanString(values.cpfCnpj) || "-"}`,
-      `Data de Nascimento: ${cleanString(values.birthDate) || "-"}`,
+      `Data de nascimento: ${cleanString(values.birthDate) || "-"}`,
       `E-mail: ${cleanString(values.email) || "-"}`,
       `Endereço: ${cleanString(values.address) || "-"}`,
       `Número: ${cleanString(values.addressNumber) || "-"}`,
