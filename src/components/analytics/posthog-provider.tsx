@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
@@ -12,34 +12,40 @@ let initialized = false;
 
 function initPostHog() {
   if (initialized || !POSTHOG_KEY || typeof window === "undefined") return;
+
   posthog.init(POSTHOG_KEY, {
     api_host: POSTHOG_HOST,
+    // defaults recent → pageviews via history_change (App Router SPA)
+    defaults: "2025-05-24",
     person_profiles: "identified_only",
-    capture_pageview: false,
     capture_pageleave: true,
+    loaded: (client) => {
+      // Garante global para debug/QA
+      (window as Window & { posthog?: typeof posthog }).posthog = client;
+    },
   });
+
   initialized = true;
 }
 
 /**
- * PostHog project 522696 — pageviews manuais para SPA App Router.
- * Sem NEXT_PUBLIC_POSTHOG_KEY o componente é no-op (não quebra a LP).
+ * PostHog project 522696 — init no client + pageview em soft navigations.
+ * Sem NEXT_PUBLIC_POSTHOG_KEY o componente é no-op.
  */
 export function PostHogProvider() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    initPostHog();
-  }, []);
 
   useEffect(() => {
     if (!POSTHOG_KEY || pathname?.startsWith("/admin")) return;
     initPostHog();
-    const search = searchParams?.toString();
-    const url = search ? `${pathname}?${search}` : pathname;
-    posthog.capture("$pageview", { $current_url: url });
-  }, [pathname, searchParams]);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!POSTHOG_KEY || !initialized || pathname?.startsWith("/admin")) return;
+    posthog.capture("$pageview", {
+      $current_url: window.location.href,
+    });
+  }, [pathname]);
 
   return null;
 }
