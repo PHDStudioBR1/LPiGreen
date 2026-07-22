@@ -1,5 +1,6 @@
 import { trackGtagEvent } from "@/lib/analytics/gtag";
 import { pushDataLayer } from "@/lib/analytics/data-layer";
+import { mirrorChannelEventToPostHog, type PostHogCapture } from "@/lib/analytics/posthog-mirror";
 import {
   buildChannelEvent,
   type ChannelEventPayload,
@@ -9,8 +10,23 @@ import {
 
 type Extra = Record<string, string | number | boolean | undefined>;
 
+function browserPostHogCapture(): PostHogCapture | null {
+  if (typeof window === "undefined") return null;
+  const w = window as Window & {
+    posthog?: {
+      capture?: (event: string, properties?: Record<string, unknown>) => void;
+      __loaded?: boolean;
+    };
+  };
+  const client = w.posthog;
+  if (!client?.capture) return null;
+  return (event, properties) => {
+    client.capture?.(event, properties);
+  };
+}
+
 /**
- * Dispara evento de canal em GA4 (gtag) + dataLayer (GTM).
+ * Dispara evento de canal em GA4 (gtag) + dataLayer (GTM) + PostHog.
  * Mantém gtag direto até o container GTM assumir 100% das tags.
  */
 export function trackChannelEvent(
@@ -29,4 +45,5 @@ export function trackChannelEvent(
 
   trackGtagEvent(eventName, gtagParams);
   pushDataLayer(payload);
+  mirrorChannelEventToPostHog(payload, browserPostHogCapture());
 }

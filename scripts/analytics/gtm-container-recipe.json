@@ -1,0 +1,61 @@
+{
+  "container_id": "GTM-K97WRGZK",
+  "notes": "Configurar no painel GTM. dataLayer já emite estes campos via trackChannelEvent.",
+  "variables": [
+    { "type": "Data Layer Variable", "name": "dlv - channel", "path": "channel" },
+    { "type": "Data Layer Variable", "name": "dlv - crm_source", "path": "crm_source" },
+    { "type": "Data Layer Variable", "name": "dlv - step", "path": "step" },
+    { "type": "Data Layer Variable", "name": "dlv - page_path", "path": "page_path" },
+    { "type": "Data Layer Variable", "name": "dlv - lead_id", "path": "lead_id" }
+  ],
+  "triggers": [
+    {
+      "name": "CE - channel events",
+      "type": "Custom Event",
+      "event_name": ".*",
+      "use_regex": true,
+      "filter": "Event does not equal gtm.js / gtm.dom / gtm.load"
+    },
+    {
+      "name": "CE - form_submit",
+      "type": "Custom Event",
+      "event_name": ".*_form_submit|form_submit",
+      "use_regex": true
+    },
+    {
+      "name": "CE - whatsapp_click",
+      "type": "Custom Event",
+      "event_name": ".*whatsapp.*|whatsapp_click",
+      "use_regex": true
+    }
+  ],
+  "tags": [
+    {
+      "name": "GA4 - Event",
+      "type": "Google Analytics: GA4 Event",
+      "measurement_id": "G-XXXX (preencher)",
+      "event_name": "{{Event}}",
+      "params": {
+        "channel": "{{dlv - channel}}",
+        "crm_source": "{{dlv - crm_source}}",
+        "step": "{{dlv - step}}",
+        "page_path": "{{dlv - page_path}}"
+      },
+      "trigger": "CE - channel events"
+    },
+    {
+      "name": "Meta - Lead (form_submit)",
+      "type": "Custom HTML or Meta Pixel Event",
+      "event": "Lead",
+      "params": { "content_name": "{{dlv - channel}}", "content_category": "{{dlv - crm_source}}" },
+      "trigger": "CE - form_submit"
+    }
+  ],
+  "channels": {
+    "bot": "whatsapp_evolution",
+    "telecom": "site_telecom",
+    "seguros": "site_seguros",
+    "seguro_auto": "site_seguro_auto",
+    "home": "site_captacao"
+  }
+}

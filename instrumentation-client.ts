@@ -11,12 +11,15 @@ const host =
 if (typeof window !== "undefined" && key) {
   posthog.init(key, {
     api_host: host,
+    ui_host: "https://us.posthog.com",
     defaults: "2025-05-24",
-    person_profiles: "always",
-    request_batching: false,
-    disable_compression: true,
+    person_profiles: "identified_only",
+    capture_pageview: false, // pageviews via PostHogProvider (App Router)
+    capture_pageleave: true,
+    persistence: "localStorage+cookie",
+    request_batching: true,
     loaded: (client) => {
-      (window as Window & { posthog?: typeof posthog }).posthog = client;
+      (window as Window & { posthog?: typeof client }).posthog = client;
     },
   });
 }
