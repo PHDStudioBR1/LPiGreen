@@ -27,7 +27,7 @@ export function ExitIntentPopup({ onQuoteClick }: ExitIntentPopupProps) {
 
   const handleQuote = () => {
     trackSegurosExitIntent("quote");
-    trackSegurosQuoteClick("exit_intent");
+    trackSegurosQuoteClick("exit_intent", "Fazer Cotação Gratuita");
     dismiss();
     onQuoteClick();
   };

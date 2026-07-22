@@ -12,7 +12,7 @@ export function StickyMobileBar({ onQuoteClick }: StickyMobileBarProps) {
       <button
         type="button"
         onClick={() => {
-          trackSegurosQuoteClick("sticky_mobile");
+          trackSegurosQuoteClick("sticky_mobile", "Cotação Grátis");
           onQuoteClick();
         }}
         className="seguros-btn-primary h-11 w-full rounded-xl text-xs font-extrabold sm:h-12 sm:text-sm"

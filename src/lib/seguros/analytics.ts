@@ -1,11 +1,5 @@
 import { trackGtagEvent } from "@/lib/analytics/gtag";
-import {
-  trackMetaFormProgress,
-  trackMetaLeadConversion,
-  trackMetaQuoteStarted,
-} from "@/lib/analytics/meta-events";
-
-const FUNNEL = "seguros" as const;
+import { trackSegurosMetaClickCta } from "@/lib/analytics/meta-pixel";
 
 function resolvePagePath(): string {
   if (typeof window !== "undefined") {
@@ -22,8 +16,10 @@ export function trackSegurosCTAClick(location: string) {
   trackGtagEvent("seguros_cta_click", { location, page_path: resolvePagePath() });
 }
 
-export function trackSegurosQuoteClick(location: string) {
+/** CTA que abre o modal — dispara Meta `Click_CTA` com o texto do botão. */
+export function trackSegurosQuoteClick(location: string, buttonLabel?: string) {
   trackSegurosCTAClick(location);
+  trackSegurosMetaClickCta(buttonLabel ?? location);
 }
 
 export function trackSegurosWhatsAppClick(location: string) {
@@ -47,7 +43,6 @@ export function trackSegurosExitIntent(action: "show" | "dismiss" | "quote" | "w
 
 export function trackSegurosModalOpen() {
   trackGtagEvent("seguros_modal_open", { page_path: resolvePagePath() });
-  trackMetaQuoteStarted(FUNNEL);
 }
 
 export function trackSegurosModalClose() {
@@ -56,7 +51,6 @@ export function trackSegurosModalClose() {
 
 export function trackSegurosFormStep(step: number) {
   trackGtagEvent("seguros_form_step", { step, page_path: resolvePagePath() });
-  trackMetaFormProgress(FUNNEL, step);
 }
 
 export function trackSegurosPlanSelect(plan: string) {
@@ -75,7 +69,6 @@ export function trackSegurosFormSubmit(params: {
     currency: "BRL",
     value: 1,
   });
-  trackMetaLeadConversion(FUNNEL, params);
 }
 
 export function trackSegurosFaqExpand(faqId: string) {

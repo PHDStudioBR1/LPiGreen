@@ -75,7 +75,7 @@ export default function SegurosLayout({
 
   return (
     <div className={poppins.variable}>
-      <MetaPixel funnel="seguros" />
+      <MetaPixel />
       {schemas.map((schema, i) => (
         <script
           key={i}

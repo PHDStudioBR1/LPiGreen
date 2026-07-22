@@ -1,11 +1,4 @@
 import { trackGtagEvent } from "@/lib/analytics/gtag";
-import {
-  trackMetaFormProgress,
-  trackMetaLeadConversion,
-  trackMetaQuoteStarted,
-} from "@/lib/analytics/meta-events";
-
-const FUNNEL = "seguro-auto" as const;
 
 function resolvePagePath(): string {
   if (typeof window !== "undefined") {
@@ -47,7 +40,6 @@ export function trackSeguroAutoExitIntent(action: "show" | "dismiss" | "quote" |
 
 export function trackSeguroAutoModalOpen() {
   trackGtagEvent("seguro_auto_modal_open", { page_path: resolvePagePath() });
-  trackMetaQuoteStarted(FUNNEL);
 }
 
 export function trackSeguroAutoModalClose() {
@@ -56,7 +48,6 @@ export function trackSeguroAutoModalClose() {
 
 export function trackSeguroAutoFormStep(step: number) {
   trackGtagEvent("seguro_auto_form_step", { step, page_path: resolvePagePath() });
-  trackMetaFormProgress(FUNNEL, step);
 }
 
 export function trackSeguroAutoPlanSelect(plan: string) {
@@ -75,7 +66,6 @@ export function trackSeguroAutoFormSubmit(params: {
     currency: "BRL",
     value: 1,
   });
-  trackMetaLeadConversion(FUNNEL, params);
 }
 
 export function trackSeguroAutoFaqExpand(faqId: string) {

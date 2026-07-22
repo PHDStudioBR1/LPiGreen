@@ -6,7 +6,6 @@ import {
   getInsuranceAgencySchema,
 } from "@/lib/seguros/seo";
 import { SEGURO_AUTO_SITE_URL } from "@/lib/seguro-auto/constants";
-import { MetaPixel } from "@/components/analytics/meta-pixel";
 import "./seguro-auto.css";
 
 const inter = Inter({
@@ -89,7 +88,6 @@ export default function SeguroAutoLayout({
 
   return (
     <div className={`${inter.variable} ${plusJakarta.variable}`}>
-      <MetaPixel funnel="seguro-auto" />
       {schemas.map((schema, i) => (
         <script
           key={i}

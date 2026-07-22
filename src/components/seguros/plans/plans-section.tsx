@@ -77,7 +77,7 @@ export function PlansSection({ onQuoteClick }: PlansSectionProps) {
               <button
                 type="button"
                 onClick={() => {
-                  trackSegurosQuoteClick(`plans_${plan.id}`);
+                  trackSegurosQuoteClick(`plans_${plan.id}`, `Contratar ${plan.name}`);
                   onQuoteClick();
                 }}
                 className={`w-full h-11 sm:h-12 rounded-xl font-bold transition-all ${

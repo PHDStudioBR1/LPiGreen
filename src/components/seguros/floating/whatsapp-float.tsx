@@ -13,7 +13,7 @@ export function WhatsAppFloat({ onQuoteClick }: QuoteFloatProps) {
       type="button"
       aria-label="Abrir formulário de cotação"
       onClick={() => {
-        trackSegurosQuoteClick("float");
+        trackSegurosQuoteClick("float", "Abrir formulário de cotação");
         onQuoteClick();
       }}
       className="fixed bottom-[5.5rem] right-3 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-seguros-primary text-white seguros-whatsapp-pulse shadow-2xl transition-transform hover:scale-110 active:scale-95 sm:right-4 md:bottom-8 md:right-6 md:h-16 md:w-16"

@@ -139,7 +139,7 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
               <button
                 type="button"
                 onClick={() => {
-                  trackSegurosQuoteClick("header");
+                  trackSegurosQuoteClick("header", "Cotar Grátis");
                   onQuoteClick();
                 }}
                 className="seguros-header__cta hidden h-10 items-center justify-center rounded-full px-5 text-sm font-extrabold sm:inline-flex lg:h-11 lg:px-6"
@@ -216,7 +216,7 @@ export function SegurosHeader({ onQuoteClick }: SegurosHeaderProps) {
           type="button"
           onClick={() => {
             setIsMenuOpen(false);
-            trackSegurosQuoteClick("header_mobile");
+            trackSegurosQuoteClick("header_mobile", "Cotar Grátis");
             onQuoteClick();
           }}
           className="seguros-header__cta mt-8 h-12 w-full rounded-2xl text-base font-extrabold"

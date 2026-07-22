@@ -39,7 +39,7 @@ export function HowItWorksTimeline({ onQuoteClick }: HowItWorksTimelineProps) {
             <button
               type="button"
               onClick={() => {
-                trackSegurosQuoteClick("how_it_works");
+                trackSegurosQuoteClick("how_it_works", "Descobrir quanto vou pagar");
                 onQuoteClick();
               }}
               className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00c853] to-[#16a34a] px-4 text-base font-extrabold text-white shadow-[0_8px_32px_rgba(22,163,74,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(22,163,74,0.45)] sm:h-16 sm:w-auto sm:px-8 sm:text-lg lg:h-[72px] lg:w-[360px]"

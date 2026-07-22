@@ -73,7 +73,7 @@ export function HeroSection({ onQuoteClick }: HeroSectionProps) {
             <button
               type="button"
               onClick={() => {
-                trackSegurosQuoteClick("hero");
+                trackSegurosQuoteClick("hero", "Fazer Cotação Gratuita");
                 onQuoteClick();
               }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-16 sm:w-auto sm:px-8 sm:text-lg"

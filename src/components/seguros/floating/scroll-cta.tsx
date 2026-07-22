@@ -27,7 +27,7 @@ export function ScrollCta({ onQuoteClick }: ScrollCtaProps) {
           <button
             type="button"
             onClick={() => {
-              trackSegurosQuoteClick("scroll_cta");
+              trackSegurosQuoteClick("scroll_cta", "Cotação Grátis");
               onQuoteClick();
             }}
             className="seguros-btn-primary h-10 px-6 rounded-full text-sm font-extrabold whitespace-nowrap"

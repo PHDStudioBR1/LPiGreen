@@ -85,7 +85,7 @@ export function IgreenClubSection({ onQuoteClick }: IgreenClubSectionProps) {
             <button
               type="button"
               onClick={() => {
-                trackSegurosQuoteClick("igreen_club");
+                trackSegurosQuoteClick("igreen_club", "Receber cotação grátis!");
                 onQuoteClick();
               }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"

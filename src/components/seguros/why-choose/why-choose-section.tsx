@@ -160,7 +160,7 @@ export function WhyChooseSection({ onQuoteClick }: WhyChooseSectionProps) {
               <button
                 type="button"
                 onClick={() => {
-                  trackSegurosQuoteClick("why_choose");
+                  trackSegurosQuoteClick("why_choose", "Receber cotação grátis");
                   onQuoteClick?.();
                 }}
                 className="seguros-btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-extrabold"

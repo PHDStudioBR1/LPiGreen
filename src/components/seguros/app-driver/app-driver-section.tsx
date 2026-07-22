@@ -66,7 +66,7 @@ export function AppDriverSection({ onQuoteClick }: AppDriverSectionProps) {
             <button
               type="button"
               onClick={() => {
-                trackSegurosQuoteClick("app_driver");
+                trackSegurosQuoteClick("app_driver", "Cotar para Motorista de App");
                 onQuoteClick();
               }}
               className="seguros-btn-primary h-12 w-full rounded-2xl px-6 text-base font-extrabold sm:h-14 sm:w-auto sm:px-8 sm:text-lg"
