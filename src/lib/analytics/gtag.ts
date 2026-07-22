@@ -4,7 +4,7 @@ export const GA4_MEASUREMENT_ID = "G-6S3NG2330K";
 declare global {
   interface Window {
     gtag?: (command: string, ...args: unknown[]) => void;
-    dataLayer?: unknown[];
+    dataLayer?: Array<Record<string, unknown> | unknown>;
   }
 }
 
