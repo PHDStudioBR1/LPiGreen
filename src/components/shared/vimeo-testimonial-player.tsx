@@ -52,6 +52,7 @@ export function VimeoTestimonialPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [coverEndScreen, setCoverEndScreen] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const resetPlayback = useCallback(async () => {
     const player = playerRef.current;
@@ -88,6 +89,8 @@ export function VimeoTestimonialPlayer({
       const player = new VimeoPlayer(iframeRef.current) as Player;
       playerRef.current = player;
 
+      player.on("error", () => setHasError(true));
+
       player.on("timeupdate", (data: { seconds: number; duration: number }) => {
         if (!isDraggingTimelineRef.current) {
           setCurrentTime(data.seconds);
@@ -119,13 +122,16 @@ export function VimeoTestimonialPlayer({
 
       setDuration(nextDuration);
       setCurrentTime(nextTime);
+      setHasError(false);
     } catch (error) {
       console.error("Vimeo testimonial player init error", error);
+      setHasError(true);
     }
   }, [handleNearEnd]);
 
   useEffect(() => {
     endScreenGuardRef.current = false;
+    setHasError(false);
     void initPlayer();
 
     return () => {
@@ -198,6 +204,17 @@ export function VimeoTestimonialPlayer({
 
   return (
     <div className={cn("relative aspect-video w-full overflow-hidden bg-black", className)}>
+      {hasError ? (
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center bg-neutral-900 px-4 text-center"
+          role="status"
+        >
+          <p className="text-sm text-white/80">
+            Vídeo temporariamente indisponível. Tente novamente mais tarde.
+          </p>
+        </div>
+      ) : null}
+
       <iframe
         ref={iframeRef}
         src={getVimeoChromelessUrl(vimeoId)}
@@ -211,6 +228,7 @@ export function VimeoTestimonialPlayer({
         <div className="absolute inset-0 z-[5] bg-black" aria-hidden />
       ) : null}
 
+      {!hasError ? (
       <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-3 pb-3 pt-8">
         <div className="mb-2 flex items-center gap-3">
           <Slider
@@ -259,6 +277,7 @@ export function VimeoTestimonialPlayer({
           />
         </div>
       </div>
+      ) : null}
     </div>
   );
 }

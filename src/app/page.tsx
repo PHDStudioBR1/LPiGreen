@@ -11,6 +11,7 @@ import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { StickyHeader } from '@/components/ui/sticky-header';
 import { redirectHomeConversion, redirectHomeWhatsAppFloat } from '@/lib/home/whatsapp';
 import { trackHomePageView } from '@/lib/home/analytics';
+import { MetaPixel } from '@/components/analytics/meta-pixel';
 
 export default function Home() {
   const [simulatedMonthlyBill, setSimulatedMonthlyBill] = useState(400);
@@ -21,6 +22,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full min-w-0 font-body flex flex-col overflow-x-hidden">
+      <MetaPixel funnel="home" />
       <StickyHeader onCTAClick={() => redirectHomeConversion("sticky_header")} />
 
       <main className="flex-grow w-full min-w-0 pt-20">

@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import {
   getMetaPageContext,
   trackMetaCustom,
+  type MetaPixelFunnel,
 } from "@/lib/analytics/meta-pixel";
 
 const SCROLL_THRESHOLDS = [25, 50, 75, 90, 100] as const;
 const TIME_THRESHOLDS = [10, 30, 60, 120] as const;
 
 type MetaJourneyTrackerProps = {
-  funnel: "seguros" | "seguro-auto";
+  funnel: MetaPixelFunnel;
   sectionIds: string[];
 };
 

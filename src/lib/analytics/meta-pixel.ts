@@ -1,12 +1,18 @@
-/** Pixel Meta por funil. /seguros usa ID próprio; /seguro-auto mantém o anterior. */
+/** Pixel Meta por funil. Home só carrega se NEXT_PUBLIC_META_PIXEL_ID_HOME estiver definido. */
 export const META_PIXEL_IDS = {
   seguros: "1051522610657600",
   "seguro-auto": "2456316114837467",
+  home: process.env.NEXT_PUBLIC_META_PIXEL_ID_HOME ?? "",
 } as const;
 
 export type MetaPixelFunnel = keyof typeof META_PIXEL_IDS;
 
 export const META_PIXEL_ID = META_PIXEL_IDS["seguro-auto"];
+
+export function resolveMetaPixelId(funnel: MetaPixelFunnel): string | null {
+  const id = META_PIXEL_IDS[funnel];
+  return id ? id : null;
+}
 
 type FbqFunction = {
   (...args: unknown[]): void;

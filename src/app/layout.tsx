@@ -2,6 +2,7 @@ import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { GoogleTag } from '@/components/analytics/google-tag';
+import { PostHogAnalytics } from '@/components/analytics/posthog-analytics';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({
@@ -41,6 +42,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <GoogleTag />
+        <PostHogAnalytics />
         {children}
         <Toaster />
       </body>

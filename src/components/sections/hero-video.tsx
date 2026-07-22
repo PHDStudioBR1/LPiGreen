@@ -27,6 +27,7 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
   const [volume, setVolume] = useState(1)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [hasError, setHasError] = useState(false)
 
   const initPlayer = useCallback(async () => {
     if (!iframeRef.current) return
@@ -35,6 +36,7 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
       const player = new VimeoPlayer(iframeRef.current) as Player
       playerRef.current = player
 
+      player.on("error", () => setHasError(true))
       player.on("timeupdate", (data: { seconds: number }) => {
         if (!isDraggingTimelineRef.current) setCurrentTime(data.seconds)
       })
@@ -46,17 +48,20 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
       const t = await player.getCurrentTime()
       setDuration(d)
       setCurrentTime(t)
+      setHasError(false)
     } catch (e) {
       console.error("Vimeo player init error", e)
+      setHasError(true)
     }
   }, [])
 
   useEffect(() => {
+    setHasError(false)
     initPlayer()
     return () => {
       playerRef.current = null
     }
-  }, [initPlayer])
+  }, [initPlayer, videoId])
 
   const togglePlay = useCallback(async () => {
     const p = playerRef.current
@@ -116,6 +121,16 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
 
   return (
     <div className="relative w-full overflow-hidden rounded-[2.5rem] shadow-2xl aspect-video bg-black/20 group">
+      {hasError ? (
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center bg-neutral-900/95 px-4 text-center"
+          role="status"
+        >
+          <p className="text-sm text-white/80">
+            Vídeo temporariamente indisponível. Tente novamente mais tarde.
+          </p>
+        </div>
+      ) : null}
       <iframe
         ref={iframeRef}
         src={`https://player.vimeo.com/video/${videoId}?background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0`}
@@ -126,6 +141,7 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
         tabIndex={-1}
       />
       {/* Overlay de controles */}
+      {!hasError ? (
       <div
         className={cn(
           "absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 p-3",
@@ -193,6 +209,7 @@ export function HeroVideo({ videoId = "1168986086" }: HeroVideoProps) {
           </div>
         </div>
       </div>
+      ) : null}
     </div>
   )
 }

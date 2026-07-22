@@ -4,8 +4,8 @@ import Script from "next/script";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
-  META_PIXEL_IDS,
   type MetaPixelFunnel,
+  resolveMetaPixelId,
   resetMetaPixelOnceKeys,
   trackMetaPageView,
 } from "@/lib/analytics/meta-pixel";
@@ -16,7 +16,7 @@ type MetaPixelProps = {
   sectionIds?: string[];
 };
 
-const DEFAULT_SECTIONS: Record<MetaPixelProps["funnel"], string[]> = {
+const DEFAULT_SECTIONS: Partial<Record<MetaPixelFunnel, string[]>> = {
   seguros: [
     "inicio",
     "beneficios",
@@ -38,6 +38,7 @@ const DEFAULT_SECTIONS: Record<MetaPixelProps["funnel"], string[]> = {
     "motorista-app",
     "faq",
   ],
+  home: ["inicio", "simulador", "igreen-club", "depoimentos", "faq"],
 };
 
 /**
@@ -77,8 +78,10 @@ export function MetaPixel({ funnel, sectionIds }: MetaPixelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, funnel]);
 
-  const sections = sectionIds ?? DEFAULT_SECTIONS[funnel];
-  const pixelId = META_PIXEL_IDS[funnel];
+  const sections = sectionIds ?? DEFAULT_SECTIONS[funnel] ?? [];
+  const pixelId = resolveMetaPixelId(funnel);
+
+  if (!pixelId) return null;
 
   return (
     <>
