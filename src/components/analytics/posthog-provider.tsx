@@ -19,6 +19,9 @@ function initPostHog() {
     defaults: "2025-05-24",
     person_profiles: "identified_only",
     capture_pageleave: true,
+    // Em produção/headless o batch+gzip às vezes não flusha; envio imediato é mais confiável.
+    request_batching: false,
+    disable_compression: true,
     loaded: (client) => {
       // Garante global para debug/QA
       (window as Window & { posthog?: typeof posthog }).posthog = client;
