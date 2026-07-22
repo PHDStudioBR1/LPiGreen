@@ -4,47 +4,20 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
 
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const POSTHOG_HOST =
-  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
-
-let initialized = false;
-
-function initPostHog() {
-  if (initialized || !POSTHOG_KEY || typeof window === "undefined") return;
-
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    // defaults recent → pageviews via history_change (App Router SPA)
-    defaults: "2025-05-24",
-    person_profiles: "identified_only",
-    capture_pageleave: true,
-    // Em produção/headless o batch+gzip às vezes não flusha; envio imediato é mais confiável.
-    request_batching: false,
-    disable_compression: true,
-    loaded: (client) => {
-      // Garante global para debug/QA
-      (window as Window & { posthog?: typeof posthog }).posthog = client;
-    },
-  });
-
-  initialized = true;
-}
-
 /**
- * PostHog project 522696 — init no client + pageview em soft navigations.
- * Sem NEXT_PUBLIC_POSTHOG_KEY o componente é no-op.
+ * Garante $pageview em soft navigations do App Router.
+ * O init principal fica em instrumentation-client.ts.
  */
 export function PostHogProvider() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!POSTHOG_KEY || pathname?.startsWith("/admin")) return;
-    initPostHog();
-  }, [pathname]);
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    if (pathname?.startsWith("/admin")) return;
+    if (typeof window === "undefined") return;
 
-  useEffect(() => {
-    if (!POSTHOG_KEY || !initialized || pathname?.startsWith("/admin")) return;
+    if (!posthog.__loaded) return;
+
     posthog.capture("$pageview", {
       $current_url: window.location.href,
     });
