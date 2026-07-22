@@ -1,10 +1,11 @@
-import { trackGtagEvent } from "@/lib/analytics/gtag";
+import { trackChannelEvent } from "@/lib/analytics/track-channel";
 
+const CHANNEL = "home" as const;
 const LANDING_VARIANT = "home";
 
-function homeEventParams(
-  extra: Record<string, string | number | boolean> = {}
-): Record<string, string | number | boolean> {
+function homeExtra(
+  extra: Record<string, string | number | boolean | undefined> = {}
+) {
   return {
     page_path: "/",
     landing_variant: LANDING_VARIANT,
@@ -13,20 +14,22 @@ function homeEventParams(
 }
 
 export function trackHomePageView() {
-  trackGtagEvent("home_page_view", homeEventParams());
+  trackChannelEvent(CHANNEL, "home_page_view", homeExtra({ step: "page_view" }));
 }
 
 function trackHomeConversion(location: string, ctaType: "cta" | "whatsapp_float") {
-  const params = homeEventParams({
+  const params = homeExtra({
+    step: "cta_click",
     location,
     cta_type: ctaType,
     destination: "whatsapp_redirect",
   });
 
-  trackGtagEvent("home_cta_click", params);
-  trackGtagEvent("home_redirect_click", params);
-  trackGtagEvent("generate_lead", {
+  trackChannelEvent(CHANNEL, "home_cta_click", params);
+  trackChannelEvent(CHANNEL, "home_redirect_click", params);
+  trackChannelEvent(CHANNEL, "generate_lead", {
     ...params,
+    step: "lead_created",
     lead_source: "home_redirect",
     currency: "BRL",
     value: 1,
@@ -42,33 +45,35 @@ export function trackHomeWhatsAppClick(location: string) {
 }
 
 export function trackHomeFaqExpand(faqId: string) {
-  trackGtagEvent("home_faq_expand", homeEventParams({ faq_id: faqId }));
+  trackChannelEvent(CHANNEL, "home_faq_expand", homeExtra({ faq_id: faqId }));
 }
 
 export function trackHomeSimulatorUse(billValue: number) {
-  trackGtagEvent("home_simulator_use", homeEventParams({ bill_value: billValue }));
+  trackChannelEvent(CHANNEL, "home_simulator_use", homeExtra({ bill_value: billValue }));
 }
 
 export function trackHomeModalOpen() {
-  trackGtagEvent("home_modal_open", homeEventParams());
+  trackChannelEvent(CHANNEL, "home_modal_open", homeExtra({ step: "quote_started" }));
 }
 
 export function trackHomeModalClose() {
-  trackGtagEvent("home_modal_close", homeEventParams());
+  trackChannelEvent(CHANNEL, "home_modal_close", homeExtra());
 }
 
 export function trackHomeFormStep(step: number) {
-  trackGtagEvent("home_form_step", homeEventParams({ step }));
+  trackChannelEvent(CHANNEL, "home_form_step", homeExtra({ step: "form_step", form_step: step }));
 }
 
 export function trackHomeFormSubmit(params: { valor_medio_fatura: number }) {
-  const eventParams = homeEventParams({
+  const eventParams = homeExtra({
+    step: "form_submit",
     valor_medio_fatura: params.valor_medio_fatura,
   });
 
-  trackGtagEvent("home_form_submit", eventParams);
-  trackGtagEvent("generate_lead", {
+  trackChannelEvent(CHANNEL, "home_form_submit", eventParams);
+  trackChannelEvent(CHANNEL, "generate_lead", {
     ...eventParams,
+    step: "lead_created",
     lead_source: "home_form",
     currency: "BRL",
     value: 1,

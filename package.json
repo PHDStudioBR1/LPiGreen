@@ -10,7 +10,8 @@
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:analytics": "npx tsx --test scripts/analytics/channels.test.ts scripts/analytics/track-channel.test.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
@@ -52,6 +53,7 @@
     "next": "15.5.9",
     "nodemailer": "^9.0.3",
     "patch-package": "^8.0.0",
+    "posthog-js": "^1.406.2",
     "react": "^19.2.1",
     "react-day-picker": "^9.11.3",
     "react-dom": "^19.2.1",
