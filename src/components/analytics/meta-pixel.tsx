@@ -2,55 +2,105 @@
 
 import Script from "next/script";
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import {
-  SEGUROS_META_PIXEL_ID,
-  trackSegurosMetaPageView,
-  trackSegurosMetaScroll,
+  type MetaPixelFunnel,
+  resolveMetaPixelId,
+  resetMetaPixelOnceKeys,
+  trackMetaPageView,
 } from "@/lib/analytics/meta-pixel";
+import { MetaJourneyTracker } from "@/components/analytics/meta-journey-tracker";
+
+type MetaPixelProps = {
+  funnel: MetaPixelFunnel;
+  sectionIds?: string[];
+};
+
+const DEFAULT_SECTIONS: Partial<Record<MetaPixelFunnel, string[]>> = {
+  seguros: [
+    "inicio",
+    "beneficios",
+    "comparacao",
+    "como-funciona",
+    "planos",
+    "igreen-club",
+    "depoimentos",
+    "motorista-app",
+    "faq",
+  ],
+  "seguro-auto": [
+    "inicio",
+    "vantagens",
+    "planos",
+    "comparacao",
+    "igreen-club",
+    "depoimentos",
+    "motorista-app",
+    "faq",
+  ],
+  home: ["inicio", "simulador", "igreen-club", "depoimentos", "faq"],
+  telecom: [
+    "inicio",
+    "beneficios",
+    "planos",
+    "comparativo",
+    "como-funciona",
+    "clube",
+    "depoimentos",
+    "faq",
+    "cta-final",
+  ],
+};
 
 /**
- * Meta Pixel da LP `/seguros`: snippet base + PageView + Scroll_50 / Scroll_90.
+ * Single Meta Pixel instance for /seguros and /seguro-auto layouts.
+ * PageView is driven by SPA pathname changes (not by the base snippet) to avoid duplicates.
  */
-export function MetaPixel() {
+export function MetaPixel({ funnel, sectionIds }: MetaPixelProps) {
+  const pathname = usePathname();
+  const lastPathRef = useRef<string | null>(null);
   const scriptReadyRef = useRef(false);
-  const pageViewFiredRef = useRef(false);
+
+  const firePageView = (path: string) => {
+    if (!scriptReadyRef.current) return;
+    if (lastPathRef.current === path) return;
+
+    resetMetaPixelOnceKeys(`ScrollDepth:${path}`);
+    resetMetaPixelOnceKeys(`TimeOnPage:${path}`);
+    resetMetaPixelOnceKeys(`SectionViewed:${path}`);
+    resetMetaPixelOnceKeys(`LandingVisited:${path}`);
+
+    lastPathRef.current = path;
+    trackMetaPageView({ funnel, page_path: path });
+  };
 
   const markReadyAndTrack = () => {
     scriptReadyRef.current = true;
-    if (pageViewFiredRef.current) return;
-    pageViewFiredRef.current = true;
-    trackSegurosMetaPageView();
+    if (pathname) firePageView(pathname);
   };
 
   useEffect(() => {
+    if (!pathname) return;
+    // If script already loaded (client navigation within segment), track immediately
     if (typeof window !== "undefined" && typeof window.fbq === "function") {
       scriptReadyRef.current = true;
-      if (!pageViewFiredRef.current) {
-        pageViewFiredRef.current = true;
-        trackSegurosMetaPageView();
-      }
     }
-  }, []);
+    firePageView(pathname);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, funnel]);
 
-  useEffect(() => {
-    const onScroll = () => {
-      if (!scriptReadyRef.current) return;
-      const doc = document.documentElement;
-      const scrollHeight = doc.scrollHeight - window.innerHeight;
-      if (scrollHeight <= 0) return;
-      const percent = Math.min(100, Math.round((window.scrollY / scrollHeight) * 100));
-      if (percent >= 50) trackSegurosMetaScroll(50);
-      if (percent >= 90) trackSegurosMetaScroll(90);
-    };
+  const sections = sectionIds ?? DEFAULT_SECTIONS[funnel] ?? [];
+  const pixelId = resolveMetaPixelId(funnel);
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  if (!pixelId) return null;
 
   return (
     <>
-      <Script id={`meta-pixel-${SEGUROS_META_PIXEL_ID}`} strategy="afterInteractive" onReady={markReadyAndTrack}>
+      <Script
+        id={`meta-pixel-${pixelId}`}
+        strategy="afterInteractive"
+        onReady={markReadyAndTrack}
+      >
         {`
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -60,9 +110,9 @@ export function MetaPixel() {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          if (window.__igreenSegurosMetaPixelInit !== '${SEGUROS_META_PIXEL_ID}') {
-            window.__igreenSegurosMetaPixelInit = '${SEGUROS_META_PIXEL_ID}';
-            fbq('init', '${SEGUROS_META_PIXEL_ID}');
+          if (window.__igreenMetaPixelInit !== '${pixelId}') {
+            window.__igreenMetaPixelInit = '${pixelId}';
+            fbq('init', '${pixelId}');
           }
         `}
       </Script>
@@ -71,10 +121,11 @@ export function MetaPixel() {
           height="1"
           width="1"
           style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${SEGUROS_META_PIXEL_ID}&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>
+      <MetaJourneyTracker funnel={funnel} sectionIds={sections} />
     </>
   );
 }

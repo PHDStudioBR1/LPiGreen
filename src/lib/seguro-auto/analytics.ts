@@ -1,6 +1,14 @@
 import { trackChannelEvent } from "@/lib/analytics/track-channel";
+import { buildFormSubmitEvents } from "@/lib/analytics/lead-conversion";
+import { trackMetaCustom } from "@/lib/analytics/meta-pixel";
+import {
+  trackMetaFormProgress,
+  trackMetaLeadConversion,
+  trackMetaQuoteStarted,
+} from "@/lib/analytics/meta-events";
 
 const CHANNEL = "seguro_auto" as const;
+const FUNNEL = "seguro-auto" as const;
 
 function resolvePagePath(): string {
   if (typeof window !== "undefined") {
@@ -24,8 +32,13 @@ export function trackSeguroAutoCTAClick(location: string) {
   });
 }
 
-export function trackSeguroAutoQuoteClick(location: string) {
+export function trackSeguroAutoQuoteClick(location: string, buttonLabel?: string) {
   trackSeguroAutoCTAClick(location);
+  trackMetaCustom("Click_CTA", {
+    funnel: FUNNEL,
+    location,
+    button_label: buttonLabel ?? location,
+  });
 }
 
 export function trackSeguroAutoWhatsAppClick(location: string) {
@@ -65,6 +78,7 @@ export function trackSeguroAutoModalOpen() {
     step: "quote_started",
     page_path: resolvePagePath(),
   });
+  trackMetaQuoteStarted(FUNNEL);
 }
 
 export function trackSeguroAutoModalClose() {
@@ -79,6 +93,7 @@ export function trackSeguroAutoFormStep(step: number) {
     form_step: step,
     page_path: resolvePagePath(),
   });
+  trackMetaFormProgress(FUNNEL, step);
 }
 
 export function trackSeguroAutoPlanSelect(plan: string) {
@@ -91,21 +106,26 @@ export function trackSeguroAutoPlanSelect(plan: string) {
 export function trackSeguroAutoFormSubmit(params: {
   vehicle_type: string;
   vehicle_use: string;
+  lead_id?: string | number;
+  event_id?: string;
 }) {
   const page_path = resolvePagePath();
-  trackChannelEvent(CHANNEL, "seguro_auto_form_submit", {
-    step: "form_submit",
-    ...params,
-    page_path,
-  });
-  trackChannelEvent(CHANNEL, "generate_lead", {
-    step: "lead_created",
-    ...params,
-    page_path,
-    lead_source: "seguro_auto_form",
-    currency: "BRL",
-    value: 1,
-  });
+  for (const payload of buildFormSubmitEvents({
+    channel: CHANNEL,
+    formEvent: "seguro_auto_form_submit",
+    leadSource: "seguro_auto_form",
+    pagePath: page_path,
+    leadId: params.lead_id,
+    extra: {
+      vehicle_type: params.vehicle_type,
+      vehicle_use: params.vehicle_use,
+      ...(params.event_id ? { event_id: params.event_id } : {}),
+    },
+  })) {
+    const { event, ...extra } = payload;
+    trackChannelEvent(CHANNEL, event, extra);
+  }
+  trackMetaLeadConversion(FUNNEL, params);
 }
 
 export function trackSeguroAutoFaqExpand(faqId: string) {

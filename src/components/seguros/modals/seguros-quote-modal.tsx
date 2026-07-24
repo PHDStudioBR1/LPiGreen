@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
@@ -35,14 +36,12 @@ import {
   trackSeguroAutoModalOpen,
 } from "@/lib/seguro-auto/analytics";
 import {
-  extractVehicleYear,
-  mapUsageType,
-  resetMetaPixelOnceKeys,
-  trackSegurosMetaInitiateCheckout,
-  trackSegurosMetaLead,
-  trackSegurosMetaStep2,
-  trackSegurosMetaStep3,
-} from "@/lib/analytics/meta-pixel";
+  trackMetaFieldCompleted,
+  trackMetaFormAbandoned,
+  trackMetaFormError,
+  trackMetaFormStarted,
+} from "@/lib/analytics/meta-events";
+import { resetMetaPixelOnceKeys } from "@/lib/analytics/meta-pixel";
 import { readStoredAttribution } from "@/lib/attribution/utm";
 import "@/app/seguros/seguros-quote-modal.css";
 
@@ -58,7 +57,12 @@ type QuoteModalAnalytics = {
   trackModalOpen: () => void;
   trackModalClose: () => void;
   trackFormStep: (step: number) => void;
-  trackFormSubmit: (params: { vehicle_type: string; vehicle_use: string }) => void;
+  trackFormSubmit: (params: {
+    vehicle_type: string;
+    vehicle_use: string;
+    lead_id?: string | number;
+    event_id?: string;
+  }) => void;
 };
 
 const QUOTE_MODAL_ANALYTICS: Record<SegurosQuoteModalVariant, QuoteModalAnalytics> = {
@@ -177,6 +181,31 @@ export function SegurosQuoteModal({
   const [crmSessionId, setCrmSessionId] = useState("");
   const [crmLeadId, setCrmLeadId] = useState<number | null>(null);
   const [crmError, setCrmError] = useState<string | null>(null);
+  const [formStarted, setFormStarted] = useState(false);
+  const [formCompleted, setFormCompleted] = useState(false);
+  const completedFieldsRef = useRef<Set<string>>(new Set());
+  const valuesRef = useRef(values);
+  const stepRef = useRef(step);
+  const abandonedTrackedRef = useRef(false);
+
+  valuesRef.current = values;
+  stepRef.current = step;
+
+  const countFilledFields = useCallback((current: SegurosQuoteFormValues) => {
+    return Object.values(current).filter(
+      (value) => typeof value === "string" && value.trim().length > 0
+    ).length;
+  }, []);
+
+  const trackAbandonIfNeeded = useCallback(() => {
+    if (abandonedTrackedRef.current) return;
+    if (!formStarted || formCompleted) return;
+    abandonedTrackedRef.current = true;
+    trackMetaFormAbandoned(variant, {
+      step: stepRef.current,
+      filled_fields: countFilledFields(valuesRef.current),
+    });
+  }, [formStarted, formCompleted, variant, countFilledFields]);
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -185,33 +214,28 @@ export function SegurosQuoteModal({
     setIsSubmitting(false);
     setIsSyncingCrm(false);
     setCrmError(null);
+    setFormStarted(false);
+    setFormCompleted(false);
+    completedFieldsRef.current = new Set();
+    abandonedTrackedRef.current = false;
   }, []);
 
   const handleClose = useCallback(() => {
+    trackAbandonIfNeeded();
     QUOTE_MODAL_ANALYTICS[variant].trackModalClose();
     resetForm();
     onClose();
-  }, [variant, onClose, resetForm]);
+  }, [variant, onClose, resetForm, trackAbandonIfNeeded]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isOpen) {
-      if (variant === "seguros") {
-        // Libera eventos do funil para a próxima abertura do modal
-        resetMetaPixelOnceKeys("InitiateCheckout:");
-        resetMetaPixelOnceKeys("Step_2_DadosPessoais:");
-        resetMetaPixelOnceKeys("Step_3_Resumo:");
-        resetMetaPixelOnceKeys("Lead:");
-      }
-      return;
-    }
-
-    QUOTE_MODAL_ANALYTICS[variant].trackModalOpen();
-    if (variant === "seguros") {
-      trackSegurosMetaInitiateCheckout();
+    if (isOpen) {
+      resetMetaPixelOnceKeys(`FormStarted:${variant}`);
+      resetMetaPixelOnceKeys(`FieldCompleted:${variant}`);
+      QUOTE_MODAL_ANALYTICS[variant].trackModalOpen();
     }
   }, [isOpen, variant]);
 
@@ -235,18 +259,37 @@ export function SegurosQuoteModal({
       if (event.key === "Escape") handleClose();
     };
 
+    const onPageHide = () => {
+      trackAbandonIfNeeded();
+    };
+
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("pagehide", onPageHide);
 
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pagehide", onPageHide);
     };
-  }, [handleClose, isOpen]);
+  }, [handleClose, isOpen, trackAbandonIfNeeded]);
 
   const updateField = <K extends keyof SegurosQuoteFormValues>(
     field: K,
     value: SegurosQuoteFormValues[K]
   ) => {
+    const fieldName = String(field);
+    const trimmed = typeof value === "string" ? value.trim() : "";
+
+    if (!formStarted && trimmed.length > 0) {
+      setFormStarted(true);
+      trackMetaFormStarted(variant, fieldName);
+    }
+
+    if (trimmed.length > 0 && !completedFieldsRef.current.has(fieldName)) {
+      completedFieldsRef.current.add(fieldName);
+      trackMetaFieldCompleted(variant, fieldName);
+    }
+
     setValues((current) => {
       const next = { ...current, [field]: value };
       if (field === "name" || field === "phone") {
@@ -318,23 +361,23 @@ export function SegurosQuoteModal({
       const stepErrors = validateQuoteStep(step as 1 | 2 | 3, values);
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors);
+        trackMetaFormError(variant, {
+          step,
+          fields: Object.keys(stepErrors).join(","),
+        });
         return;
       }
       if (step === 1) {
         try {
           await syncLeadToCrm("vehicle");
         } catch {
+          trackMetaFormError(variant, {
+            step,
+            fields: "crm_sync",
+            message: "CRM sync failed on vehicle step",
+          });
           return;
         }
-        if (variant === "seguros") {
-          trackSegurosMetaStep2({
-            vehicle_brand: values.model.trim(),
-            usage_type: mapUsageType(values.vehicleUse),
-          });
-        }
-      }
-      if (step === 2 && variant === "seguros") {
-        trackSegurosMetaStep3();
       }
     }
 
@@ -349,6 +392,10 @@ export function SegurosQuoteModal({
     const stepErrors = validateQuoteStep(3, values);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
+      trackMetaFormError(variant, {
+        step: 3,
+        fields: Object.keys(stepErrors).join(","),
+      });
       return;
     }
 
@@ -363,27 +410,28 @@ export function SegurosQuoteModal({
           : "";
 
       QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
+      const crmLeadIdFromResponse =
+        typeof crmData?.lead_id === "number" && crmData.lead_id > 0
+          ? crmData.lead_id
+          : crmLeadId ?? undefined;
+      const metaEventId =
+        typeof crmData?.meta_event_id === "string" && crmData.meta_event_id
+          ? crmData.meta_event_id
+          : undefined;
+
       QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
         vehicle_type: values.vehicleType,
         vehicle_use: values.vehicleUse,
+        lead_id: crmLeadIdFromResponse,
+        event_id: metaEventId,
       });
-
-      if (variant === "seguros") {
-        trackSegurosMetaLead({
-          email: values.email,
-          phone: values.phone,
-          name: values.name,
-          vehicle_brand: values.model.trim(),
-          vehicle_year: extractVehicleYear(values.model),
-          usage_type: mapUsageType(values.vehicleUse),
-        });
-      }
 
       if (typeof window !== "undefined") {
         sessionStorage.removeItem(SEGUROS_CRM_SESSION_STORAGE_KEY);
         clearCrmLeadId();
       }
 
+      setFormCompleted(true);
       setStep(4);
       QUOTE_MODAL_ANALYTICS[variant].trackFormStep(4);
 
@@ -391,6 +439,11 @@ export function SegurosQuoteModal({
         window.open(representativeLink, "_blank", "noopener,noreferrer");
       }
     } catch {
+      trackMetaFormError(variant, {
+        step: 3,
+        fields: "crm_sync",
+        message: "CRM sync failed on contact step",
+      });
       setIsSubmitting(false);
       return;
     }

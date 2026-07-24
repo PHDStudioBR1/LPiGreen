@@ -1,5 +1,6 @@
 import { trackGtagEvent } from "@/lib/analytics/gtag";
 import { pushDataLayer } from "@/lib/analytics/data-layer";
+import { isGtmContainerConfigured } from "@/lib/analytics/gtm-mode";
 import { mirrorChannelEventToPostHog, type PostHogCapture } from "@/lib/analytics/posthog-mirror";
 import {
   buildChannelEvent,
@@ -26,8 +27,9 @@ function browserPostHogCapture(): PostHogCapture | null {
 }
 
 /**
- * Dispara evento de canal em GA4 (gtag) + dataLayer (GTM) + PostHog.
- * Mantém gtag direto até o container GTM assumir 100% das tags.
+ * Dispara evento de canal em dataLayer (GTM) + PostHog.
+ * Com GTM configurado, não envia gtag direto (evita duplicar GA4 Channel Events).
+ * Sem GTM, mantém gtag direto como fallback.
  */
 export function trackChannelEvent(
   channel: MarketingChannel,
@@ -36,14 +38,16 @@ export function trackChannelEvent(
 ) {
   const payload: ChannelEventPayload = buildChannelEvent(channel, eventName, extra);
 
-  const gtagParams: Record<string, string | number | boolean> = {};
-  for (const [key, value] of Object.entries(payload)) {
-    if (key === "event") continue;
-    if (value === undefined) continue;
-    gtagParams[key] = value;
+  if (!isGtmContainerConfigured()) {
+    const gtagParams: Record<string, string | number | boolean> = {};
+    for (const [key, value] of Object.entries(payload)) {
+      if (key === "event") continue;
+      if (value === undefined) continue;
+      gtagParams[key] = value;
+    }
+    trackGtagEvent(eventName, gtagParams);
   }
 
-  trackGtagEvent(eventName, gtagParams);
   pushDataLayer(payload);
   mirrorChannelEventToPostHog(payload, browserPostHogCapture());
 }
