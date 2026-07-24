@@ -1,6 +1,7 @@
 import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { AttributionCapture } from '@/components/analytics/attribution-capture';
 import { GoogleTag } from '@/components/analytics/google-tag';
 import { GoogleTagManager } from '@/components/analytics/google-tag-manager';
 import { PostHogAnalytics } from '@/components/analytics/posthog-analytics';
@@ -45,6 +46,7 @@ export default function RootLayout({
         <GoogleTagManager />
         <GoogleTag />
         <PostHogAnalytics />
+        <AttributionCapture />
         {children}
         <Toaster />
       </body>

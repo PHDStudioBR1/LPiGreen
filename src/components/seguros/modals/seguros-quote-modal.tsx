@@ -43,6 +43,7 @@ import {
   trackSegurosMetaStep2,
   trackSegurosMetaStep3,
 } from "@/lib/analytics/meta-pixel";
+import { readStoredAttribution } from "@/lib/attribution/utm";
 import "@/app/seguros/seguros-quote-modal.css";
 
 export type SegurosQuoteModalVariant = "seguros" | "seguro-auto";
@@ -281,6 +282,7 @@ export function SegurosQuoteModal({
             session_id: sessionId,
             crm_lead_id: crmLeadId ?? undefined,
             funil: variant === "seguro-auto" ? "seguro-auto" : "seguros",
+            attribution: readStoredAttribution(),
             values,
           }),
         });

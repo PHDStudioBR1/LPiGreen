@@ -14,6 +14,11 @@ import {
 } from "@/lib/crm/phd-crm-client";
 import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
 import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
+import {
+  attributionToCustomValues,
+  sanitizeAttribution,
+  type Attribution,
+} from "@/lib/attribution/utm";
 
 export const runtime = "nodejs";
 
@@ -23,6 +28,7 @@ type TelecomCrmPayload = {
   step: TelecomCrmStep;
   session_id?: string;
   crm_lead_id?: number;
+  attribution?: Attribution;
   values?: {
     activationType?: string;
     name?: string;
@@ -157,6 +163,11 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Tele
   } else {
     customValues.telecom_quote_status = "activation_selected";
   }
+
+  Object.assign(
+    customValues,
+    attributionToCustomValues(sanitizeAttribution(payload.attribution))
+  );
 
   Object.keys(customValues).forEach((key) => {
     if (!customValues[key]) delete customValues[key];

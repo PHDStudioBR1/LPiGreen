@@ -24,6 +24,7 @@ import {
   trackTelecomModalOpen,
   trackTelecomPlanSelect,
 } from "@/lib/telecom/analytics";
+import { readStoredAttribution } from "@/lib/attribution/utm";
 import "@/app/telecom/telecom-quote-modal.css";
 
 export type TelecomQuoteModalProps = {
@@ -173,6 +174,7 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
           step: crmStep,
           session_id: crmSessionId,
           crm_lead_id: crmLeadId ?? undefined,
+          attribution: readStoredAttribution(),
           values: payloadValues,
         }),
       });

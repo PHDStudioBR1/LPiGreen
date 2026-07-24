@@ -33,6 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { maskCep, maskPhone, maskCpfCnpj, maskCurrency, maskBirthDate } from "@/lib/masks";
 import { validateBirthDateMinAge } from "@/lib/validation";
+import { readStoredAttribution } from "@/lib/attribution/utm";
 
 /** Rótulos amigáveis para exibir erros (não técnicos). */
 const FIELD_LABELS: Record<string, string> = {
@@ -571,6 +572,7 @@ export function LeadFormModal({ isOpen, onClose, analytics }: LeadFormModalProps
             session_id: sessionId,
             mysql_lead_id: data.id,
             source: "site_captacao",
+            attribution: readStoredAttribution(),
             values: {
               name: values.name,
               phone: values.phone,

@@ -12,6 +12,11 @@ import {
 } from "@/lib/crm/phd-crm-client";
 import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
 import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
+import {
+  attributionToCustomValues,
+  sanitizeAttribution,
+  type Attribution,
+} from "@/lib/attribution/utm";
 
 export const runtime = "nodejs";
 
@@ -19,6 +24,7 @@ type CaptacaoCrmPayload = {
   session_id?: string;
   mysql_lead_id?: number;
   source?: string;
+  attribution?: Attribution;
   values?: {
     name?: string;
     phone?: string;
@@ -83,6 +89,11 @@ function buildLeadPayload(
   if (payload.mysql_lead_id != null) {
     customValues.mysql_lead_id = String(payload.mysql_lead_id);
   }
+
+  Object.assign(
+    customValues,
+    attributionToCustomValues(sanitizeAttribution(payload.attribution))
+  );
 
   Object.keys(customValues).forEach((key) => {
     if (!customValues[key]) delete customValues[key];
