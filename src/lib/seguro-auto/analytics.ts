@@ -1,5 +1,6 @@
 import { trackChannelEvent } from "@/lib/analytics/track-channel";
 import { buildFormSubmitEvents } from "@/lib/analytics/lead-conversion";
+import { trackMetaCustom } from "@/lib/analytics/meta-pixel";
 import {
   trackMetaFormProgress,
   trackMetaLeadConversion,
@@ -31,8 +32,13 @@ export function trackSeguroAutoCTAClick(location: string) {
   });
 }
 
-export function trackSeguroAutoQuoteClick(location: string) {
+export function trackSeguroAutoQuoteClick(location: string, buttonLabel?: string) {
   trackSeguroAutoCTAClick(location);
+  trackMetaCustom("Click_CTA", {
+    funnel: FUNNEL,
+    location,
+    button_label: buttonLabel ?? location,
+  });
 }
 
 export function trackSeguroAutoWhatsAppClick(location: string) {
