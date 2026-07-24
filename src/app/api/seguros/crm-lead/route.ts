@@ -13,6 +13,11 @@ import {
 } from "@/lib/crm/phd-crm-client";
 import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
 import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
+import {
+  attributionToCustomValues,
+  sanitizeAttribution,
+  type Attribution,
+} from "@/lib/attribution/utm";
 
 export const runtime = "nodejs";
 
@@ -24,6 +29,7 @@ type SegurosCrmPayload = {
   session_id?: string;
   crm_lead_id?: number;
   funil?: SegurosFunil;
+  attribution?: Attribution;
   values?: {
     vehicleType?: string;
     plate?: string;
@@ -116,6 +122,11 @@ function buildLeadPayload(config: ReturnType<typeof getCrmConfig>, payload: Segu
   } else {
     customValues.seguros_quote_status = "vehicle_completed";
   }
+
+  Object.assign(
+    customValues,
+    attributionToCustomValues(sanitizeAttribution(payload.attribution))
+  );
 
   Object.keys(customValues).forEach((key) => {
     if (!customValues[key]) delete customValues[key];
