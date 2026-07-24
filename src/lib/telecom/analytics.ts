@@ -1,12 +1,28 @@
 import { trackChannelEvent } from "@/lib/analytics/track-channel";
+import { buildFormSubmitEvents } from "@/lib/analytics/lead-conversion";
+import {
+  trackMetaFormProgress,
+  trackMetaLeadConversion,
+  trackMetaQuoteStarted,
+} from "@/lib/analytics/meta-events";
 
 const CHANNEL = "telecom" as const;
+const FUNNEL = "telecom" as const;
 
 function resolvePagePath(): string {
   if (typeof window !== "undefined") {
     return window.location.pathname;
   }
   return "/telecom";
+}
+
+function emitPayloads(
+  events: ReturnType<typeof buildFormSubmitEvents>
+) {
+  for (const payload of events) {
+    const { event, ...extra } = payload;
+    trackChannelEvent(CHANNEL, event, extra);
+  }
 }
 
 export function trackTelecomPageView() {
@@ -65,6 +81,7 @@ export function trackTelecomModalOpen() {
     step: "quote_started",
     page_path: resolvePagePath(),
   });
+  trackMetaQuoteStarted(FUNNEL);
 }
 
 export function trackTelecomModalClose() {
@@ -79,6 +96,7 @@ export function trackTelecomFormStep(step: number) {
     form_step: step,
     page_path: resolvePagePath(),
   });
+  trackMetaFormProgress(FUNNEL, step);
 }
 
 export function trackTelecomPlanSelect(plan: string) {
@@ -91,20 +109,29 @@ export function trackTelecomPlanSelect(plan: string) {
 export function trackTelecomFormSubmit(params: {
   plan_type: string;
   portability: string;
+  lead_id?: string | number;
+  event_id?: string;
 }) {
   const page_path = resolvePagePath();
-  trackChannelEvent(CHANNEL, "telecom_form_submit", {
-    step: "form_submit",
-    ...params,
-    page_path,
-  });
-  trackChannelEvent(CHANNEL, "generate_lead", {
-    step: "lead_created",
-    ...params,
-    page_path,
-    lead_source: "telecom_form",
-    currency: "BRL",
-    value: 1,
+  emitPayloads(
+    buildFormSubmitEvents({
+      channel: CHANNEL,
+      formEvent: "telecom_form_submit",
+      leadSource: "telecom_form",
+      pagePath: page_path,
+      leadId: params.lead_id,
+      extra: {
+        plan_type: params.plan_type,
+        portability: params.portability,
+        ...(params.event_id ? { event_id: params.event_id } : {}),
+      },
+    })
+  );
+  trackMetaLeadConversion(FUNNEL, {
+    plan_type: params.plan_type,
+    portability: params.portability,
+    lead_id: params.lead_id,
+    event_id: params.event_id,
   });
 }
 

@@ -57,7 +57,12 @@ type QuoteModalAnalytics = {
   trackModalOpen: () => void;
   trackModalClose: () => void;
   trackFormStep: (step: number) => void;
-  trackFormSubmit: (params: { vehicle_type: string; vehicle_use: string }) => void;
+  trackFormSubmit: (params: {
+    vehicle_type: string;
+    vehicle_use: string;
+    lead_id?: string | number;
+    event_id?: string;
+  }) => void;
 };
 
 const QUOTE_MODAL_ANALYTICS: Record<SegurosQuoteModalVariant, QuoteModalAnalytics> = {
@@ -405,9 +410,20 @@ export function SegurosQuoteModal({
           : "";
 
       QUOTE_MODAL_ANALYTICS[variant].trackFormStep(3);
+      const crmLeadIdFromResponse =
+        typeof crmData?.lead_id === "number" && crmData.lead_id > 0
+          ? crmData.lead_id
+          : crmLeadId ?? undefined;
+      const metaEventId =
+        typeof crmData?.meta_event_id === "string" && crmData.meta_event_id
+          ? crmData.meta_event_id
+          : undefined;
+
       QUOTE_MODAL_ANALYTICS[variant].trackFormSubmit({
         vehicle_type: values.vehicleType,
         vehicle_use: values.vehicleUse,
+        lead_id: crmLeadIdFromResponse,
+        event_id: metaEventId,
       });
 
       if (typeof window !== "undefined") {

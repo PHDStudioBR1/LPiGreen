@@ -7,6 +7,7 @@ import {
   getTelecomServiceSchema,
 } from "@/lib/telecom/seo";
 import { TELECOM_SITE_URL } from "@/lib/telecom/constants";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import "./telecom.css";
 
 const inter = Inter({
@@ -88,6 +89,7 @@ export default function TelecomLayout({
 
   return (
     <div className={`${inter.variable} ${plusJakarta.variable}`}>
+      <MetaPixel funnel="telecom" />
       {schemas.map((schema, i) => (
         <script
           key={i}

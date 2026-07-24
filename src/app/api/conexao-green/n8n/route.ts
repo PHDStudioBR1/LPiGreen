@@ -12,6 +12,11 @@ import {
 } from "@/lib/crm/phd-crm-client";
 import { getRepresentativeLinkForSegment } from "@/lib/random-service/client";
 import { PAGE_SEGMENT_MAP } from "@/lib/random-service/segments";
+import {
+  buildMetaCapiEventId,
+  clientIpFromHeaders,
+  sendMetaCapiLead,
+} from "@/lib/analytics/meta-capi";
 
 export const runtime = "nodejs";
 
@@ -213,6 +218,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let metaEventId = buildMetaCapiEventId(lead.id, "Lead");
+    const capi = await sendMetaCapiLead({
+      funnel: "home",
+      leadId: lead.id,
+      phone: phoneDigits,
+      eventSourceUrl: request.headers.get("referer") || undefined,
+      clientIp: clientIpFromHeaders(request.headers),
+      clientUserAgent: request.headers.get("user-agent") || undefined,
+    });
+    if (!capi.ok) {
+      console.error("Conexao Green Meta CAPI:", capi.error, {
+        lead_id: lead.id,
+        status: capi.status,
+      });
+    }
+    if (capi.eventId) metaEventId = capi.eventId;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -222,6 +244,7 @@ export async function POST(request: NextRequest) {
         rotation_approved: rotationApproved,
         representative_link: representativeLink,
         n8n_skipped: n8nResult.skipped,
+        meta_event_id: metaEventId,
       },
     });
   } catch (error) {

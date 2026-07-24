@@ -39,6 +39,17 @@ const DEFAULT_SECTIONS: Partial<Record<MetaPixelFunnel, string[]>> = {
     "faq",
   ],
   home: ["inicio", "simulador", "igreen-club", "depoimentos", "faq"],
+  telecom: [
+    "inicio",
+    "beneficios",
+    "planos",
+    "comparativo",
+    "como-funciona",
+    "clube",
+    "depoimentos",
+    "faq",
+    "cta-final",
+  ],
 };
 
 /**

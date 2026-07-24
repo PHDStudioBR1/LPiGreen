@@ -1,4 +1,5 @@
 import { trackChannelEvent } from "@/lib/analytics/track-channel";
+import { buildFormSubmitEvents } from "@/lib/analytics/lead-conversion";
 import {
   trackMetaFormProgress,
   trackMetaLeadConversion,
@@ -99,21 +100,25 @@ export function trackSegurosPlanSelect(plan: string) {
 export function trackSegurosFormSubmit(params: {
   vehicle_type: string;
   vehicle_use: string;
+  lead_id?: string | number;
+  event_id?: string;
 }) {
   const page_path = resolvePagePath();
-  trackChannelEvent(CHANNEL, "seguros_form_submit", {
-    step: "form_submit",
-    ...params,
-    page_path,
-  });
-  trackChannelEvent(CHANNEL, "generate_lead", {
-    step: "lead_created",
-    ...params,
-    page_path,
-    lead_source: "seguros_form",
-    currency: "BRL",
-    value: 1,
-  });
+  for (const payload of buildFormSubmitEvents({
+    channel: CHANNEL,
+    formEvent: "seguros_form_submit",
+    leadSource: "seguros_form",
+    pagePath: page_path,
+    leadId: params.lead_id,
+    extra: {
+      vehicle_type: params.vehicle_type,
+      vehicle_use: params.vehicle_use,
+      ...(params.event_id ? { event_id: params.event_id } : {}),
+    },
+  })) {
+    const { event, ...extra } = payload;
+    trackChannelEvent(CHANNEL, event, extra);
+  }
   trackMetaLeadConversion(FUNNEL, params);
 }
 

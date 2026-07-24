@@ -1,8 +1,9 @@
-/** Pixel Meta por funil. Home só carrega se NEXT_PUBLIC_META_PIXEL_ID_HOME estiver definido. */
+/** Pixel Meta por funil. Home/telecom só carregam se o env respectivo estiver definido. */
 export const META_PIXEL_IDS = {
   seguros: "1051522610657600",
   "seguro-auto": "2456316114837467",
   home: process.env.NEXT_PUBLIC_META_PIXEL_ID_HOME ?? "",
+  telecom: process.env.NEXT_PUBLIC_META_PIXEL_ID_TELECOM ?? "",
 } as const;
 
 export type MetaPixelFunnel = keyof typeof META_PIXEL_IDS;
@@ -92,10 +93,15 @@ export function getMetaPageContext() {
 export function trackMetaStandard(
   eventName: string,
   params?: MetaEventParams,
-  options?: { onceKey?: string }
+  options?: { onceKey?: string; eventID?: string }
 ) {
   if (!canTrack() || !shouldFireOnce(options?.onceKey)) return;
-  window.fbq!("track", eventName, sanitizeParams(params));
+  const clean = sanitizeParams(params);
+  if (options?.eventID) {
+    window.fbq!("track", eventName, clean, { eventID: options.eventID });
+    return;
+  }
+  window.fbq!("track", eventName, clean);
 }
 
 /** Custom Meta event (LandingVisited, CTA_Click, ScrollDepth, etc.) */

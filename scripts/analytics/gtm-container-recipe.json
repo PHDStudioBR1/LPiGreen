@@ -1,54 +1,114 @@
 {
   "container_id": "GTM-K97WRGZK",
-  "notes": "Configurar no painel GTM. dataLayer já emite estes campos via trackChannelEvent.",
+  "live_version": "5",
+  "live_version_name": "iGreen pause generate_lead_attribution duplicate (após v4 quotes+generate_lead+lead_id)",
+  "notes": "dataLayer via trackChannelEvent. Com NEXT_PUBLIC_GTM_ID setado, o app não envia gtag direto dos eventos de canal. GTM publicado com aprovação 2026-07-23.",
   "variables": [
     { "type": "Data Layer Variable", "name": "dlv - channel", "path": "channel" },
     { "type": "Data Layer Variable", "name": "dlv - crm_source", "path": "crm_source" },
     { "type": "Data Layer Variable", "name": "dlv - step", "path": "step" },
     { "type": "Data Layer Variable", "name": "dlv - page_path", "path": "page_path" },
-    { "type": "Data Layer Variable", "name": "dlv - lead_id", "path": "lead_id" }
+    { "type": "Data Layer Variable", "name": "dlv - lead_id", "path": "lead_id" },
+    { "type": "Data Layer Variable", "name": "dlv - event_id", "path": "event_id" }
   ],
   "triggers": [
     {
       "name": "CE - channel events",
       "type": "Custom Event",
-      "event_name": ".*",
-      "use_regex": true,
-      "filter": "Event does not equal gtm.js / gtm.dom / gtm.load"
+      "event_name": "^(?!gtm\\.).+",
+      "use_regex": true
     },
     {
       "name": "CE - form_submit",
       "type": "Custom Event",
-      "event_name": ".*_form_submit|form_submit",
+      "event_name": ".*_form_submit",
       "use_regex": true
     },
     {
       "name": "CE - whatsapp_click",
       "type": "Custom Event",
-      "event_name": ".*whatsapp.*|whatsapp_click",
+      "event_name": ".*whatsapp_click",
       "use_regex": true
+    },
+    {
+      "name": "CE - generate_lead",
+      "type": "Custom Event",
+      "event_name": "generate_lead",
+      "use_regex": false
     }
   ],
   "tags": [
     {
-      "name": "GA4 - Event",
+      "name": "GA4 - Config",
+      "type": "Google Tag",
+      "measurement_id": "G-6S3NG2330K",
+      "send_page_view": true,
+      "trigger": "All Pages",
+      "status": "live"
+    },
+    {
+      "name": "GA4 - Channel Events",
       "type": "Google Analytics: GA4 Event",
-      "measurement_id": "G-XXXX (preencher)",
+      "measurement_id": "G-6S3NG2330K",
       "event_name": "{{Event}}",
       "params": {
         "channel": "{{dlv - channel}}",
         "crm_source": "{{dlv - crm_source}}",
         "step": "{{dlv - step}}",
-        "page_path": "{{dlv - page_path}}"
+        "page_path": "{{dlv - page_path}}",
+        "lead_id": "{{dlv - lead_id}}"
       },
-      "trigger": "CE - channel events"
+      "trigger": "CE - channel events",
+      "status": "live"
     },
     {
-      "name": "Meta - Lead (form_submit)",
-      "type": "Custom HTML or Meta Pixel Event",
-      "event": "Lead",
-      "params": { "content_name": "{{dlv - channel}}", "content_category": "{{dlv - crm_source}}" },
+      "name": "Meta - Lead form_submit (paused)",
+      "type": "Custom HTML",
+      "status": "paused",
       "trigger": "CE - form_submit"
+    },
+    {
+      "name": "Meta - Contact whatsapp (paused broken)",
+      "type": "Custom HTML",
+      "status": "paused",
+      "trigger": "CE - whatsapp_click"
+    },
+    {
+      "name": "Meta - Contact whatsapp",
+      "type": "Custom HTML",
+      "event": "Contact",
+      "html": "<script>\n  if (typeof fbq === 'function') {\n    fbq('track', 'Contact', {\n      content_name: '{{dlv - channel}}',\n      content_category: '{{dlv - crm_source}}'\n    });\n  }\n</script>",
+      "params": {
+        "content_name": "'{{dlv - channel}}'",
+        "content_category": "'{{dlv - crm_source}}'"
+      },
+      "trigger": "CE - whatsapp_click",
+      "status": "live"
+    },
+    {
+      "name": "Meta - Lead generate_lead",
+      "type": "Custom HTML",
+      "event": "Lead",
+      "html": "<script>\n  if (typeof fbq === 'function') {\n    fbq('track', 'Lead', {\n      content_name: '{{dlv - channel}}',\n      content_category: '{{dlv - crm_source}}',\n      lead_id: '{{dlv - lead_id}}'\n    }, { eventID: '{{dlv - event_id}}' });\n  }\n</script>",
+      "params": {
+        "content_name": "'{{dlv - channel}}'",
+        "content_category": "'{{dlv - crm_source}}'"
+      },
+      "trigger": "CE - generate_lead",
+      "status": "live",
+      "notes": "Deduplicar com CAPI server (mesmo event_id). Atualizar no GTM só com aprovação."
+    },
+    {
+      "name": "Meta Pixel - Código Base (PageView)",
+      "type": "Custom HTML",
+      "status": "live",
+      "notes": "Init pixel seguros 1051522610657600 em All Pages (existente antes desta publicação)"
+    },
+    {
+      "name": "GA4 - generate_lead lead_id (paused unused)",
+      "type": "Custom HTML",
+      "status": "paused",
+      "notes": "Workaround temporário; lead_id já no Channel Events"
     }
   ],
   "channels": {
@@ -57,5 +117,10 @@
     "seguros": "site_seguros",
     "seguro_auto": "site_seguro_auto",
     "home": "site_captacao"
-  }
+  },
+  "pending_gtm_publish": [
+    "Adicionar dlv - event_id",
+    "Meta - Lead generate_lead: passar eventID no fbq para dedupe com CAPI",
+    "Não publicar sem aprovação explícita"
+  ]
 }

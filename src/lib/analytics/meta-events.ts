@@ -4,8 +4,9 @@ import {
   trackMetaStandard,
   type MetaEventParams,
 } from "@/lib/analytics/meta-pixel";
+import { isGtmContainerConfigured } from "@/lib/analytics/gtm-mode";
 
-export type MetaFunnel = "seguros" | "seguro-auto";
+export type MetaFunnel = "seguros" | "seguro-auto" | "telecom";
 
 function withContext(funnel: MetaFunnel, params?: MetaEventParams) {
   return { funnel, ...getMetaPageContext(), ...params };
@@ -88,19 +89,37 @@ export function trackMetaQuoteCompleted(
 /** Standard conversions after successful quote submit */
 export function trackMetaLeadConversion(
   funnel: MetaFunnel,
-  params?: MetaEventParams
+  params?: MetaEventParams & { event_id?: string }
 ) {
+  const contentByFunnel: Record<MetaFunnel, { name: string; category: string }> = {
+    seguros: { name: "Seguros Quote", category: "insurance_quote" },
+    "seguro-auto": { name: "Seguro Auto Quote", category: "insurance_quote" },
+    telecom: { name: "Telecom Quote", category: "telecom_quote" },
+  };
+  const content = contentByFunnel[funnel];
+  const eventID =
+    typeof params?.event_id === "string" && params.event_id
+      ? params.event_id
+      : undefined;
+
+  const { event_id: _eventId, ...rest } = params || {};
   const payload = withContext(funnel, {
-    content_name: funnel === "seguro-auto" ? "Seguro Auto Quote" : "Seguros Quote",
-    content_category: "insurance_quote",
+    content_name: content.name,
+    content_category: content.category,
     currency: "BRL",
     value: 1,
-    ...params,
+    ...rest,
   });
 
-  trackMetaStandard("Lead", payload);
-  trackMetaFormSubmitted(funnel, params);
-  trackMetaQuoteCompleted(funnel, params);
-  // Success UI is in-modal (no /sucesso route) — treat as registration complete
-  trackMetaStandard("CompleteRegistration", payload);
+  // Com GTM ativo, Lead/CompleteRegistration vêm das tags do container (evita triplicar).
+  // Sem GTM, dispara Pixel com eventID para dedupe com CAPI server-side.
+  if (!isGtmContainerConfigured()) {
+    trackMetaStandard("Lead", payload, { eventID });
+    trackMetaStandard("CompleteRegistration", payload, {
+      eventID: eventID ? eventID.replace(/-Lead$/, "-CompleteRegistration") : undefined,
+    });
+  }
+
+  trackMetaFormSubmitted(funnel, rest);
+  trackMetaQuoteCompleted(funnel, rest);
 }

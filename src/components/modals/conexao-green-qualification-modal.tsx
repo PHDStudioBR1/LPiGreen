@@ -23,7 +23,6 @@ import { useToast } from "@/hooks/use-toast";
 import { maskCurrency, maskPhone, unmaskCurrency } from "@/lib/masks";
 import { projectedAnnualSavingsFromMonthly } from "@/lib/conexao-green-savings";
 import {
-  trackHomeFormStep,
   trackHomeFormSubmit,
 } from "@/lib/home/analytics";
 
@@ -149,8 +148,21 @@ export function ConexaoGreenQualificationModal({
         description:
           "Em instantes nosso time continua a conversa com você no WhatsApp — sem custo oculto e sem compromisso.",
       });
-      trackHomeFormStep(1);
-      trackHomeFormSubmit({ valor_medio_fatura: valorNum });
+      const homeLeadId =
+        typeof result?.data?.lead_id === "number" && result.data.lead_id > 0
+          ? result.data.lead_id
+          : typeof result?.data?.crm_lead_id === "number" && result.data.crm_lead_id > 0
+            ? result.data.crm_lead_id
+            : undefined;
+      const homeEventId =
+        typeof result?.data?.meta_event_id === "string" && result.data.meta_event_id
+          ? result.data.meta_event_id
+          : undefined;
+      trackHomeFormSubmit({
+        valor_medio_fatura: valorNum,
+        lead_id: homeLeadId,
+        event_id: homeEventId,
+      });
       onClose();
 
       const representativeLink =

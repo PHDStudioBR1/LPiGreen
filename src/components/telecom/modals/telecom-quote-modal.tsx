@@ -244,13 +244,23 @@ export function TelecomQuoteModal({ isOpen, onClose }: TelecomQuoteModalProps) {
     setErrors({});
     setIsSubmitting(true);
     trackTelecomFormStep(3);
-    trackTelecomFormSubmit({
-      plan_type: values.selectedPlan,
-      portability: values.activationType === "portabilidade" ? "yes" : "no",
-    });
     trackTelecomPlanSelect(values.selectedPlan);
     try {
       const crmData = await syncCrm("contact");
+      const resolvedLeadId =
+        typeof crmData?.lead_id === "number" && crmData.lead_id > 0
+          ? crmData.lead_id
+          : crmLeadId ?? undefined;
+      const metaEventId =
+        typeof crmData?.meta_event_id === "string" && crmData.meta_event_id
+          ? crmData.meta_event_id
+          : undefined;
+      trackTelecomFormSubmit({
+        plan_type: values.selectedPlan,
+        portability: values.activationType === "portabilidade" ? "yes" : "no",
+        lead_id: resolvedLeadId,
+        event_id: metaEventId,
+      });
       if (typeof window !== "undefined") {
         sessionStorage.removeItem(TELECOM_CRM_SESSION_STORAGE_KEY);
         clearCrmLeadId();

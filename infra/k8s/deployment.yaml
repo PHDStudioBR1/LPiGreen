@@ -96,6 +96,18 @@ spec:
               name: smtp-secret
               key: notify-enabled
               optional: true
+        - name: META_CAPI_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: meta-capi-secret
+              key: access-token
+              optional: true
+        - name: META_CAPI_TEST_EVENT_CODE
+          valueFrom:
+            secretKeyRef:
+              name: meta-capi-secret
+              key: test-event-code
+              optional: true
         - name: SMTP_HOST
           valueFrom:
             secretKeyRef:
