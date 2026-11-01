@@ -37,6 +37,28 @@ html:has(.telecom-page) {
   border: 1px solid rgba(108, 58, 237, 0.08);
 }
 
+/* Campanha eSIM — banner promocional modular */
+.telecom-promo-banner {
+  box-shadow:
+    0 0 0 1px rgba(0, 230, 118, 0.2),
+    0 0 40px rgba(0, 230, 118, 0.18),
+    inset 0 1px 0 rgba(0, 230, 118, 0.12);
+}
+
+.telecom-promo-badge {
+  animation: telecom-promo-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes telecom-promo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 230, 118, 0);
+  }
+}
+
 .telecom-glow {
   box-shadow: 0 4px 24px rgba(108, 58, 237, 0.12);
 }

@@ -20,6 +20,19 @@ export const TELECOM_SITE_URL =
 export const TELECOM_WHATSAPP_URL =
   "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20contratar%20o%20Telecom%20iGreen.";
 
+/** Extrai o número de `TELECOM_WHATSAPP_URL` e monta um link com mensagem customizada. */
+export function buildTelecomWhatsAppUrl(message: string): string {
+  const match = TELECOM_WHATSAPP_URL.match(/wa\.me\/(\d+)/);
+  const number = match?.[1] ?? "5500000000000";
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
+export const TELECOM_PROMO_ESIM_WHATSAPP_MESSAGE =
+  "Olá! Vi a promoção de 1º Mês Grátis no site. Quero fazer a portabilidade do meu número para o eSIM no Plano Start e ativar meu voucher!";
+
+/** Flag global da campanha eSIM — desative aqui ou passe `isPromoActive={false}` no componente. */
+export const TELECOM_PROMO_ESIM_ACTIVE = true;
+
 export const TELECOM_HEADER_OFFSET = 110;
 
 export const TELECOM_LOGO_SRC = "/images/logo_igreen_telecom_branco.png";

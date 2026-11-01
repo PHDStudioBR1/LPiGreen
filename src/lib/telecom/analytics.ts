@@ -4,6 +4,7 @@ import {
   trackMetaFormProgress,
   trackMetaLeadConversion,
   trackMetaQuoteStarted,
+  trackMetaWhatsAppContact,
 } from "@/lib/analytics/meta-events";
 
 const CHANNEL = "telecom" as const;
@@ -59,6 +60,11 @@ export function trackTelecomWhatsAppClick(location: string) {
     lead_source: "whatsapp",
     currency: "BRL",
     value: 1,
+  });
+  trackMetaWhatsAppContact(FUNNEL, {
+    location,
+    content_name: "Telecom WhatsApp",
+    content_category: "whatsapp_cta",
   });
 }
 

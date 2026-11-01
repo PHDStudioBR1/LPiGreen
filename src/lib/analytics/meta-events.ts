@@ -16,6 +16,15 @@ export function trackMetaQuoteStarted(funnel: MetaFunnel) {
   trackMetaCustom("QuoteStarted", withContext(funnel));
 }
 
+/** Clique em CTA WhatsApp (ex.: banner promocional). */
+export function trackMetaWhatsAppContact(
+  funnel: MetaFunnel,
+  params?: MetaEventParams
+) {
+  trackMetaStandard("Contact", withContext(funnel, params));
+  trackMetaCustom("WhatsAppClick", withContext(funnel, params));
+}
+
 export function trackMetaFormStarted(funnel: MetaFunnel, field?: string) {
   trackMetaCustom("FormStarted", withContext(funnel, { first_field: field || "" }), {
     onceKey: `FormStarted:${funnel}:${getMetaPageContext().page_path}`,
