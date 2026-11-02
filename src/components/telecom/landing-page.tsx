@@ -14,7 +14,7 @@ import { ClubSection } from "@/components/telecom/sections/club-section";
 import { TestimonialsSection } from "@/components/telecom/sections/testimonials-section";
 import { FaqSection } from "@/components/telecom/sections/faq-section";
 import { CtaBanner } from "@/components/telecom/sections/cta-banner";
-import { Footer } from "@/components/telecom/footer/footer";
+import { FooterTelecom } from "@/components/telecom/footer/FooterTelecom";
 import { StickyMobileBar } from "@/components/telecom/floating/sticky-mobile-bar";
 import { ScrollCta } from "@/components/telecom/floating/scroll-cta";
 import { ExitIntentPopup } from "@/components/telecom/floating/exit-intent-popup";
@@ -60,7 +60,7 @@ export function TelecomLandingPage() {
           <CtaBanner onQuoteClick={openQuote} />
         </main>
 
-        <Footer />
+        <FooterTelecom />
       </div>
 
       <StickyMobileBar onQuoteClick={openQuote} />

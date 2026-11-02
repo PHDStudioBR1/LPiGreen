@@ -52,7 +52,7 @@ export function PromoBanner({
                 </span>
 
                 <h2 className="mt-3 font-tc-headline text-[clamp(1.2rem,3.6vw,1.85rem)] font-extrabold leading-tight tracking-tight text-white">
-                  1º MÊS GRÁTIS: Traga seu número para o eSIM iGreen!
+                  1º MÊS GRÁTIS: Traga seu número para a iGreen Telecom!
                 </h2>
 
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-[15px]">

@@ -9,7 +9,7 @@ type WhatsAppButtonProps = {
 
 export function WhatsAppButton({
   onClick,
-  href = "https://wa.me/5500000000000",
+  href = "https://wa.me/5511920880275",
 }: WhatsAppButtonProps) {
   const className =
     "fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition-transform hover:scale-110 active:scale-95 animate-pulse-soft";

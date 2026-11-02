@@ -3,7 +3,7 @@ export const SEGURO_AUTO_SITE_URL =
   "https://centraldobeneficioenergia.com.br";
 
 export const SEGURO_AUTO_WHATSAPP_URL =
-  "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20seguro%20auto%20iGreen.";
+  "https://wa.me/5511920880275?text=Ol%C3%A1%21%20Quero%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20seguro%20auto%20iGreen.";
 
 export const SEGURO_AUTO_HEADER_OFFSET = 108;
 

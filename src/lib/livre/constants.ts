@@ -9,7 +9,7 @@ export const LIVRE_LOGO_SRC = "/images/livre/logo_igreen_livre_branco.svg";
 export const LIVRE_LOGO_ALT = "Conexão Livre iGreen";
 
 export const LIVRE_WHATSAPP_URL =
-  "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20saber%20mais%20sobre%20a%20Conex%C3%A3o%20Livre%20iGreen.";
+  "https://wa.me/5511920880275?text=Ol%C3%A1%21%20Quero%20saber%20mais%20sobre%20a%20Conex%C3%A3o%20Livre%20iGreen.";
 
 export const LIVRE_CONTACT_EMAIL = "contato@igreenenergy.com.br";
 export const LIVRE_CONTACT_PHONE = "0800 183 0080";

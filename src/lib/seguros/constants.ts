@@ -9,7 +9,7 @@ export const SEGUROS_COLORS = {
 } as const;
 
 export const SEGUROS_WHATSAPP_URL =
-  "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20seguro%20iGreen.";
+  "https://wa.me/5511920880275?text=Ol%C3%A1%21%20Quero%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20seguro%20iGreen.";
 
 export const SEGUROS_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://centraldobeneficioenergia.com.br";

@@ -18,12 +18,12 @@ export const TELECOM_SITE_URL =
   "https://centraldobeneficioenergia.com.br";
 
 export const TELECOM_WHATSAPP_URL =
-  "https://wa.me/5500000000000?text=Ol%C3%A1%21%20Quero%20contratar%20o%20Telecom%20iGreen.";
+  "https://wa.me/5511920880275?text=Ol%C3%A1%21%20Quero%20contratar%20o%20Telecom%20iGreen.";
 
 /** Extrai o número de `TELECOM_WHATSAPP_URL` e monta um link com mensagem customizada. */
 export function buildTelecomWhatsAppUrl(message: string): string {
   const match = TELECOM_WHATSAPP_URL.match(/wa\.me\/(\d+)/);
-  const number = match?.[1] ?? "5500000000000";
+  const number = match?.[1] ?? "5511920880275";
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
